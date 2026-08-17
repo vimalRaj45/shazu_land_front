@@ -489,43 +489,148 @@
     </section>
 
     <!-- Membership Registration Form Section -->
-    <section data-aos="fade-up" id="form-section" class="py-12 md:py-10 md:py-12 bg-white border-t border-brand-border">
-      <div class="max-w-xl mx-auto px-6">
-        <div class="text-center mb-8">
-          <h2 class="text-2xl md:text-[30px] font-black text-brand-darkText tracking-tighter leading-[1.12] font-heading">Registration Form</h2>
-          <p class="text-xs text-brand-secText mt-2">Submit your details to apply for membership.</p>
+    <section data-aos="fade-up" id="form-section" class="py-14 md:py-16 bg-[#F8FAFC] dark:bg-[#0B1120] border-t border-brand-border dark:border-slate-800 transition-colors">
+      <div class="max-w-3xl mx-auto px-4 sm:px-6">
+        
+        <div class="text-center mb-10 space-y-2">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700">
+            <i class="bi bi-person-badge-fill"></i> Membership Application Portal
+          </span>
+          <h2 class="text-2xl md:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight font-heading">
+            Apply for Membership
+          </h2>
+          <p class="text-xs md:text-sm text-slate-600 dark:text-slate-400 max-w-lg mx-auto">
+            Join the Shazu Soft Technologies global scientific and engineering community. Please complete all required sections below.
+          </p>
         </div>
 
-        <form id="membership-form" class="space-y-5 border border-brand-border p-5 rounded-xl bg-[#F1F8F5]/30">
-          <div class="space-y-1">
-            <label for="member-name" class="block text-xs font-bold text-brand-darkText">Applicant Name *</label>
-            <input type="text" id="member-name" required placeholder="Enter full name" class="w-full border border-brand-border bg-white p-2.5 rounded-lg text-sm text-brand-darkText focus:bg-white focus:outline-none">
-          </div>
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-10 shadow-xl space-y-8">
           
-          <div class="space-y-1">
-            <label for="member-email" class="block text-xs font-bold text-brand-darkText">Email Address *</label>
-            <input type="email" id="member-email" required placeholder="name@university.edu" class="w-full border border-brand-border bg-white p-2.5 rounded-lg text-sm text-brand-darkText focus:bg-white focus:outline-none">
-          </div>
+          <form id="membership-form" class="space-y-6">
+            
+            <!-- Section 1: Association & Category -->
+            <div class="space-y-4">
+              <div class="flex items-center gap-2 pb-2 border-b border-slate-100 dark:border-slate-800">
+                <span class="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 flex items-center justify-center text-xs font-bold font-mono">1</span>
+                <h3 class="text-sm font-bold text-slate-900 dark:text-white font-heading">Association &amp; Membership Category</h3>
+              </div>
 
-          <div class="space-y-1">
-            <label for="member-category" class="block text-xs font-bold text-brand-darkText">Membership Category *</label>
-            <select id="member-category" required class="w-full border border-brand-border bg-white p-2.5 rounded-lg text-sm text-brand-darkText focus:bg-white focus:outline-none">
-              <option value="">Select category...</option>
-              <option value="Student Member">Student Member</option>
-              <option value="Professional Member">Professional Member</option>
-              <option value="Institutional Member">Institutional Member</option>
-            </select>
-          </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- Association Name -->
+                <div class="space-y-1.5">
+                  <label for="member-association" class="block text-xs font-bold text-slate-700 dark:text-slate-300">Association Name <span class="text-rose-500">*</span></label>
+                  <select id="member-association" required class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2.5 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#123B32] dark:focus:border-emerald-400 transition-colors">
+                    <option value="">Select Association / Chapter...</option>
+                    <option value="Scientific Computing Chapter">Scientific Computing Chapter</option>
+                    <option value="Educational Pedagogy Chapter">Educational Pedagogy Chapter</option>
+                    <option value="Applied Sciences Alliance">Applied Sciences Alliance</option>
+                    <option value="International Association of Computer Engineers & Researchers (IACER)">International Association of Computer Engineers &amp; Researchers (IACER)</option>
+                    <option value="Artificial Intelligence & Data Science Forum">Artificial Intelligence &amp; Data Science Forum</option>
+                    <option value="Other Regional Association">Other Regional Association</option>
+                  </select>
+                </div>
 
-          <div class="space-y-1">
-            <label for="member-institution" class="block text-xs font-bold text-brand-darkText">Affiliated Institution / University *</label>
-            <input type="text" id="member-institution" required placeholder="University or firm name" class="w-full border border-brand-border bg-white p-2.5 rounded-lg text-sm text-brand-darkText focus:bg-white focus:outline-none">
-          </div>
+                <!-- Membership Type -->
+                <div class="space-y-1.5">
+                  <label for="member-type" class="block text-xs font-bold text-slate-700 dark:text-slate-300">Membership Type <span class="text-rose-500">*</span></label>
+                  <select id="member-type" required class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2.5 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#123B32] dark:focus:border-emerald-400 transition-colors">
+                    <option value="">Select Membership Type...</option>
+                    <option value="Professional Member">Professional Member</option>
+                    <option value="Institutional Member">Institutional Member</option>
+                    <option value="Student Member">Student Member</option>
+                  </select>
+                </div>
+              </div>
+            </div>
 
-          <button type="submit" class="w-full py-3 bg-brand-green hover:bg-brand-hoverGreen text-white text-sm font-bold rounded-lg transition-all duration-200 mt-2 shadow-sm">
-            Submit Application
-          </button>
-        </form>
+            <!-- Section 2: Personal & Contact Information -->
+            <div class="space-y-4">
+              <div class="flex items-center gap-2 pb-2 border-b border-slate-100 dark:border-slate-800">
+                <span class="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 flex items-center justify-center text-xs font-bold font-mono">2</span>
+                <h3 class="text-sm font-bold text-slate-900 dark:text-white font-heading">Personal &amp; Contact Details</h3>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- Full Name -->
+                <div class="space-y-1.5">
+                  <label for="member-name" class="block text-xs font-bold text-slate-700 dark:text-slate-300">Full Name <span class="text-rose-500">*</span></label>
+                  <input type="text" id="member-name" required placeholder="Dr. / Prof. / Mr. / Ms. Full Name" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2.5 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#123B32] dark:focus:border-emerald-400 transition-colors">
+                </div>
+
+                <!-- Date of Birth (DOB) -->
+                <div class="space-y-1.5">
+                  <label for="member-dob" class="block text-xs font-bold text-slate-700 dark:text-slate-300">Date of Birth (DOB) <span class="text-rose-500">*</span></label>
+                  <input type="date" id="member-dob" required class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2.5 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#123B32] dark:focus:border-emerald-400 transition-colors">
+                </div>
+
+                <!-- Contact Number -->
+                <div class="space-y-1.5">
+                  <label for="member-phone" class="block text-xs font-bold text-slate-700 dark:text-slate-300">Contact Number <span class="text-rose-500">*</span></label>
+                  <input type="tel" id="member-phone" required placeholder="+91 98765 43210" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2.5 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#123B32] dark:focus:border-emerald-400 transition-colors">
+                </div>
+
+                <!-- Email ID -->
+                <div class="space-y-1.5">
+                  <label for="member-email" class="block text-xs font-bold text-slate-700 dark:text-slate-300">Email Address <span class="text-rose-500">*</span></label>
+                  <input type="email" id="member-email" required placeholder="applicant@university.edu" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2.5 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#123B32] dark:focus:border-emerald-400 transition-colors">
+                </div>
+              </div>
+            </div>
+
+            <!-- Section 3: Professional & Academic Qualifications -->
+            <div class="space-y-4">
+              <div class="flex items-center gap-2 pb-2 border-b border-slate-100 dark:border-slate-800">
+                <span class="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 flex items-center justify-center text-xs font-bold font-mono">3</span>
+                <h3 class="text-sm font-bold text-slate-900 dark:text-white font-heading">Professional &amp; Academic Credentials</h3>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- Professional Qualification -->
+                <div class="space-y-1.5">
+                  <label for="member-qualification" class="block text-xs font-bold text-slate-700 dark:text-slate-300">Professional Qualification <span class="text-rose-500">*</span></label>
+                  <input type="text" id="member-qualification" required placeholder="e.g. Ph.D (CSE), M.E, B.Tech, MCA, M.Sc" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2.5 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#123B32] dark:focus:border-emerald-400 transition-colors">
+                </div>
+
+                <!-- Present Designation -->
+                <div class="space-y-1.5">
+                  <label for="member-designation" class="block text-xs font-bold text-slate-700 dark:text-slate-300">Present Designation <span class="text-rose-500">*</span></label>
+                  <input type="text" id="member-designation" required placeholder="e.g. Professor / Senior Engineer / Student" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2.5 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#123B32] dark:focus:border-emerald-400 transition-colors">
+                </div>
+              </div>
+
+              <!-- Area of Interest -->
+              <div class="space-y-1.5">
+                <label for="member-interest" class="block text-xs font-bold text-slate-700 dark:text-slate-300">Area of Interest <span class="text-rose-500">*</span></label>
+                <input type="text" id="member-interest" required placeholder="e.g. Artificial Intelligence, Cloud Systems, VLSI, Cybersecurity, Web Technologies, IoT" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2.5 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#123B32] dark:focus:border-emerald-400 transition-colors">
+              </div>
+
+              <!-- Name & Address of Organization -->
+              <div class="space-y-1.5">
+                <label for="member-org-address" class="block text-xs font-bold text-slate-700 dark:text-slate-300">Name &amp; Address of the Organization / Institution <span class="text-rose-500">*</span></label>
+                <textarea id="member-org-address" rows="3" required placeholder="Full Institution Name, Department, City, State, PIN Code" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-2.5 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#123B32] dark:focus:border-emerald-400 transition-colors"></textarea>
+              </div>
+            </div>
+
+            <!-- Section 4: Declaration Checkbox -->
+            <div class="p-4 bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-2xl space-y-2">
+              <div class="flex items-start gap-3">
+                <input type="checkbox" id="member-declaration" required class="mt-0.5 w-4 h-4 text-emerald-600 rounded border-slate-300 dark:border-slate-600 focus:ring-emerald-500 cursor-pointer">
+                <label for="member-declaration" class="text-xs font-medium text-slate-800 dark:text-slate-200 leading-relaxed cursor-pointer select-none">
+                  <span class="font-bold text-emerald-800 dark:text-emerald-300">Declaration:</span> I hereby declare that all the information provided above is true, complete, and accurate to the best of my knowledge and belief. I agree to abide by the rules, code of ethics, and bylaws of Shazu Soft Technologies and its affiliated chapters.
+                </label>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" id="btn-submit-membership" class="w-full py-3.5 bg-[#123B32] hover:bg-[#2F5B4E] text-white text-xs sm:text-sm font-extrabold rounded-2xl shadow-lg transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer">
+              <i class="bi bi-shield-check text-base"></i>
+              <span>Submit Membership Application</span>
+            </button>
+
+          </form>
+
+        </div>
+
       </div>
     </section>
   </main>

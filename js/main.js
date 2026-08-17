@@ -217,23 +217,78 @@ function initForms() {
   const membershipForm = document.getElementById('membership-form');
   if (membershipForm && !membershipForm.dataset.mainBound) {
     membershipForm.dataset.mainBound = 'true';
-    membershipForm.addEventListener('submit', (e) => {
+    membershipForm.addEventListener('submit', async (e) => {
       e.preventDefault();
+      
+      const association_name = document.getElementById('member-association')?.value;
+      const membership_type = document.getElementById('member-type')?.value;
       const name = document.getElementById('member-name')?.value.trim();
+      const dob = document.getElementById('member-dob')?.value;
+      const contact_no = document.getElementById('member-phone')?.value.trim();
       const email = document.getElementById('member-email')?.value.trim();
-      const category = document.getElementById('member-category')?.value;
-      const institution = document.getElementById('member-institution')?.value.trim();
+      const qualification = document.getElementById('member-qualification')?.value.trim();
+      const designation = document.getElementById('member-designation')?.value.trim();
+      const area_of_interest = document.getElementById('member-interest')?.value.trim();
+      const organization_address = document.getElementById('member-org-address')?.value.trim();
+      const declaration_accepted = document.getElementById('member-declaration')?.checked;
 
-      if (!name || !email || !category || !institution) {
-        showToast('Please fill in all the details.', 'error');
+      if (!association_name || !membership_type || !name || !dob || !contact_no || !email || !qualification || !designation || !area_of_interest || !organization_address) {
+        showToast('Please fill out all mandatory fields.', 'error');
         return;
       }
 
-      showSuccessModal(
-        'Registration Submitted!',
-        `Thank you for applying as a ${category}. We will review your application for ${institution} and contact you soon.`
-      );
-      membershipForm.reset();
+      if (!declaration_accepted) {
+        showToast('Please confirm the declaration checkbox to proceed.', 'error');
+        return;
+      }
+
+      const btnSubmit = document.getElementById('btn-submit-membership');
+      if (btnSubmit) {
+        btnSubmit.disabled = true;
+        btnSubmit.innerHTML = `<i class="bi bi-arrow-repeat animate-spin text-base"></i> <span>Submitting Application...</span>`;
+      }
+
+      try {
+        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        const apiBase = isLocal 
+          ? (window.location.port === '5000' ? '' : 'http://localhost:5000')
+          : ((window.SST_CONFIG && window.SST_CONFIG.API_BASE_URL) || 'https://shazu-land-back.onrender.com');
+
+        const response = await fetch(`${apiBase}/api/public/membership/apply`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            association_name,
+            membership_type,
+            name,
+            dob,
+            area_of_interest,
+            contact_no,
+            email,
+            qualification,
+            designation,
+            organization_address,
+            declaration_accepted
+          })
+        });
+
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Failed to submit application');
+
+        const token = data.token || 'SST-MEM-SUBMITTED';
+        showSuccessModal(
+          'Membership Application Submitted!',
+          `Thank you, <strong>${name}</strong>. Your application for <strong>${membership_type}</strong> under <em>${association_name}</em> has been recorded successfully.<br><br><span class="inline-block px-3 py-1 bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-mono font-bold rounded-lg text-xs">Reference Token: ${token}</span><br><br>A confirmation copy has been sent to <strong>${email}</strong>.`
+        );
+        membershipForm.reset();
+      } catch (err) {
+        showToast(err.message || 'Submission error. Please check your connection.', 'error');
+      } finally {
+        if (btnSubmit) {
+          btnSubmit.disabled = false;
+          btnSubmit.innerHTML = `<i class="bi bi-shield-check text-base"></i> <span>Submit Membership Application</span>`;
+        }
+      }
     });
   }
 }
