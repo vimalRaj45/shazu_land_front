@@ -960,24 +960,25 @@
         showPublicModalNotice(
           'Registration Received!',
           `
-          <div class="space-y-3 pt-1">
-            <div class="p-3 bg-amber-50 dark:bg-amber-950/50 rounded-2xl border border-amber-200 dark:border-amber-800 text-center">
-              <div class="text-[11px] font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider mb-1">Registration Reference Token</div>
-              <div class="font-mono text-base sm:text-lg font-extrabold text-amber-900 dark:text-amber-200 tracking-wider py-1">${token}</div>
-              <div class="text-[11px] text-amber-700 dark:text-amber-400">${body.name} • ${title}</div>
-            </div>
-
-            <div class="p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-left text-xs space-y-2">
-              <div class="flex items-center gap-1.5 text-amber-800 dark:text-amber-300 font-bold text-xs">
-                <i class="bi bi-clock-history text-amber-600"></i>
-                <span>Payment Verification in Progress</span>
+          <div class="space-y-3 pt-1 text-left">
+            <div class="p-3.5 bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800/80 rounded-2xl space-y-2">
+              <div class="flex items-center gap-2 text-amber-900 dark:text-amber-300 font-bold text-xs">
+                <i class="bi bi-clock-history text-amber-600 text-sm"></i>
+                <span>Payment Verification in Progress (Within 12 Hours)</span>
               </div>
               <p class="text-slate-600 dark:text-slate-300 text-[11.5px] leading-relaxed">
-                We have received your payment UTR (<strong class="font-mono text-slate-900 dark:text-white">${body.transaction_id || 'Attached'}</strong>). Our accounts team will verify your transaction within <strong>12 hours</strong>.
+                Thank you, <strong>${body.name}</strong>! We have received your registration for <strong>"${title}"</strong> with payment UTR: <strong class="font-mono text-slate-900 dark:text-white">${body.transaction_id || 'Attached'}</strong>.
               </p>
-              <div class="p-2 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 rounded-lg text-emerald-800 dark:text-emerald-300 font-semibold text-[11px]">
-                <i class="bi bi-qr-code"></i> Your official <strong>Event Entry QR Pass</strong> will be sent to your inbox (<u>${body.email}</u>) once payment is verified.
+            </div>
+
+            <div class="p-3 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 rounded-xl text-emerald-900 dark:text-emerald-300 text-xs space-y-1">
+              <div class="font-bold flex items-center gap-1.5 text-[11.5px]">
+                <i class="bi bi-qr-code text-emerald-700 dark:text-emerald-400"></i>
+                <span>Official QR Pass Dispatch Notice:</span>
               </div>
+              <p class="text-[11px] leading-relaxed text-emerald-800 dark:text-emerald-300">
+                Our accounts team is validating your transaction. Once verified, your official <strong>Event Entry QR Pass</strong> will be generated and emailed directly to <u>${body.email}</u>.
+              </p>
             </div>
           </div>
           `
