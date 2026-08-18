@@ -820,7 +820,31 @@
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Registration failed');
       closePublicModal();
-      showPublicModalNotice('Registration Confirmed!', `You have successfully registered for ${title}! An official pass reference has been sent to ${body.email}.`);
+
+      const isPaidEvent = fee !== 'Free' && fee !== '0' && fee !== '';
+      if (isPaidEvent || body.transaction_id) {
+        showPublicModalNotice(
+          'Registration Received - Verification Pending',
+          `Thank you, <strong>${body.name}</strong>! Your registration for <strong>"${title}"</strong> has been successfully submitted.<br><br>
+          <div class="p-3.5 bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800/60 rounded-2xl text-left text-xs space-y-2 mt-1">
+            <div class="flex items-center gap-2 text-amber-900 dark:text-amber-300 font-bold">
+              <i class="bi bi-clock-history text-base text-amber-600 dark:text-amber-400"></i>
+              <span>Payment Verification in Progress (12 Hours)</span>
+            </div>
+            <p class="text-slate-600 dark:text-slate-300 leading-relaxed text-[11.5px]">
+              We have received your payment details with UTR: <strong class="font-mono text-slate-900 dark:text-white">${body.transaction_id || 'Attached'}</strong>. Our admin team will verify your transaction within <strong>12 hours</strong>.
+            </p>
+            <p class="text-amber-900 dark:text-amber-300 font-semibold text-[11px] flex items-center gap-1.5 pt-1 border-t border-amber-200/60 dark:border-amber-800/40">
+              <i class="bi bi-envelope-check"></i> An update & entry pass will be emailed to <u>${body.email}</u>. Stay tuned!
+            </p>
+          </div>`
+        );
+      } else {
+        showPublicModalNotice(
+          'Registration Confirmed!',
+          `You have successfully registered for <strong>"${title}"</strong>! Your official access pass [Token: <strong>${data.registration?.token_no || 'SST-PASS'}</strong>] has been emailed to <strong>${body.email}</strong>.`
+        );
+      }
     } catch (err) {
       if (submitBtn) {
         submitBtn.disabled = false;
