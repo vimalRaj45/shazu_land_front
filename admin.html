@@ -3986,7 +3986,9 @@
     }
 
     function showModal(html) {
-      document.getElementById('modal-container').innerHTML = html;
+      const container = document.getElementById('modal-container');
+      container.innerHTML = html;
+      container.classList.add('animate-sst-modal');
       document.getElementById('modal-backdrop').classList.remove('hidden');
     }
 

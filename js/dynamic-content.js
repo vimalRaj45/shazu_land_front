@@ -5,6 +5,55 @@
 (function () {
   const API_BASE = (window.ENV && window.ENV.API_BASE) || '';
 
+  // 0. Universal Graceful Progress Bar Engine
+  window.startProgressBar = function () {
+    let bar = document.getElementById('sst-global-progress-bar');
+    if (!bar) {
+      bar = document.createElement('div');
+      bar.id = 'sst-global-progress-bar';
+      document.body.appendChild(bar);
+    }
+    bar.style.opacity = '1';
+    bar.style.width = '20%';
+    setTimeout(() => { if (bar && bar.style.opacity === '1') bar.style.width = '60%'; }, 150);
+    setTimeout(() => { if (bar && bar.style.opacity === '1') bar.style.width = '85%'; }, 450);
+  };
+
+  window.finishProgressBar = function () {
+    const bar = document.getElementById('sst-global-progress-bar');
+    if (!bar) return;
+    bar.style.width = '100%';
+    setTimeout(() => {
+      bar.style.opacity = '0';
+      setTimeout(() => { if (bar) bar.style.width = '0%'; }, 300);
+    }, 200);
+  };
+
+  // Universal Processing Overlay Modal for Asynchronous Operations
+  window.showProcessingModal = function (title = 'Processing...', subtitle = 'Please wait a moment while we secure your details.') {
+    window.hideProcessingModal();
+    const overlay = document.createElement('div');
+    overlay.id = 'sst-processing-overlay';
+    overlay.className = 'fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 transition-all duration-300';
+    overlay.innerHTML = `
+      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-7 max-w-sm w-full text-center space-y-4 shadow-2xl animate-sst-modal">
+        <div class="w-14 h-14 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/60 flex items-center justify-center mx-auto text-emerald-600 dark:text-emerald-400">
+          <div class="sst-spinner !w-7 !h-7 !border-2"></div>
+        </div>
+        <div class="space-y-1">
+          <h4 class="text-base font-bold text-slate-900 dark:text-white font-heading">${title}</h4>
+          <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">${subtitle}</p>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+  };
+
+  window.hideProcessingModal = function () {
+    const el = document.getElementById('sst-processing-overlay');
+    if (el) el.remove();
+  };
+
   // 1. Telemetry / Analytics Tracker (Mobile, Tablet, Desktop)
   function trackPageView() {
     try {
@@ -765,6 +814,68 @@
     document.body.insertAdjacentHTML('beforeend', modalHtml);
   };
 
+  window.submitJobApplication = async function (e, jobId, encodedTitle) {
+    e.preventDefault();
+    const title = decodeURIComponent(encodedTitle || '');
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn ? submitBtn.innerHTML : 'Submit Application';
+
+    const name = document.getElementById('pub-app-name')?.value.trim() || '';
+    const email = document.getElementById('pub-app-email')?.value.trim() || '';
+    const phone = document.getElementById('pub-app-phone')?.value.trim() || '';
+    const resume_url = document.getElementById('pub-app-resume')?.value || '';
+    const message = document.getElementById('pub-app-msg')?.value.trim() || '';
+
+    if (!name || !email) {
+      if (window.toast) window.toast.error('Please provide your name and email address.');
+      return;
+    }
+
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<span class="sst-spinner !w-3.5 !h-3.5 mr-1.5"></span><span>Submitting Profile...</span>`;
+    }
+
+    window.startProgressBar();
+    window.showProcessingModal('Submitting Application...', 'Please wait while we transmit your credentials to our talent desk.');
+
+    try {
+      const res = await fetch(`${API_BASE}/api/public/careers/apply`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          job_id: jobId || null,
+          job_title: title || 'Engineering Position',
+          applicant_name: name,
+          email,
+          phone,
+          resume_url,
+          message
+        })
+      });
+
+      const data = await res.json();
+      window.finishProgressBar();
+      window.hideProcessingModal();
+
+      if (!res.ok) throw new Error(data.error || 'Failed to submit application');
+      closePublicModal();
+
+      showPublicModalNotice(
+        'Application Received!',
+        `Thank you, <strong>${name}</strong>! Your application for <strong>"${title}"</strong> has been successfully submitted. Our talent acquisition desk has dispatched a confirmation email to <strong>${email}</strong>.`
+      );
+    } catch (err) {
+      window.finishProgressBar();
+      window.hideProcessingModal();
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+      }
+      showPublicModalNotice('Application Error', err.message, true);
+    }
+  };
+
   window.submitEventRegistration = async function (e, eventId) {
     e.preventDefault();
     const ev = (window.allEventsCache || []).find(event => String(event.id) === String(eventId)) || {};
@@ -778,8 +889,11 @@
 
     if (submitBtn) {
       submitBtn.disabled = true;
-      submitBtn.innerHTML = `<svg class="animate-spin h-3.5 w-3.5 text-white inline-block mr-1.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg><span>Registering...</span>`;
+      submitBtn.innerHTML = `<span class="sst-spinner !w-3.5 !h-3.5 mr-1.5"></span><span>Registering Pass...</span>`;
     }
+
+    window.startProgressBar();
+    window.showProcessingModal('Registering Event Pass...', 'Please wait while we secure your event token and record your verification details.');
 
     const body = {
       event_id: eventId,
@@ -818,6 +932,9 @@
         body: JSON.stringify(body)
       });
       const data = await res.json();
+      window.finishProgressBar();
+      window.hideProcessingModal();
+
       if (!res.ok) throw new Error(data.error || 'Registration failed');
       closePublicModal();
 
@@ -846,6 +963,8 @@
         );
       }
     } catch (err) {
+      window.finishProgressBar();
+      window.hideProcessingModal();
       if (submitBtn) {
         submitBtn.disabled = false;
         submitBtn.innerHTML = originalText;
@@ -866,7 +985,7 @@
 
     const modalHtml = `
       <div id="public-notice-backdrop" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-sm rounded-2xl p-6 shadow-2xl space-y-4 text-center">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-sm rounded-3xl p-6 sm:p-7 shadow-2xl space-y-4 text-center animate-sst-modal">
           <div class="w-12 h-12 rounded-full ${isError ? 'bg-red-100 dark:bg-red-950 text-red-600' : 'bg-emerald-100 dark:bg-emerald-950 text-emerald-600'} flex items-center justify-center mx-auto text-2xl">
             <i class="bi bi-${isError ? 'x-circle-fill' : 'check-circle-fill'}"></i>
           </div>
@@ -882,6 +1001,9 @@
   };
 
   window.submitContactInquiry = async function (name, email, phone, subject, service_category, message) {
+    window.startProgressBar();
+    window.showProcessingModal('Sending Message...', 'Please wait while we record your inquiry.');
+
     try {
       const res = await fetch(`${API_BASE}/api/public/contact`, {
         method: 'POST',
@@ -889,10 +1011,15 @@
         body: JSON.stringify({ name, email, phone, subject, service_category, message })
       });
       const data = await res.json();
+      window.finishProgressBar();
+      window.hideProcessingModal();
+
       if (!res.ok) throw new Error(data.error || 'Failed to submit inquiry');
-      showPublicModalNotice('Message Sent!', 'Thank you for reaching out! We have received your message and sent a confirmation to your email address.');
+      showPublicModalNotice('Message Sent!', 'Thank you for reaching out! We have received your message and sent a confirmation token to your email.');
       return true;
     } catch (err) {
+      window.finishProgressBar();
+      window.hideProcessingModal();
       showPublicModalNotice('Submission Error', err.message, true);
       return false;
     }

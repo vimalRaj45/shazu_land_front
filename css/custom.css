@@ -1875,12 +1875,85 @@ html.dark .announcement-filter-btn.active {
   }
 }
 
-@media (min-width: 641px) and (max-width: 1024px) {
-  html {
-    font-size: 17px !important;
+/* ==========================================================================
+   GRACEFUL PROCESS LOADING & SHIMMER ENGINE
+   ========================================================================== */
+
+/* 1. Global Top Progress Bar */
+#sst-global-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0%;
+  background: linear-gradient(90deg, #123B32, #C47D4C, #10B981);
+  background-size: 200% 100%;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.6);
+  z-index: 999999;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+  pointer-events: none;
+  animation: sst-gradient-flow 2s linear infinite;
+}
+
+@keyframes sst-gradient-flow {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+/* 2. Skeleton Shimmer Loading Effect */
+.sst-skeleton {
+  background: linear-gradient(90deg, rgba(226, 232, 240, 0.6) 25%, rgba(241, 245, 249, 0.9) 50%, rgba(226, 232, 240, 0.6) 75%);
+  background-size: 200% 100%;
+  animation: sst-shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+
+.dark .sst-skeleton {
+  background: linear-gradient(90deg, rgba(30, 41, 59, 0.8) 25%, rgba(51, 65, 85, 0.9) 50%, rgba(30, 41, 59, 0.8) 75%);
+  background-size: 200% 100%;
+}
+
+@keyframes sst-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* 3. Button Loading & Graceful State */
+.btn-loading {
+  position: relative !important;
+  pointer-events: none !important;
+  opacity: 0.8 !important;
+  cursor: wait !important;
+}
+
+/* 4. Modal & Overlay Graceful Transitions */
+@keyframes sst-scale-up {
+  0% {
+    opacity: 0;
+    transform: scale(0.94) translateY(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
   }
 }
 
+.animate-sst-modal {
+  animation: sst-scale-up 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
 
+/* 5. Spinner Pulse Animation */
+@keyframes sst-spin {
+  to { transform: rotate(360deg); }
+}
 
-
+.sst-spinner {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: sst-spin 0.65s linear infinite;
+  vertical-align: text-bottom;
+}

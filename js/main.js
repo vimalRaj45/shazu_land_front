@@ -194,10 +194,11 @@ function initForms() {
   const contactForm = document.getElementById('contact-form');
   if (contactForm && !contactForm.dataset.mainBound) {
     contactForm.dataset.mainBound = 'true';
-    contactForm.addEventListener('submit', (e) => {
+    contactForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const name = document.getElementById('contact-name')?.value.trim();
       const email = document.getElementById('contact-email')?.value.trim();
+      const phone = document.getElementById('contact-phone')?.value.trim() || '';
       const subject = document.getElementById('contact-subject')?.value.trim();
       const message = document.getElementById('contact-message')?.value.trim();
 
@@ -206,11 +207,16 @@ function initForms() {
         return;
       }
 
-      showSuccessModal(
-        'Message Sent!',
-        `Thank you, ${name}. We have received your message regarding "${subject}" and will respond shortly.`
-      );
-      contactForm.reset();
+      if (window.submitContactInquiry) {
+        const ok = await window.submitContactInquiry(name, email, phone, subject, 'General', message);
+        if (ok) contactForm.reset();
+      } else {
+        showSuccessModal(
+          'Message Sent!',
+          `Thank you, ${name}. We have received your message regarding "${subject}" and will respond shortly.`
+        );
+        contactForm.reset();
+      }
     });
   }
 
@@ -245,8 +251,10 @@ function initForms() {
       const btnSubmit = document.getElementById('btn-submit-membership');
       if (btnSubmit) {
         btnSubmit.disabled = true;
-        btnSubmit.innerHTML = `<i class="bi bi-arrow-repeat animate-spin text-base"></i> <span>Submitting Application...</span>`;
+        btnSubmit.innerHTML = `<span class="sst-spinner !w-4 !h-4 mr-2"></span> <span>Submitting Application...</span>`;
       }
+
+      if (window.startProgressBar) window.startProgressBar();
 
       try {
         const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
@@ -273,6 +281,7 @@ function initForms() {
         });
 
         const data = await response.json();
+        if (window.finishProgressBar) window.finishProgressBar();
         if (!response.ok) throw new Error(data.error || 'Failed to submit application');
 
         const token = data.token || 'SST-MEM-SUBMITTED';
@@ -282,6 +291,7 @@ function initForms() {
         );
         membershipForm.reset();
       } catch (err) {
+        if (window.finishProgressBar) window.finishProgressBar();
         showToast(err.message || 'Submission error. Please check your connection.', 'error');
       } finally {
         if (btnSubmit) {
