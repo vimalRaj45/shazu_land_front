@@ -16,13 +16,13 @@
     }
 
     // Set position classes
-    let posClasses = 'fixed z-[99999] flex flex-col gap-2.5 pointer-events-none transition-all duration-300 p-4 ';
-    if (position.includes('top')) posClasses += 'top-2 ';
-    else posClasses += 'bottom-2 ';
+    let posClasses = 'fixed z-[99999] flex flex-col gap-2 pointer-events-none transition-all duration-300 p-2 sm:p-4 max-w-full ';
+    if (position.includes('top')) posClasses += 'top-2 sm:top-3 ';
+    else posClasses += 'bottom-2 sm:bottom-3 ';
 
-    if (position.includes('center')) posClasses += 'left-1/2 -translate-x-1/2 items-center';
-    else if (position.includes('right')) posClasses += 'right-4 items-end';
-    else posClasses += 'left-4 items-start';
+    if (position.includes('center')) posClasses += 'left-1/2 -translate-x-1/2 items-center w-full max-w-[94vw] sm:max-w-sm';
+    else if (position.includes('right')) posClasses += 'right-2 sm:right-4 items-end';
+    else posClasses += 'left-2 sm:left-4 items-start';
 
     toastContainer.className = posClasses;
     return toastContainer;
@@ -32,7 +32,7 @@
     const toast = document.createElement('div');
     const isDark = opts.style === 'dark' || document.documentElement.classList.contains('dark');
     
-    toast.className = `pointer-events-auto flex items-center gap-2.5 px-3 py-1.5 rounded-md text-[11px] font-medium font-sans transition-all duration-200 transform translate-y-[-10px] opacity-0 scale-95 shadow-md border ${
+    toast.className = `pointer-events-auto flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10.5px] sm:text-xs font-medium font-sans transition-all duration-200 transform translate-y-[-10px] opacity-0 scale-95 shadow-lg border max-w-[92vw] sm:max-w-sm shrink-0 ${
       isDark 
         ? 'bg-slate-900 text-slate-100 border-slate-700' 
         : 'bg-white text-slate-800 border-slate-200'

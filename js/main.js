@@ -44,10 +44,10 @@ window.closeMobileDrawer = function(e) {
 // Global Toast Feedback Helper
 function showToast(message, type = 'success') {
   const toast = document.createElement('div');
-  toast.className = `fixed bottom-5 right-5 px-3.5 py-2 rounded-md shadow-md z-50 text-[11px] font-medium text-white transition-all duration-200 transform translate-y-6 opacity-0 flex items-center gap-2 border ${
-    type === 'success' ? 'bg-[#123B32] border-[#2F5B4E]' : 'bg-red-700 border-red-800'
+  toast.className = `fixed bottom-3 right-3 sm:bottom-5 sm:right-5 max-w-[92vw] sm:max-w-sm px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-lg shadow-lg z-50 text-[10.5px] sm:text-[11px] font-medium text-white transition-all duration-200 transform translate-y-6 opacity-0 flex items-center gap-2 border ${
+    type === 'error' ? 'bg-red-700 border-red-800' : 'bg-[#123B32] border-[#2F5B4E]'
   }`;
-  toast.innerHTML = `<i class="bi ${type === 'error' ? 'bi-exclamation-triangle-fill' : 'bi-check-circle-fill'} text-xs"></i> <span>${message}</span>`;
+  toast.innerHTML = `<i class="bi ${type === 'error' ? 'bi-exclamation-triangle-fill' : 'bi-check-circle-fill'} text-xs shrink-0"></i> <span class="leading-tight">${message}</span>`;
   document.body.appendChild(toast);
 
   setTimeout(() => {

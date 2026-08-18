@@ -951,28 +951,56 @@
       if (!res.ok) throw new Error(data.error || 'Registration failed');
       closePublicModal();
 
+      const reg = data.registration || {};
+      const token = reg.token_no || 'SST-PASS';
       const isPaidEvent = fee !== 'Free' && fee !== '0' && fee !== '';
-      if (isPaidEvent || body.transaction_id) {
+      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(token)}&margin=8`;
+
+      if (isPaidEvent) {
         showPublicModalNotice(
-          'Registration Received - Verification Pending',
-          `Thank you, <strong>${body.name}</strong>! Your registration for <strong>"${title}"</strong> has been successfully submitted.<br><br>
-          <div class="p-3.5 bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800/60 rounded-2xl text-left text-xs space-y-2 mt-1">
-            <div class="flex items-center gap-2 text-amber-900 dark:text-amber-300 font-bold">
-              <i class="bi bi-clock-history text-base text-amber-600 dark:text-amber-400"></i>
-              <span>Payment Verification in Progress (12 Hours)</span>
+          'Registration Received!',
+          `
+          <div class="space-y-3 pt-1">
+            <div class="p-3 bg-amber-50 dark:bg-amber-950/50 rounded-2xl border border-amber-200 dark:border-amber-800 text-center">
+              <div class="text-[11px] font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider mb-1">Registration Reference Token</div>
+              <div class="font-mono text-base sm:text-lg font-extrabold text-amber-900 dark:text-amber-200 tracking-wider py-1">${token}</div>
+              <div class="text-[11px] text-amber-700 dark:text-amber-400">${body.name} • ${title}</div>
             </div>
-            <p class="text-slate-600 dark:text-slate-300 leading-relaxed text-[11.5px]">
-              We have received your payment details with UTR: <strong class="font-mono text-slate-900 dark:text-white">${body.transaction_id || 'Attached'}</strong>. Our admin team will verify your transaction within <strong>12 hours</strong>.
-            </p>
-            <p class="text-amber-900 dark:text-amber-300 font-semibold text-[11px] flex items-center gap-1.5 pt-1 border-t border-amber-200/60 dark:border-amber-800/40">
-              <i class="bi bi-envelope-check"></i> An update & entry pass will be emailed to <u>${body.email}</u>. Stay tuned!
-            </p>
-          </div>`
+
+            <div class="p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-left text-xs space-y-2">
+              <div class="flex items-center gap-1.5 text-amber-800 dark:text-amber-300 font-bold text-xs">
+                <i class="bi bi-clock-history text-amber-600"></i>
+                <span>Payment Verification in Progress</span>
+              </div>
+              <p class="text-slate-600 dark:text-slate-300 text-[11.5px] leading-relaxed">
+                We have received your payment UTR (<strong class="font-mono text-slate-900 dark:text-white">${body.transaction_id || 'Attached'}</strong>). Our accounts team will verify your transaction within <strong>12 hours</strong>.
+              </p>
+              <div class="p-2 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 rounded-lg text-emerald-800 dark:text-emerald-300 font-semibold text-[11px]">
+                <i class="bi bi-qr-code"></i> Your official <strong>Event Entry QR Pass</strong> will be sent to your inbox (<u>${body.email}</u>) once payment is verified.
+              </div>
+            </div>
+          </div>
+          `
         );
       } else {
         showPublicModalNotice(
           'Registration Confirmed!',
-          `You have successfully registered for <strong>"${title}"</strong>! Your official access pass [Token: <strong>${data.registration?.token_no || 'SST-PASS'}</strong>] has been emailed to <strong>${body.email}</strong>.`
+          `
+          <div class="space-y-3 pt-1">
+            <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 text-center">
+              <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Event Entry QR Pass</div>
+              <div class="inline-block p-2 bg-white rounded-xl shadow-xs border border-slate-200 dark:border-slate-700 mb-2">
+                <img src="${qrUrl}" alt="Event Entry QR" class="w-36 h-36 sm:w-40 sm:h-40 mx-auto rounded-lg" />
+              </div>
+              <div class="font-mono text-xs sm:text-sm font-extrabold text-[#123B32] dark:text-emerald-400 tracking-wider">${token}</div>
+              <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">${body.name} • ${title}</div>
+            </div>
+
+            <p class="text-emerald-700 dark:text-emerald-400 text-xs font-semibold">
+              <i class="bi bi-check-circle"></i> Free pass confirmed! Your QR ticket has also been emailed to <u>${body.email}</u>.
+            </p>
+          </div>
+          `
         );
       }
     } catch (err) {
@@ -987,7 +1015,7 @@
   };
 
   window.showPublicModalNotice = function (title, message, isError = false) {
-    if (window.toast) {
+    if (window.toast && typeof message === 'string' && !message.includes('<div') && !message.includes('<img')) {
       if (isError) {
         window.toast.error(`${title}: ${message}`, { position: 'top-center' });
       } else {
@@ -997,16 +1025,16 @@
     }
 
     const modalHtml = `
-      <div id="public-notice-backdrop" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-sm rounded-3xl p-6 sm:p-7 shadow-2xl space-y-4 text-center animate-sst-modal">
-          <div class="w-12 h-12 rounded-full ${isError ? 'bg-red-100 dark:bg-red-950 text-red-600' : 'bg-emerald-100 dark:bg-emerald-950 text-emerald-600'} flex items-center justify-center mx-auto text-2xl">
+      <div id="public-notice-backdrop" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-[92vw] sm:max-w-sm rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-2xl space-y-3.5 text-center animate-sst-modal">
+          <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-full ${isError ? 'bg-red-100 dark:bg-red-950 text-red-600' : 'bg-emerald-100 dark:bg-emerald-950 text-emerald-600'} flex items-center justify-center mx-auto text-xl">
             <i class="bi bi-${isError ? 'x-circle-fill' : 'check-circle-fill'}"></i>
           </div>
           <div class="space-y-1">
-            <h3 class="text-lg font-bold font-heading text-slate-900 dark:text-white">${title}</h3>
-            <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">${message}</p>
+            <h3 class="text-base sm:text-lg font-bold font-heading text-slate-900 dark:text-white">${title}</h3>
+            <div class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">${message}</div>
           </div>
-          <button onclick="document.getElementById('public-notice-backdrop').remove()" class="w-full py-2.5 bg-[#123B32] hover:bg-[#2F5B4E] text-white font-semibold text-xs rounded-xl shadow-md cursor-pointer">OK, Got It</button>
+          <button onclick="document.getElementById('public-notice-backdrop').remove()" class="w-full py-2 sm:py-2.5 bg-[#123B32] hover:bg-[#2F5B4E] text-white font-semibold text-xs rounded-xl shadow-md cursor-pointer transition-colors">OK, Got It</button>
         </div>
       </div>
     `;

@@ -43,6 +43,8 @@
   
   <!-- Bootstrap Icons CDN -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <!-- HTML5 QR Code Scanner CDN -->
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <link rel="icon" href="https://shazusofttechnologies.org/sst.svg" type="image/svg+xml">
 
   <style>
@@ -697,8 +699,19 @@
             <p class="text-xs text-slate-500">Filter registrations by event/hackathon, verify payments, and issue access entry passes</p>
           </div>
           
-          <!-- Event Selector & Export Buttons -->
+          <!-- Event Selector, Attendance Filter, Scan QR & Export Buttons -->
           <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+            <button onclick="openQRScannerModal()" class="px-3.5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap">
+              <i class="bi bi-qr-code-scan"></i>
+              <span>Scan QR & Attendance</span>
+            </button>
+
+            <select id="filter-registration-attendance" onchange="renderRegistrationsTable()" class="bg-white border border-slate-200 text-slate-900 rounded-xl px-3 py-2 text-xs font-bold shadow-xs focus:outline-none focus:border-[#123B32] cursor-pointer">
+              <option value="ALL">All Attendance</option>
+              <option value="Present">Present</option>
+              <option value="Not Marked">Not Marked</option>
+            </select>
+
             <label for="filter-registration-event" class="text-xs font-bold text-slate-700 whitespace-nowrap"><i class="bi bi-funnel-fill text-[#123B32]"></i> Event:</label>
             <select id="filter-registration-event" onchange="renderRegistrationsTable()" class="bg-white border border-slate-200 text-slate-900 rounded-xl px-3 py-2 text-xs font-bold shadow-xs focus:outline-none focus:border-[#123B32] max-w-xs truncate cursor-pointer">
               <option value="ALL">All Events & Hackathons</option>
@@ -743,22 +756,19 @@
             <div id="metric-event-verified-count" class="text-xl font-bold font-mono text-emerald-800">0</div>
             <span id="metric-event-verified-amount" class="text-[10px] text-emerald-700 font-bold block">₹0 Collected</span>
           </div>
-          <div class="p-3 bg-amber-50/60 rounded-xl border border-amber-100 space-y-1">
-            <span class="text-[10px] text-amber-700 font-mono uppercase font-bold">Pending Verification</span>
-            <div id="metric-event-pending-count" class="text-xl font-bold font-mono text-amber-800">0</div>
-            <span id="metric-event-pending-amount" class="text-[10px] text-amber-700 font-bold block">₹0 Pending</span>
+          <div class="p-3 bg-teal-50/60 rounded-xl border border-teal-100 space-y-1">
+            <span class="text-[10px] text-teal-700 font-mono uppercase font-bold">Attendance Checked-In</span>
+            <div id="metric-event-attendance-count" class="text-xl font-bold font-mono text-teal-800">0</div>
+            <span id="metric-event-attendance-pct" class="text-[10px] text-teal-700 font-bold block">0% Present</span>
           </div>
-          <div class="p-3 bg-sky-50/60 rounded-xl border border-sky-100 space-y-1 flex flex-col justify-between">
-            <span class="text-[10px] text-sky-700 font-mono uppercase font-bold">Quick Actions</span>
+          <div class="p-3 bg-amber-50/60 rounded-xl border border-amber-100 space-y-1 flex flex-col justify-between">
+            <div>
+              <span class="text-[10px] text-amber-700 font-mono uppercase font-bold">Pending Payment</span>
+              <div id="metric-event-pending-count" class="text-xl font-bold font-mono text-amber-800">0</div>
+            </div>
             <div class="flex items-center gap-1.5 pt-1">
-              <button onclick="exportCurrentTab('csv')" title="Download CSV Spreadsheet" class="px-2.5 py-1.5 bg-[#123B32] hover:bg-[#2F5B4E] text-white rounded-lg text-[10px] font-bold flex items-center gap-1 cursor-pointer">
-                <i class="bi bi-filetype-csv"></i> CSV
-              </button>
-              <button onclick="exportCurrentTab('json')" title="Download JSON" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-[10px] font-bold flex items-center gap-1 cursor-pointer">
-                <i class="bi bi-filetype-json"></i> JSON
-              </button>
-              <button onclick="loadRegistrations()" class="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs cursor-pointer" title="Refresh List">
-                <i class="bi bi-arrow-clockwise"></i>
+              <button onclick="loadRegistrations()" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold flex items-center gap-1 cursor-pointer" title="Refresh List">
+                <i class="bi bi-arrow-clockwise"></i> Refresh
               </button>
             </div>
           </div>
@@ -766,7 +776,7 @@
 
         <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
           <div class="overflow-x-auto">
-            <table class="w-full min-w-[850px] text-left text-xs">
+            <table class="w-full min-w-[920px] text-left text-xs">
               <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase font-semibold text-[10px]">
                 <tr>
                   <th class="p-3">Date</th>
@@ -774,6 +784,7 @@
                   <th class="p-3">Event Name</th>
                   <th class="p-3">Fee / Transaction UTR</th>
                   <th class="p-3">Payment Status</th>
+                  <th class="p-3">Attendance</th>
                   <th class="p-3 text-right">Actions</th>
                 </tr>
               </thead>
@@ -1791,14 +1802,17 @@
         const trendChart = document.getElementById('traffic-trend-chart');
         const dailyTrend = pv.dailyTrend || [];
         if (dailyTrend.length > 0) {
-          const maxDaily = Math.max(...dailyTrend.map(d => parseInt(d.views, 10) || 1));
+          const maxDaily = Math.max(...dailyTrend.map(d => parseInt(d.views, 10) || 0), 1);
           trendChart.innerHTML = dailyTrend.map(d => {
-            const hPct = Math.max(12, Math.round((parseInt(d.views, 10) / maxDaily) * 100));
+            const viewsCount = parseInt(d.views, 10) || 0;
+            const hPct = viewsCount > 0 ? Math.max(16, Math.round((viewsCount / maxDaily) * 100)) : 8;
             return `
-              <div class="flex-1 flex flex-col items-center gap-1.5 group cursor-pointer" title="${d.views} views on ${d.label}">
-                <span class="text-[9px] font-mono font-bold text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity">${d.views}</span>
-                <div class="w-full max-w-[28px] bg-gradient-to-t from-[#123B32] to-[#C47D4C] rounded-t-md transition-all duration-500 hover:brightness-110" style="height: ${hPct}%"></div>
-                <span class="text-[9px] text-slate-500 font-mono truncate w-full text-center">${d.label}</span>
+              <div class="flex-1 h-full flex flex-col justify-end items-center gap-1 group cursor-pointer" title="${viewsCount} views on ${d.label}">
+                <span class="text-[10px] font-mono font-bold text-slate-700 transition-opacity ${viewsCount > 0 ? 'opacity-100' : 'opacity-40'}">${viewsCount}</span>
+                <div class="w-full max-w-[28px] h-20 flex items-end justify-center">
+                  <div class="w-full bg-gradient-to-t ${viewsCount > 0 ? 'from-[#123B32] to-[#C47D4C] shadow-xs' : 'from-slate-200 to-slate-300'} rounded-t-md transition-all duration-500 hover:brightness-110" style="height: ${hPct}%"></div>
+                </div>
+                <span class="text-[9.5px] text-slate-500 font-mono truncate w-full text-center mt-0.5">${d.label}</span>
               </div>
             `;
           }).join('');
@@ -1937,6 +1951,7 @@
 
     function renderRegistrationsTable() {
       const selectedEventId = document.getElementById('filter-registration-event')?.value || 'ALL';
+      const selectedAttendance = document.getElementById('filter-registration-attendance')?.value || 'ALL';
       
       // Filter by selected event
       let eventFiltered = tableData.registrations || [];
@@ -1944,17 +1959,24 @@
         eventFiltered = eventFiltered.filter(r => String(r.event_id) === String(selectedEventId) || (tableData.events?.find(e => String(e.id) === String(selectedEventId))?.title === r.event_title));
       }
 
+      // Filter by attendance status
+      if (selectedAttendance === 'Present') {
+        eventFiltered = eventFiltered.filter(r => r.attendance_status === 'Present');
+      } else if (selectedAttendance === 'Not Marked') {
+        eventFiltered = eventFiltered.filter(r => r.attendance_status !== 'Present');
+      }
+
       window.currentFilteredRegistrations = eventFiltered;
 
-      // Compute Event-Specific Performance Metrics
+      // Compute Event-Specific Performance & Attendance Metrics
       const totalCount = eventFiltered.length;
       let verifiedCount = 0;
       let verifiedAmount = 0;
       let pendingCount = 0;
-      let pendingAmount = 0;
       let schoolCount = 0;
       let collegeCount = 0;
       let proCount = 0;
+      let attendedCount = 0;
 
       eventFiltered.forEach(r => {
         const numericFee = parseFloat(String(r.fee_amount || r.registration_fee || '0').replace(/[^0-9.]/g, '')) || 0;
@@ -1963,7 +1985,10 @@
           verifiedAmount += numericFee;
         } else if (r.payment_status === 'Pending Verification') {
           pendingCount++;
-          pendingAmount += numericFee;
+        }
+
+        if (r.attendance_status === 'Present') {
+          attendedCount++;
         }
 
         const aud = r.target_audience || 'College';
@@ -1978,14 +2003,18 @@
       const verCountEl = document.getElementById('metric-event-verified-count');
       const verAmtEl = document.getElementById('metric-event-verified-amount');
       const pendCountEl = document.getElementById('metric-event-pending-count');
-      const pendAmtEl = document.getElementById('metric-event-pending-amount');
+      const attCountEl = document.getElementById('metric-event-attendance-count');
+      const attPctEl = document.getElementById('metric-event-attendance-pct');
 
       if (totalEl) totalEl.textContent = totalCount;
       if (audSplitEl) audSplitEl.textContent = `${collegeCount} College • ${schoolCount} School • ${proCount} Pro`;
       if (verCountEl) verCountEl.textContent = verifiedCount;
       if (verAmtEl) verAmtEl.textContent = `₹${verifiedAmount.toLocaleString('en-IN')} Collected`;
       if (pendCountEl) pendCountEl.textContent = pendingCount;
-      if (pendAmtEl) pendAmtEl.textContent = `₹${pendingAmount.toLocaleString('en-IN')} Pending`;
+      
+      const attendancePct = totalCount > 0 ? Math.round((attendedCount / totalCount) * 100) : 0;
+      if (attCountEl) attCountEl.textContent = attendedCount;
+      if (attPctEl) attPctEl.textContent = `${attendancePct}% Present (${attendedCount}/${totalCount})`;
 
       // Apply search and sorting
       const filtered = filterAndSortArray(eventFiltered, 'registered_at', 'name', 'payment_status', 'payment_method');
@@ -2004,6 +2033,8 @@
           audienceBadge = '<span class="px-2 py-0.5 bg-purple-50 text-purple-800 border border-purple-200 font-bold rounded text-[10px]"><i class="bi bi-briefcase-fill"></i> Professional</span>';
           subDetail = `${r.company_name || r.organization || 'Company'} ${r.designation ? `• ${r.designation}` : ''}`;
         }
+
+        const isAttended = r.attendance_status === 'Present';
 
         return `
           <tr class="hover:bg-emerald-50/40 cursor-pointer transition-colors" onclick="openRowDetails('registrations', ${r.id})">
@@ -2036,6 +2067,20 @@
                 <option value="Rejected" ${r.payment_status === 'Rejected' ? 'selected' : ''}>Rejected</option>
               </select>
             </td>
+            <td class="p-3" onclick="event.stopPropagation()">
+              ${isAttended ? `
+                <div class="flex items-center gap-1.5">
+                  <span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 font-bold rounded-lg text-[10.5px] inline-flex items-center gap-1 shadow-2xs">
+                    <i class="bi bi-check-circle-fill text-emerald-600"></i> Present
+                  </span>
+                  <button onclick="toggleAttendance(${r.id}, 'Not Marked')" title="Reset attendance to Not Marked" class="text-[10px] text-slate-400 hover:text-red-600 underline cursor-pointer">Undo</button>
+                </div>
+              ` : `
+                <button onclick="toggleAttendance(${r.id}, 'Present')" class="px-2.5 py-1 bg-slate-100 hover:bg-emerald-700 hover:text-white text-slate-700 border border-slate-200 font-bold rounded-lg text-[10.5px] inline-flex items-center gap-1 transition-colors shadow-2xs cursor-pointer">
+                  <i class="bi bi-person-check"></i> Check In
+                </button>
+              `}
+            </td>
             <td class="p-3 text-right space-x-1.5 whitespace-nowrap" onclick="event.stopPropagation()">
               <button onclick="openRowDetails('registrations', ${r.id})" title="View Full Dossier" class="p-1.5 bg-slate-100 hover:bg-[#123B32] hover:text-white text-slate-700 rounded-lg text-xs font-semibold transition-colors shadow-2xs cursor-pointer"><i class="bi bi-eye"></i></button>
               ${r.payment_status !== 'Verified' ? `<button onclick="updateRegistrationPaymentStatus(${r.id}, 'Verified')" title="Verify Pass & Email Ticket" class="px-2.5 py-1 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-lg text-[11px] shadow-2xs cursor-pointer"><i class="bi bi-check-circle"></i> Verify</button>` : ''}
@@ -2043,61 +2088,275 @@
             </td>
           </tr>
         `;
-      }).join('') || '<tr><td colspan="6" class="p-6 text-center text-slate-400">No matching registrations found for this selection.</td></tr>';
+      }).join('') || '<tr><td colspan="7" class="p-6 text-center text-slate-400">No matching registrations found for this selection.</td></tr>';
     }
 
-    function viewEventRegistrations(eventId) {
-      switchTab('registrations');
-      setTimeout(() => {
-        const select = document.getElementById('filter-registration-event');
-        if (select) {
-          select.value = String(eventId);
-          renderRegistrationsTable();
-        }
-      }, 100);
-    }
-
-    function previewReceiptModal(attendeeName, imgUrl) {
-      showModal(`
-        <div class="space-y-3">
-          <div class="flex items-center justify-between pb-2 border-b border-slate-200">
-            <h3 class="text-sm font-bold text-slate-900">Payment Receipt - ${attendeeName}</h3>
-          </div>
-          <div class="max-h-[70vh] overflow-auto text-center bg-slate-950 p-2 rounded-xl">
-            <img src="${imgUrl}" alt="Payment Receipt" class="max-w-full h-auto mx-auto rounded-lg">
-          </div>
-          <div class="flex justify-end">
-            <button type="button" onclick="closeModal()" class="px-4 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-lg text-xs font-bold cursor-pointer">Close</button>
-          </div>
-        </div>
-      `);
-    }
-
-    async function updateRegistrationPaymentStatus(id, payment_status) {
+    async function toggleAttendance(id, newStatus) {
       try {
-        const { ok, data } = await safeFetchJson(`${API_BASE}/api/admin/event-registrations/${id}/payment`, {
+        const { ok, data } = await safeFetchJson(`${API_BASE}/api/admin/event-registrations/${id}/attendance`, {
           method: 'PUT',
           headers: getAuthHeaders(),
-          body: JSON.stringify({ payment_status })
+          body: JSON.stringify({ attendance_status: newStatus })
         });
-        if (!ok) throw new Error(data.error || 'Payment status update failed');
-        showToast(payment_status === 'Verified' ? 'Payment Verified! Official Entry Pass emailed.' : `Status updated to ${payment_status}`);
+        if (!ok) throw new Error(data.error || 'Failed to update attendance');
+        showToast(newStatus === 'Present' ? 'Attendee checked in as Present' : 'Attendance reset to Not Marked');
         loadRegistrations();
       } catch (err) {
         showToast(err.message, 'error');
       }
     }
 
-    function confirmDeleteRegistration(id) {
-      showConfirmModal('Delete Registration', 'Are you sure you want to delete this event attendee registration?', 'Delete Registration', async () => {
-        try {
-          await safeFetchJson(`${API_BASE}/api/admin/event-registrations/${id}`, { method: 'DELETE', headers: getAuthHeaders() });
-          showToast('Registration deleted');
-          loadRegistrations();
-        } catch (err) {
-          showToast('Delete failed', 'error');
-        }
-      });
+    // ==========================================================================
+    // QR CODE SCANNER & ATTENDANCE VERIFICATION SUITE
+    // ==========================================================================
+    let html5QrCode = null;
+
+    function openQRScannerModal() {
+      showModal(`
+        <div class="space-y-4 max-w-lg mx-auto">
+          <div class="flex items-center justify-between pb-2 border-b border-slate-200">
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold">
+                <i class="bi bi-qr-code-scan"></i>
+              </div>
+              <div>
+                <h3 class="text-sm font-bold text-slate-900 font-heading">Event QR Pass Scanner & Attendance Desk</h3>
+                <p class="text-[11px] text-slate-500">Scan attendee QR pass or enter token to verify payment & mark attendance</p>
+              </div>
+            </div>
+            <button type="button" onclick="closeQRScannerModal()" class="p-1 rounded-lg text-slate-400 hover:text-slate-700 cursor-pointer"><i class="bi bi-x-lg"></i></button>
+          </div>
+
+          <!-- Mode Selector Tabs -->
+          <div class="flex gap-1.5 p-1 bg-slate-100 rounded-xl text-xs">
+            <button id="qr-tab-cam" type="button" onclick="switchQRMode('camera')" class="flex-1 py-1.5 bg-white text-slate-900 font-bold rounded-lg shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+              <i class="bi bi-camera"></i> Live Camera
+            </button>
+            <button id="qr-tab-file" type="button" onclick="switchQRMode('file')" class="flex-1 py-1.5 text-slate-600 font-semibold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+              <i class="bi bi-image"></i> Upload Image
+            </button>
+            <button id="qr-tab-manual" type="button" onclick="switchQRMode('manual')" class="flex-1 py-1.5 text-slate-600 font-semibold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+              <i class="bi bi-keyboard"></i> Enter Token
+            </button>
+          </div>
+
+          <!-- Live Camera View -->
+          <div id="qr-view-camera" class="space-y-2">
+            <div id="qr-reader" class="w-full rounded-2xl overflow-hidden bg-slate-950 min-h-[220px] flex items-center justify-center text-white text-xs border border-slate-200 relative">
+              <div id="qr-loading-msg" class="text-center p-4">
+                <span class="sst-spinner !w-6 !h-6 mb-2"></span>
+                <p class="text-slate-400">Initializing camera scanner...</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- File Upload View -->
+          <div id="qr-view-file" class="hidden space-y-2">
+            <label class="border-2 border-dashed border-slate-300 hover:border-emerald-600 rounded-2xl p-6 flex flex-col items-center justify-center text-center cursor-pointer bg-slate-50 hover:bg-emerald-50/50 transition-colors">
+              <i class="bi bi-cloud-arrow-up text-3xl text-emerald-700 mb-1"></i>
+              <span class="text-xs font-bold text-slate-800">Click to upload QR Ticket Screenshot / Photo</span>
+              <span class="text-[10px] text-slate-500">PNG, JPG, WEBP formats supported</span>
+              <input type="file" accept="image/*" onchange="handleQRFileUpload(event)" class="hidden" />
+            </label>
+          </div>
+
+          <!-- Manual Input View -->
+          <div id="qr-view-manual" class="hidden space-y-2">
+            <form onsubmit="handleManualTokenScan(event)" class="flex gap-2">
+              <input type="text" id="manual-token-input" placeholder="e.g. SST-PASS-1234-567890" class="flex-1 p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono focus:outline-none focus:border-[#123B32]" required />
+              <button type="submit" class="px-4 py-2.5 bg-[#123B32] hover:bg-[#2F5B4E] text-white text-xs font-bold rounded-xl shadow-xs transition-colors cursor-pointer">Lookup</button>
+            </form>
+          </div>
+
+          <!-- Scanned Result Card Container -->
+          <div id="qr-scan-result" class="hidden"></div>
+        </div>
+      `);
+
+      setTimeout(() => {
+        startQRCamera();
+      }, 150);
+    }
+
+    function switchQRMode(mode) {
+      document.getElementById('qr-tab-cam').className = mode === 'camera' ? 'flex-1 py-1.5 bg-white text-slate-900 font-bold rounded-lg shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer' : 'flex-1 py-1.5 text-slate-600 font-semibold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer';
+      document.getElementById('qr-tab-file').className = mode === 'file' ? 'flex-1 py-1.5 bg-white text-slate-900 font-bold rounded-lg shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer' : 'flex-1 py-1.5 text-slate-600 font-semibold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer';
+      document.getElementById('qr-tab-manual').className = mode === 'manual' ? 'flex-1 py-1.5 bg-white text-slate-900 font-bold rounded-lg shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer' : 'flex-1 py-1.5 text-slate-600 font-semibold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer';
+
+      document.getElementById('qr-view-camera').classList.toggle('hidden', mode !== 'camera');
+      document.getElementById('qr-view-file').classList.toggle('hidden', mode !== 'file');
+      document.getElementById('qr-view-manual').classList.toggle('hidden', mode !== 'manual');
+
+      if (mode === 'camera') {
+        startQRCamera();
+      } else {
+        stopQRCamera();
+      }
+    }
+
+    async function startQRCamera() {
+      if (typeof Html5Qrcode === 'undefined') {
+        const loadingMsg = document.getElementById('qr-loading-msg');
+        if (loadingMsg) loadingMsg.innerHTML = '<p class="text-amber-400">QR Scanner library loading... please use Manual Token input.</p>';
+        return;
+      }
+
+      try {
+        stopQRCamera();
+        html5QrCode = new Html5Qrcode("qr-reader");
+        const config = { fps: 10, qrbox: { width: 220, height: 220 } };
+
+        await html5QrCode.start(
+          { facingMode: "environment" },
+          config,
+          (decodedText) => {
+            stopQRCamera();
+            verifyScannedPass(decodedText);
+          },
+          (errorMessage) => {
+            // parsing errors ignored
+          }
+        );
+      } catch (err) {
+        const loadingMsg = document.getElementById('qr-loading-msg');
+        if (loadingMsg) loadingMsg.innerHTML = `<p class="text-amber-400">Camera access unavailable (${err.message || 'Permission denied'}). Please use Image Upload or Manual Input.</p>`;
+      }
+    }
+
+    function stopQRCamera() {
+      if (html5QrCode && html5QrCode.isScanning) {
+        html5QrCode.stop().then(() => {
+          html5QrCode.clear();
+          html5QrCode = null;
+        }).catch(() => {
+          html5QrCode = null;
+        });
+      }
+    }
+
+    function closeQRScannerModal() {
+      stopQRCamera();
+      closeModal();
+    }
+
+    async function handleQRFileUpload(e) {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      if (typeof Html5Qrcode === 'undefined') {
+        showToast('QR Scanner engine loading...', 'error');
+        return;
+      }
+
+      try {
+        const qrScanner = new Html5Qrcode("qr-reader");
+        const decodedText = await qrScanner.scanFile(file, true);
+        verifyScannedPass(decodedText);
+      } catch (err) {
+        showToast('Could not decode QR code from this image. Please try another image or manual input.', 'error');
+      }
+    }
+
+    function handleManualTokenScan(e) {
+      e.preventDefault();
+      const token = document.getElementById('manual-token-input')?.value.trim();
+      if (token) {
+        verifyScannedPass(token);
+      }
+    }
+
+    async function verifyScannedPass(scannedPayload) {
+      const resultContainer = document.getElementById('qr-scan-result');
+      if (!resultContainer) return;
+
+      resultContainer.classList.remove('hidden');
+      resultContainer.innerHTML = `
+        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 text-center space-y-2">
+          <span class="sst-spinner !w-5 !h-5 mx-auto"></span>
+          <p class="text-xs text-slate-600">Verifying pass payload <code>${scannedPayload}</code>...</p>
+        </div>
+      `;
+
+      try {
+        const { ok, data } = await safeFetchJson(`${API_BASE}/api/admin/event-registrations/scan`, {
+          method: 'POST',
+          headers: getAuthHeaders(),
+          body: JSON.stringify({ token_no: scannedPayload })
+        });
+
+        if (!ok) throw new Error(data.error || 'Pass token not recognized');
+
+        const reg = data.registration;
+        const isPaid = reg.registration_fee && reg.registration_fee !== 'Free' && reg.registration_fee !== '0';
+        const isVerified = reg.payment_status === 'Verified';
+        const isPresent = reg.attendance_status === 'Present';
+
+        resultContainer.innerHTML = `
+          <div class="p-4 bg-emerald-50/70 border-2 border-emerald-500 rounded-2xl space-y-3.5 animate-sst-modal text-left">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-1 bg-emerald-700 text-white font-mono font-extrabold text-xs rounded-lg">${reg.token_no}</span>
+                <span class="px-2 py-0.5 bg-white border border-emerald-300 text-emerald-900 font-bold rounded text-[10px] uppercase">${reg.target_audience || 'College'}</span>
+              </div>
+              <span class="px-2.5 py-1 ${isVerified ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-900'} font-bold rounded-full text-xs flex items-center gap-1">
+                <i class="bi ${isVerified ? 'bi-patch-check-fill text-emerald-600' : 'bi-clock-history text-amber-600'}"></i>
+                <span>${isVerified ? 'Payment Verified' : 'Payment Pending'}</span>
+              </span>
+            </div>
+
+            <div class="space-y-1 text-xs">
+              <div class="text-sm font-extrabold text-slate-900">${reg.name}</div>
+              <div class="text-slate-600">${reg.email} • ${reg.phone || 'No Phone'}</div>
+              <div class="font-bold text-[#123B32] pt-1"><i class="bi bi-calendar-event"></i> ${reg.event_title}</div>
+              <div class="text-slate-500 text-[11px]">${reg.college_name || reg.school_name || reg.company_name || 'Organization N/A'} ${reg.department ? `(${reg.department})` : ''}</div>
+              ${reg.transaction_id ? `<div class="font-mono text-[11px] text-slate-700 bg-white p-1.5 rounded-lg border border-slate-200 mt-1">UTR: <strong>${reg.transaction_id}</strong> (Fee: ${reg.registration_fee})</div>` : ''}
+            </div>
+
+            <!-- Attendance & Action Buttons -->
+            <div class="pt-2 border-t border-emerald-200 flex flex-col sm:flex-row items-center justify-between gap-2">
+              <div class="flex items-center gap-1.5 w-full sm:w-auto">
+                <span class="text-xs font-bold text-slate-700">Attendance:</span>
+                <span id="scanned-attendance-badge" class="px-2 py-0.5 ${isPresent ? 'bg-emerald-700 text-white' : 'bg-slate-200 text-slate-700'} font-bold rounded text-xs flex items-center gap-1">
+                  <i class="bi ${isPresent ? 'bi-person-check-fill' : 'bi-dash-circle'}"></i>
+                  <span>${isPresent ? 'Present' : 'Not Marked'}</span>
+                </span>
+              </div>
+
+              <div class="flex items-center gap-2 w-full sm:w-auto">
+                ${!isVerified ? `
+                  <button type="button" onclick="verifyPaymentFromScanner(${reg.id})" class="flex-1 sm:flex-none px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer flex items-center gap-1">
+                    <i class="bi bi-shield-check"></i> Verify Payment
+                  </button>
+                ` : ''}
+
+                <button type="button" id="scanned-btn-attendance" onclick="markAttendanceFromScanner(${reg.id}, '${isPresent ? 'Not Marked' : 'Present'}')" class="flex-1 sm:flex-none px-3.5 py-1.5 ${isPresent ? 'bg-slate-200 hover:bg-red-600 hover:text-white text-slate-800' : 'bg-emerald-700 hover:bg-emerald-800 text-white'} font-bold rounded-xl text-xs transition-colors cursor-pointer flex items-center justify-center gap-1">
+                  <i class="bi ${isPresent ? 'bi-x-circle' : 'bi-check-circle'}"></i>
+                  <span>${isPresent ? 'Undo Attendance' : 'Mark Present (Check-In)'}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      } catch (err) {
+        resultContainer.innerHTML = `
+          <div class="p-3.5 bg-red-50 border border-red-200 rounded-2xl text-red-700 text-xs text-center space-y-1">
+            <div class="font-bold"><i class="bi bi-exclamation-triangle-fill"></i> Pass Not Found</div>
+            <p>${err.message}</p>
+          </div>
+        `;
+      }
+    }
+
+    async function verifyPaymentFromScanner(regId) {
+      await updateRegistrationPaymentStatus(regId, 'Verified');
+      const passToken = document.getElementById('manual-token-input')?.value || regId;
+      verifyScannedPass(passToken);
+    }
+
+    async function markAttendanceFromScanner(regId, status) {
+      await toggleAttendance(regId, status);
+      const passToken = document.getElementById('manual-token-input')?.value || regId;
+      verifyScannedPass(passToken);
     }
 
     // ==========================================
