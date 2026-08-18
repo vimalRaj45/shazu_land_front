@@ -307,14 +307,27 @@
       `;
       return;
     }
+    window.allEventsCache = eventsList;
 
     container.innerHTML = eventsList.map(ev => {
       const fee = ev.registration_fee || 'Free';
-      const isPaid = fee !== 'Free' && fee !== '0' && fee !== '';
+      const isPaid = ev.is_paid || (fee !== 'Free' && fee !== '0' && fee !== '');
+      const audience = ev.target_audience || 'College';
       const defaultImg = ev.category && ev.category.toLowerCase().includes('hackathon') ? 
         'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&q=80' : 
         'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=600&q=80';
       const eventImg = ev.image_url || defaultImg;
+
+      let audienceBadge = '';
+      if (audience === 'School') {
+        audienceBadge = '<span class="px-2.5 py-0.5 bg-blue-600/90 text-white font-extrabold text-[10px] rounded-full uppercase tracking-wider shadow-xs"><i class="bi bi-backpack-fill mr-1"></i>School</span>';
+      } else if (audience === 'Professional') {
+        audienceBadge = '<span class="px-2.5 py-0.5 bg-purple-700/90 text-white font-extrabold text-[10px] rounded-full uppercase tracking-wider shadow-xs"><i class="bi bi-briefcase-fill mr-1"></i>Professional</span>';
+      } else if (audience === 'General') {
+        audienceBadge = '<span class="px-2.5 py-0.5 bg-slate-700/90 text-white font-extrabold text-[10px] rounded-full uppercase tracking-wider shadow-xs"><i class="bi bi-globe mr-1"></i>Open to All</span>';
+      } else {
+        audienceBadge = '<span class="px-2.5 py-0.5 bg-emerald-700/90 text-white font-extrabold text-[10px] rounded-full uppercase tracking-wider shadow-xs"><i class="bi bi-mortarboard-fill mr-1"></i>College</span>';
+      }
 
       return `
         <div class="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl shadow-lg hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 relative overflow-hidden flex flex-col justify-between group">
@@ -323,11 +336,14 @@
             <img src="${eventImg}" alt="${ev.title}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
             <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
             
-            <!-- Category & Status Overlay Badges -->
+            <!-- Category & Audience Badges -->
             <div class="absolute top-3 left-3 right-3 flex items-center justify-between gap-2">
-              <span class="px-3 py-1 bg-black/60 backdrop-blur-md text-white font-extrabold text-[10px] rounded-full uppercase tracking-wider border border-white/20">
-                <i class="bi bi-tag-fill text-[9px] mr-1 text-emerald-400"></i>${ev.category || 'Event'}
-              </span>
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="px-3 py-1 bg-black/60 backdrop-blur-md text-white font-extrabold text-[10px] rounded-full uppercase tracking-wider border border-white/20">
+                  <i class="bi bi-tag-fill text-[9px] mr-1 text-emerald-400"></i>${ev.category || 'Event'}
+                </span>
+                ${audienceBadge}
+              </div>
               <span class="px-3 py-1 ${isPaid ? 'bg-amber-500 text-white font-bold' : 'bg-emerald-600 text-white font-bold'} text-xs rounded-full shadow-md font-mono">
                 ${fee}
               </span>
@@ -361,7 +377,7 @@
             </div>
 
             <!-- Register Button -->
-            <button onclick="openRegisterModal('${ev.id}', '${encodeURIComponent(ev.title)}', '${encodeURIComponent(fee)}')" class="w-full py-3 bg-[#123B32] hover:bg-[#C47D4C] text-white font-bold text-xs rounded-2xl transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-xl cursor-pointer">
+            <button onclick="openRegisterModal('${ev.id}')" class="w-full py-3 bg-[#123B32] hover:bg-[#C47D4C] text-white font-bold text-xs rounded-2xl transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-xl cursor-pointer">
               <i class="bi bi-ticket-perforated text-sm"></i>
               <span>Register For Event</span>
               <i class="bi bi-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
@@ -386,19 +402,18 @@
     });
   };
 
-  window.handlePublicResumeUpload = async function(event) {
+  window.handleReceiptScreenshotUpload = async function(event) {
     const file = event.target.files[0];
     if (!file) return;
     try {
-      const base64Data = await window.convertFileToBase64(file);
-      document.getElementById('pub-app-resume').value = base64Data;
-      const preview = document.getElementById('pub-resume-preview');
-      const filenameSpan = document.getElementById('pub-resume-filename');
-      if (preview && filenameSpan) {
-        filenameSpan.textContent = `Attached: ${file.name} (${(file.size / (1024 * 1024)).toFixed(2)} MB)`;
-        preview.classList.remove('hidden');
-      }
-      if (window.toast) window.toast.success(`Attached ${file.name} successfully!`);
+      const base64 = await convertFileToBase64(file);
+      const hiddenInput = document.getElementById('pub-reg-screenshot-base64');
+      const previewImg = document.getElementById('pub-reg-screenshot-preview');
+      const previewContainer = document.getElementById('pub-reg-screenshot-preview-container');
+      if (hiddenInput) hiddenInput.value = base64;
+      if (previewImg) previewImg.src = base64;
+      if (previewContainer) previewContainer.classList.remove('hidden');
+      if (window.toast) window.toast.success('Receipt image attached successfully!');
     } catch (err) {
       if (window.toast) window.toast.error(err.message);
       else alert(err.message);
@@ -458,171 +473,6 @@
       </div>
     `;
     document.body.insertAdjacentHTML('beforeend', modalHtml);
-  };
-
-  window.openRegisterModal = function (eventId, encodedTitle, encodedFee = 'Free') {
-    const title = decodeURIComponent(encodedTitle);
-    const fee = decodeURIComponent(encodedFee);
-    const isPaid = fee !== 'Free' && fee !== '0' && fee !== '';
-
-    const modalHtml = `
-      <div id="public-modal-backdrop" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white dark:bg-slate-900 border border-[#D3DDD7] dark:border-slate-800 w-full max-w-lg rounded-3xl p-6 sm:p-7 shadow-2xl space-y-4 text-[#0F172A] dark:text-slate-100 max-h-[90vh] overflow-y-auto">
-          <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
-            <div>
-              <h3 class="text-lg sm:text-xl font-black font-heading text-[#0F172A] dark:text-white leading-tight">Register for ${title}</h3>
-              <p class="text-xs text-[#527A68] dark:text-emerald-400 font-semibold mt-0.5">SST Event & Contest Registration</p>
-            </div>
-            <button onclick="closePublicModal()" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center transition-colors cursor-pointer"><i class="bi bi-x-lg text-sm pointer-events-none"></i></button>
-          </div>
-
-          ${isPaid ? `
-            <div class="bg-[#E8EFEB] dark:bg-emerald-950/50 border border-[#D3DDD7] dark:border-emerald-800 p-4 rounded-2xl space-y-3">
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-bold uppercase tracking-wider text-[#123B32] dark:text-emerald-300">Registration Fee Required</span>
-                <span class="px-3 py-1 bg-[#123B32] text-white font-mono font-bold text-xs rounded-lg">${fee}</span>
-              </div>
-              <div class="flex flex-col sm:flex-row items-center gap-4 bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-emerald-900/50">
-                <div class="bg-white p-1.5 rounded-lg shadow-xs border border-slate-200">
-                  <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=upi://pay?pa=shazusofttechnologies@upi%26pn=ShazuSoftTechnologies%26am=499%26cu=INR" alt="UPI QR Code" class="w-24 h-24">
-                </div>
-                <div class="space-y-1 text-center sm:text-left text-xs">
-                  <span class="block font-bold text-[#0F172A] dark:text-white">Pay via any UPI App (GPay / PhonePe / Paytm)</span>
-                  <span class="block font-mono font-bold text-[#123B32] dark:text-emerald-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">UPI ID: shazusofttechnologies@upi</span>
-                  <span class="block text-[11px] text-slate-500">Scan QR or use UPI ID, complete payment, and enter your 12-digit UTR / Ref No below.</span>
-                </div>
-              </div>
-            </div>
-          ` : ''}
-
-          <form onsubmit="submitEventRegistration(event, '${eventId}', '${encodedTitle}', '${encodedFee}')" class="space-y-3.5 text-xs">
-            <div>
-              <label class="block font-bold text-xs text-[#1E292B] dark:text-slate-200 mb-1.5">Full Name *</label>
-              <input type="text" id="pub-reg-name" required placeholder="Jane Doe" class="w-full p-3 bg-[#F8FAFC] dark:bg-[#0B0F19] border border-[#D3DDD7] dark:border-slate-800 rounded-xl text-xs text-[#0F172A] dark:text-white placeholder:text-[#64748B] dark:placeholder:text-slate-500 focus:outline-none focus:border-[#123B32] dark:focus:border-emerald-500 font-sans transition-all">
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-              <div>
-                <label class="block font-bold text-xs text-[#1E292B] dark:text-slate-200 mb-1.5">Email Address *</label>
-                <input type="email" id="pub-reg-email" required placeholder="jane@example.com" class="w-full p-3 bg-[#F8FAFC] dark:bg-[#0B0F19] border border-[#D3DDD7] dark:border-slate-800 rounded-xl text-xs text-[#0F172A] dark:text-white placeholder:text-[#64748B] dark:placeholder:text-slate-500 focus:outline-none focus:border-[#123B32] dark:focus:border-emerald-500 font-sans transition-all">
-              </div>
-              <div>
-                <label class="block font-bold text-xs text-[#1E292B] dark:text-slate-200 mb-1.5">Phone Number *</label>
-                <input type="tel" id="pub-reg-phone" required placeholder="+91 98765 43210" class="w-full p-3 bg-[#F8FAFC] dark:bg-[#0B0F19] border border-[#D3DDD7] dark:border-slate-800 rounded-xl text-xs text-[#0F172A] dark:text-white placeholder:text-[#64748B] dark:placeholder:text-slate-500 focus:outline-none focus:border-[#123B32] dark:focus:border-emerald-500 font-sans transition-all">
-              </div>
-            </div>
-            <div>
-              <label class="block font-bold text-xs text-[#1E292B] dark:text-slate-200 mb-1.5">College / Organization</label>
-              <input type="text" id="pub-reg-org" placeholder="Anna University / SST Tech" class="w-full p-3 bg-[#F8FAFC] dark:bg-[#0B0F19] border border-[#D3DDD7] dark:border-slate-800 rounded-xl text-xs text-[#0F172A] dark:text-white placeholder:text-[#64748B] dark:placeholder:text-slate-500 focus:outline-none focus:border-[#123B32] dark:focus:border-emerald-500 font-sans transition-all">
-            </div>
-
-            ${isPaid ? `
-              <div>
-                <label class="block font-bold text-xs text-[#1E292B] dark:text-slate-200 mb-1.5">UPI Transaction / UTR No *</label>
-                <input type="text" id="pub-reg-utr" required placeholder="e.g. 423589102456" class="w-full p-3 bg-[#F8FAFC] dark:bg-[#0B0F19] border border-amber-300 dark:border-amber-700 rounded-xl text-xs text-[#0F172A] dark:text-white focus:outline-none focus:border-[#123B32] font-mono">
-                <span class="text-[10px] text-slate-500 mt-1 block">Find 12-digit UTR in GPay / PhonePe payment receipt.</span>
-              </div>
-            ` : ''}
-
-            <div class="flex justify-end items-center gap-3 pt-2">
-              <button type="button" onclick="closePublicModal()" class="px-5 py-2.5 bg-[#F1F5F3] hover:bg-[#E2E8F0] dark:bg-slate-800 dark:hover:bg-slate-700 text-[#0F172A] dark:text-slate-300 rounded-xl font-bold text-xs transition-all cursor-pointer">Cancel</button>
-              <button type="submit" class="px-6 py-2.5 bg-[#123B32] hover:bg-[#1A4B40] dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-extrabold rounded-xl transition-all shadow-md text-xs inline-flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">
-                <span>Complete Registration</span>
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    `;
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
-  };
-
-  window.closePublicModal = function () {
-    const backdrop = document.getElementById('public-modal-backdrop');
-    if (backdrop) backdrop.remove();
-  };
-
-  window.submitJobApplication = async function (e, jobId, encodedTitle) {
-    e.preventDefault();
-    const title = decodeURIComponent(encodedTitle);
-    const submitBtn = e.target.querySelector('button[type="submit"]');
-    const originalText = submitBtn ? submitBtn.innerHTML : 'Submit Application';
-
-    if (submitBtn) {
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = `<svg class="animate-spin h-3.5 w-3.5 text-white inline-block mr-1.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg><span>Submitting...</span>`;
-    }
-
-    const body = {
-      job_id: jobId,
-      job_title: title,
-      applicant_name: document.getElementById('pub-app-name').value,
-      email: document.getElementById('pub-app-email').value,
-      phone: document.getElementById('pub-app-phone').value,
-      resume_url: document.getElementById('pub-app-resume').value,
-      message: document.getElementById('pub-app-msg').value
-    };
-
-    try {
-      const res = await fetch(`${API_BASE}/api/public/careers/apply`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Submission failed');
-      closePublicModal();
-      showPublicModalNotice('Application Submitted!', 'Your job application has been successfully submitted to Shazu Soft Technologies! Our hiring team will review it shortly.');
-    } catch (err) {
-      if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = originalText;
-      }
-      showPublicModalNotice('Submission Error', err.message, true);
-    }
-  };
-
-  window.submitEventRegistration = async function (e, eventId, encodedTitle, encodedFee = 'Free') {
-    e.preventDefault();
-    const title = decodeURIComponent(encodedTitle);
-    const fee = decodeURIComponent(encodedFee);
-    const utrEl = document.getElementById('pub-reg-utr');
-    const submitBtn = e.target.querySelector('button[type="submit"]');
-    const originalText = submitBtn ? submitBtn.innerHTML : 'Complete Registration';
-
-    if (submitBtn) {
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = `<svg class="animate-spin h-3.5 w-3.5 text-white inline-block mr-1.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg><span>Registering...</span>`;
-    }
-
-    const body = {
-      event_id: eventId,
-      event_title: title,
-      name: document.getElementById('pub-reg-name').value,
-      email: document.getElementById('pub-reg-email').value,
-      phone: document.getElementById('pub-reg-phone').value,
-      organization: document.getElementById('pub-reg-org').value,
-      registration_fee: fee,
-      payment_method: 'UPI QR',
-      transaction_id: utrEl ? utrEl.value : ''
-    };
-
-    try {
-      const res = await fetch(`${API_BASE}/api/public/events/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Registration failed');
-      closePublicModal();
-      showPublicModalNotice('Registration Confirmed!', 'You have successfully registered for the event! A confirmation pass has been sent to your email.');
-    } catch (err) {
-      if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = originalText;
-      }
-      showPublicModalNotice('Registration Error', err.message, true);
-    }
   };
 
   window.showPublicModalNotice = function (title, message, isError = false) {
