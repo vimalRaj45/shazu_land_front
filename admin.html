@@ -694,10 +694,76 @@
       <!-- TAB 3: EVENT REGISTRATIONS & UTR VERIFICATION -->
       <!-- ========================================== -->
       <div id="tab-registrations" class="hidden space-y-4">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <h2 class="text-lg font-bold font-heading text-slate-900">Event Registrations & Ticket Passes</h2>
-            <p class="text-xs text-slate-500">Verify attendee payments, validate UTR references, and issue access entry passes</p>
+            <p class="text-xs text-slate-500">Filter registrations by event/hackathon, verify payments, and issue access entry passes</p>
+          </div>
+          
+          <!-- Event Selector & Export Buttons -->
+          <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+            <label for="filter-registration-event" class="text-xs font-bold text-slate-700 whitespace-nowrap"><i class="bi bi-funnel-fill text-[#123B32]"></i> Event:</label>
+            <select id="filter-registration-event" onchange="renderRegistrationsTable()" class="bg-white border border-slate-200 text-slate-900 rounded-xl px-3 py-2 text-xs font-bold shadow-xs focus:outline-none focus:border-[#123B32] max-w-xs truncate cursor-pointer">
+              <option value="ALL">All Events & Hackathons</option>
+            </select>
+
+            <!-- Export Registrations Dropdown -->
+            <div class="relative group">
+              <button type="button" class="px-3 py-2 bg-[#123B32] hover:bg-[#2F5B4E] text-white text-xs font-bold rounded-xl shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap">
+                <i class="bi bi-download"></i>
+                <span>Export</span>
+                <i class="bi bi-chevron-down text-[10px]"></i>
+              </button>
+              <div class="absolute right-0 top-full pt-1 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-150 z-50 min-w-[200px]">
+                <div class="bg-white border border-slate-200 rounded-xl shadow-xl p-1.5 space-y-1 text-xs text-slate-700">
+                  <button onclick="exportCurrentTab('csv')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-emerald-50 hover:text-emerald-900 flex items-center gap-2 cursor-pointer font-semibold">
+                    <i class="bi bi-file-earmark-spreadsheet text-emerald-600 text-sm"></i>
+                    <span>Export to CSV (Excel)</span>
+                  </button>
+                  <button onclick="exportCurrentTab('json')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-amber-50 hover:text-amber-900 flex items-center gap-2 cursor-pointer font-semibold">
+                    <i class="bi bi-file-earmark-code text-amber-600 text-sm"></i>
+                    <span>Export JSON Dossier</span>
+                  </button>
+                  <button onclick="exportCurrentTab('print')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-indigo-50 hover:text-indigo-900 flex items-center gap-2 cursor-pointer font-semibold">
+                    <i class="bi bi-printer text-indigo-600 text-sm"></i>
+                    <span>Print Attendee Pass List</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dynamic Event Performance Metrics Header -->
+        <div id="event-metrics-bar" class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs text-xs">
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 space-y-1">
+            <span class="text-[10px] text-slate-400 font-mono uppercase font-bold">Total Registrations</span>
+            <div id="metric-event-total" class="text-xl font-bold font-mono text-slate-900">0</div>
+            <span id="metric-event-audience-split" class="text-[10px] text-slate-500 block truncate">0 School • 0 College</span>
+          </div>
+          <div class="p-3 bg-emerald-50/60 rounded-xl border border-emerald-100 space-y-1">
+            <span class="text-[10px] text-emerald-700 font-mono uppercase font-bold">Verified & Paid</span>
+            <div id="metric-event-verified-count" class="text-xl font-bold font-mono text-emerald-800">0</div>
+            <span id="metric-event-verified-amount" class="text-[10px] text-emerald-700 font-bold block">₹0 Collected</span>
+          </div>
+          <div class="p-3 bg-amber-50/60 rounded-xl border border-amber-100 space-y-1">
+            <span class="text-[10px] text-amber-700 font-mono uppercase font-bold">Pending Verification</span>
+            <div id="metric-event-pending-count" class="text-xl font-bold font-mono text-amber-800">0</div>
+            <span id="metric-event-pending-amount" class="text-[10px] text-amber-700 font-bold block">₹0 Pending</span>
+          </div>
+          <div class="p-3 bg-sky-50/60 rounded-xl border border-sky-100 space-y-1 flex flex-col justify-between">
+            <span class="text-[10px] text-sky-700 font-mono uppercase font-bold">Quick Actions</span>
+            <div class="flex items-center gap-1.5 pt-1">
+              <button onclick="exportCurrentTab('csv')" title="Download CSV Spreadsheet" class="px-2.5 py-1.5 bg-[#123B32] hover:bg-[#2F5B4E] text-white rounded-lg text-[10px] font-bold flex items-center gap-1 cursor-pointer">
+                <i class="bi bi-filetype-csv"></i> CSV
+              </button>
+              <button onclick="exportCurrentTab('json')" title="Download JSON" class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-[10px] font-bold flex items-center gap-1 cursor-pointer">
+                <i class="bi bi-filetype-json"></i> JSON
+              </button>
+              <button onclick="loadRegistrations()" class="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs cursor-pointer" title="Refresh List">
+                <i class="bi bi-arrow-clockwise"></i>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -1834,17 +1900,102 @@
     async function loadRegistrations() {
       renderTableSkeleton('registrations-table-body');
       try {
-        const { ok, data } = await safeFetchJson(`${API_BASE}/api/admin/event-registrations`, { headers: getAuthHeaders() });
-        tableData.registrations = data.registrations || [];
+        const [regRes, evRes] = await Promise.all([
+          safeFetchJson(`${API_BASE}/api/admin/event-registrations`, { headers: getAuthHeaders() }),
+          safeFetchJson(`${API_BASE}/api/admin/events`, { headers: getAuthHeaders() })
+        ]);
+        
+        tableData.registrations = regRes.data?.registrations || [];
+        if (evRes.ok && evRes.data?.events) {
+          tableData.events = evRes.data.events;
+        }
+        
         document.getElementById('badge-registrations-count').textContent = tableData.registrations.length;
+        populateRegistrationEventFilter();
         renderRegistrationsTable();
       } catch (err) {
         showToast('Error loading registrations', 'error');
       }
     }
 
+    function populateRegistrationEventFilter() {
+      const select = document.getElementById('filter-registration-event');
+      if (!select) return;
+      
+      const currentVal = select.value || 'ALL';
+      
+      // Calculate registrations per event
+      const eventCounts = {};
+      (tableData.registrations || []).forEach(r => {
+        const key = r.event_id ? `ID_${r.event_id}` : (r.event_title || 'Unknown');
+        eventCounts[key] = (eventCounts[key] || 0) + 1;
+      });
+
+      let optionsHtml = `<option value="ALL">All Events & Hackathons (${tableData.registrations.length})</option>`;
+      
+      (tableData.events || []).forEach(ev => {
+        const count = eventCounts[`ID_${ev.id}`] || (tableData.registrations.filter(r => r.event_title === ev.title).length) || 0;
+        optionsHtml += `<option value="${ev.id}">[ID: #${ev.id}] ${ev.title} (${count} reg)</option>`;
+      });
+
+      select.innerHTML = optionsHtml;
+      select.value = currentVal;
+    }
+
     function renderRegistrationsTable() {
-      const filtered = filterAndSortArray(tableData.registrations, 'registered_at', 'name', 'payment_status', 'payment_method');
+      const selectedEventId = document.getElementById('filter-registration-event')?.value || 'ALL';
+      
+      // Filter by selected event
+      let eventFiltered = tableData.registrations || [];
+      if (selectedEventId !== 'ALL') {
+        eventFiltered = eventFiltered.filter(r => String(r.event_id) === String(selectedEventId) || (tableData.events?.find(e => String(e.id) === String(selectedEventId))?.title === r.event_title));
+      }
+
+      window.currentFilteredRegistrations = eventFiltered;
+
+      // Compute Event-Specific Performance Metrics
+      const totalCount = eventFiltered.length;
+      let verifiedCount = 0;
+      let verifiedAmount = 0;
+      let pendingCount = 0;
+      let pendingAmount = 0;
+      let schoolCount = 0;
+      let collegeCount = 0;
+      let proCount = 0;
+
+      eventFiltered.forEach(r => {
+        const numericFee = parseFloat(String(r.fee_amount || r.registration_fee || '0').replace(/[^0-9.]/g, '')) || 0;
+        if (r.payment_status === 'Verified') {
+          verifiedCount++;
+          verifiedAmount += numericFee;
+        } else if (r.payment_status === 'Pending Verification') {
+          pendingCount++;
+          pendingAmount += numericFee;
+        }
+
+        const aud = r.target_audience || 'College';
+        if (aud === 'School') schoolCount++;
+        else if (aud === 'Professional') proCount++;
+        else collegeCount++;
+      });
+
+      // Update Metrics Bar in Tab 3
+      const totalEl = document.getElementById('metric-event-total');
+      const audSplitEl = document.getElementById('metric-event-audience-split');
+      const verCountEl = document.getElementById('metric-event-verified-count');
+      const verAmtEl = document.getElementById('metric-event-verified-amount');
+      const pendCountEl = document.getElementById('metric-event-pending-count');
+      const pendAmtEl = document.getElementById('metric-event-pending-amount');
+
+      if (totalEl) totalEl.textContent = totalCount;
+      if (audSplitEl) audSplitEl.textContent = `${collegeCount} College • ${schoolCount} School • ${proCount} Pro`;
+      if (verCountEl) verCountEl.textContent = verifiedCount;
+      if (verAmtEl) verAmtEl.textContent = `₹${verifiedAmount.toLocaleString('en-IN')} Collected`;
+      if (pendCountEl) pendCountEl.textContent = pendingCount;
+      if (pendAmtEl) pendAmtEl.textContent = `₹${pendingAmount.toLocaleString('en-IN')} Pending`;
+
+      // Apply search and sorting
+      const filtered = filterAndSortArray(eventFiltered, 'registered_at', 'name', 'payment_status', 'payment_method');
       document.getElementById('filter-records-count').textContent = `Showing ${filtered.length} of ${tableData.registrations.length} registrations`;
 
       const tbody = document.getElementById('registrations-table-body');
@@ -1899,7 +2050,18 @@
             </td>
           </tr>
         `;
-      }).join('') || '<tr><td colspan="6" class="p-6 text-center text-slate-400">No event registrations found.</td></tr>';
+      }).join('') || '<tr><td colspan="6" class="p-6 text-center text-slate-400">No matching registrations found for this selection.</td></tr>';
+    }
+
+    function viewEventRegistrations(eventId) {
+      switchTab('registrations');
+      setTimeout(() => {
+        const select = document.getElementById('filter-registration-event');
+        if (select) {
+          select.value = String(eventId);
+          renderRegistrationsTable();
+        }
+      }, 100);
     }
 
     function previewReceiptModal(attendeeName, imgUrl) {
@@ -1967,6 +2129,8 @@
       const tbody = document.getElementById('events-table-body');
       tbody.innerHTML = filtered.map(ev => {
         const audience = ev.target_audience || 'College';
+        const regCount = (tableData.registrations || []).filter(r => String(r.event_id) === String(ev.id) || r.event_title === ev.title).length;
+
         let audienceBadge = '<span class="px-2 py-0.5 bg-emerald-50 text-emerald-800 font-bold rounded text-[10px]"><i class="bi bi-mortarboard-fill"></i> College</span>';
         if (audience === 'School') audienceBadge = '<span class="px-2 py-0.5 bg-blue-50 text-blue-800 font-bold rounded text-[10px]"><i class="bi bi-backpack-fill"></i> School</span>';
         else if (audience === 'Professional') audienceBadge = '<span class="px-2 py-0.5 bg-purple-50 text-purple-800 font-bold rounded text-[10px]"><i class="bi bi-briefcase-fill"></i> Professional</span>';
@@ -1981,8 +2145,13 @@
               </div>
             </td>
             <td class="p-3">
-              <span class="block font-bold text-slate-900">${ev.title}</span>
-              <span class="block text-[11px] text-slate-500 truncate max-w-sm">${ev.description}</span>
+              <div class="flex items-center gap-2.5">
+                ${ev.image_url ? `<img src="${ev.image_url}" alt="Banner" class="w-10 h-10 object-cover rounded-lg border border-slate-200 shrink-0">` : ''}
+                <div>
+                  <span class="block font-bold text-slate-900">${ev.title}</span>
+                  <span class="block text-[11px] text-slate-500 truncate max-w-sm">${ev.description}</span>
+                </div>
+              </div>
             </td>
             <td class="p-3 text-slate-600 font-mono text-[11px]">${ev.event_date}</td>
             <td class="p-3 text-slate-500">
@@ -1995,7 +2164,12 @@
               }">${ev.status}</span>
             </td>
             <td class="p-3 text-right space-x-1.5 whitespace-nowrap" onclick="event.stopPropagation()">
-              <button onclick="openRowDetails('events', ${ev.id})" title="View Details" class="p-1.5 bg-slate-100 hover:bg-[#123B32] hover:text-white text-slate-700 rounded-lg text-xs font-semibold transition-colors shadow-2xs cursor-pointer"><i class="bi bi-eye"></i></button>
+              <button onclick="viewEventRegistrations(${ev.id})" title="View Attendees" class="px-2.5 py-1.5 bg-[#123B32] hover:bg-[#2F5B4E] text-white rounded-lg text-[11px] font-bold transition-colors shadow-2xs cursor-pointer inline-flex items-center gap-1">
+                <i class="bi bi-people-fill"></i> Registrations (${regCount})
+              </button>
+              <button onclick="exportSpecificEventRegistrations(${ev.id})" title="Export Attendees to CSV" class="p-1.5 bg-slate-100 hover:bg-emerald-700 hover:text-white text-emerald-800 rounded-lg text-xs font-semibold transition-colors shadow-2xs cursor-pointer inline-flex items-center gap-1">
+                <i class="bi bi-download"></i>
+              </button>
               <button onclick="openEventModal(${ev.id})" title="Edit Event" class="p-1.5 bg-slate-100 hover:bg-amber-600 hover:text-white text-slate-700 rounded-lg text-xs font-semibold transition-colors shadow-2xs cursor-pointer"><i class="bi bi-pencil"></i></button>
               <button onclick="confirmDeleteEvent(${ev.id})" title="Delete Event" class="p-1.5 bg-slate-100 hover:bg-red-600 hover:text-white text-red-600 rounded-lg text-xs font-semibold transition-colors shadow-2xs cursor-pointer"><i class="bi bi-trash"></i></button>
             </td>
@@ -2019,10 +2193,45 @@
       const feeInput = document.getElementById('ev-fee-amount')?.value || '499';
       const cleanFee = feeInput.replace(/[^0-9.]/g, '') || '499';
       const upiId = document.getElementById('ev-upi-id')?.value || '8807099288@upi';
+      const evTitle = document.getElementById('ev-title')?.value || 'Event';
+      const upiNote = `${evTitle} (ID: Preview)`;
       const qrImg = document.getElementById('ev-admin-qr-img');
+      const noteSpan = document.getElementById('ev-admin-qr-note');
       if (qrImg) {
-        qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=upi://pay?pa=${encodeURIComponent(upiId)}%26pn=Shazu%20Soft%20Technologies%26am=${cleanFee}%26cu=INR`;
+        qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=upi://pay?pa=${encodeURIComponent(upiId)}%26pn=Shazu%20Soft%20Technologies%26am=${cleanFee}%26cu=INR%26tn=${encodeURIComponent(upiNote)}`;
       }
+      if (noteSpan) {
+        noteSpan.textContent = upiNote;
+      }
+    }
+
+    async function handleEventBannerUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      try {
+        const base64 = await convertFileToBase64(file);
+        const hiddenInput = document.getElementById('ev-image-data');
+        const previewImg = document.getElementById('ev-banner-preview-img');
+        const previewContainer = document.getElementById('ev-banner-preview-container');
+        if (hiddenInput) hiddenInput.value = base64;
+        if (previewImg) previewImg.src = base64;
+        if (previewContainer) previewContainer.classList.remove('hidden');
+        showToast('Banner image uploaded successfully!');
+      } catch (err) {
+        showToast(err.message, 'error');
+        event.target.value = '';
+      }
+    }
+
+    function removeEventBannerUpload() {
+      const hiddenInput = document.getElementById('ev-image-data');
+      const previewImg = document.getElementById('ev-banner-preview-img');
+      const previewContainer = document.getElementById('ev-banner-preview-container');
+      const fileInput = document.getElementById('ev-banner-file');
+      if (hiddenInput) hiddenInput.value = '';
+      if (previewImg) previewImg.src = '';
+      if (previewContainer) previewContainer.classList.add('hidden');
+      if (fileInput) fileInput.value = '';
     }
 
     function openEventModal(id = null) {
@@ -2036,13 +2245,14 @@
       const isPaid = ev.is_paid || (ev.registration_fee && ev.registration_fee !== 'Free' && ev.registration_fee !== '0');
       const feeAmount = ev.fee_amount || (isPaid ? (ev.registration_fee?.replace(/[^0-9.]/g, '') || '499') : '499');
       const upiId = ev.upi_id || '8807099288@upi';
+      const bannerImg = ev.image_url || '';
 
       showModal(`
         <h3 class="text-base font-bold font-heading text-slate-900">${isEdit ? 'Edit Event / Hackathon' : 'Create New Event / Hackathon'}</h3>
         <form onsubmit="saveEvent(event, ${id || 'null'})" class="space-y-3.5 text-xs">
           <div>
             <label class="block text-slate-600 font-semibold mb-1">Event Title *</label>
-            <input type="text" id="ev-title" required value="${ev.title || ''}" placeholder="e.g. National AI Hackathon 2026" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32]">
+            <input type="text" id="ev-title" oninput="updateAdminQrPreview()" required value="${ev.title || ''}" placeholder="e.g. National AI Hackathon 2026" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32]">
           </div>
 
           <div class="grid grid-cols-2 gap-3">
@@ -2083,12 +2293,32 @@
                 </div>
               </div>
               <div class="flex items-center gap-3 bg-white p-2.5 rounded-xl border border-amber-200">
-                <img id="ev-admin-qr-img" src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=upi://pay?pa=${encodeURIComponent(upiId)}%26pn=Shazu%20Soft%20Technologies%26am=${feeAmount}%26cu=INR" alt="QR Preview" class="w-16 h-16 object-contain rounded border border-slate-200">
-                <div class="text-[11px] text-slate-600 space-y-0.5">
+                <img id="ev-admin-qr-img" src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=upi://pay?pa=${encodeURIComponent(upiId)}%26pn=Shazu%20Soft%20Technologies%26am=${feeAmount}%26cu=INR%26tn=${encodeURIComponent((ev.title || 'Event') + ' (ID: Preview)')}" alt="QR Preview" class="w-16 h-16 object-contain rounded border border-slate-200">
+                <div class="text-[11px] text-slate-600 space-y-0.5 flex-1">
                   <span class="font-bold text-slate-900 block">Live UPI QR Code Preview</span>
-                  <p>Attendees will scan this QR code on the registration modal to transfer the fee directly.</p>
+                  <p>Includes Auto UPI Note: <code id="ev-admin-qr-note" class="bg-slate-100 text-[#123B32] font-mono px-1 rounded">${ev.title || 'Event'} (ID: Preview)</code></p>
                 </div>
               </div>
+            </div>
+          </div>
+
+          <!-- Direct Banner Image File Upload -->
+          <div class="p-3 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+            <label class="block text-slate-700 font-bold text-xs">Event Banner Image Upload</label>
+            <input type="file" id="ev-banner-file" accept="image/*" onchange="handleEventBannerUpload(event)" class="w-full p-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-700 cursor-pointer">
+            <input type="hidden" id="ev-image-data" value="${bannerImg}">
+            
+            <div id="ev-banner-preview-container" class="${bannerImg ? '' : 'hidden'} flex items-center justify-between gap-3 p-2 bg-white rounded-xl border border-slate-200">
+              <div class="flex items-center gap-2.5">
+                <img id="ev-banner-preview-img" src="${bannerImg}" alt="Banner Preview" class="w-16 h-12 object-cover rounded-lg border border-slate-200">
+                <span class="text-[11px] text-emerald-600 font-bold"><i class="bi bi-image"></i> Banner image attached</span>
+              </div>
+              <button type="button" onclick="removeEventBannerUpload()" class="px-2 py-1 bg-red-50 hover:bg-red-100 text-red-600 text-[10px] font-bold rounded-lg cursor-pointer">Remove</button>
+            </div>
+
+            <div>
+              <span class="text-[10.5px] text-slate-400 block mb-1">Or provide external image URL:</span>
+              <input type="text" id="ev-image-url" value="${bannerImg.startsWith('http') ? bannerImg : ''}" placeholder="https://images.unsplash.com/..." class="w-full p-2 bg-white border border-slate-200 rounded-xl text-slate-900 text-xs focus:outline-none focus:border-[#123B32]">
             </div>
           </div>
 
@@ -2103,19 +2333,13 @@
             </div>
           </div>
 
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block text-slate-600 font-semibold mb-1">Status</label>
-              <select id="ev-status" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32]">
-                <option value="Upcoming" ${ev.status === 'Upcoming' ? 'selected' : ''}>Upcoming</option>
-                <option value="Completed" ${ev.status === 'Completed' ? 'selected' : ''}>Completed</option>
-                <option value="Cancelled" ${ev.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-slate-600 font-semibold mb-1">Banner Image URL</label>
-              <input type="text" id="ev-image-url" value="${ev.image_url || ''}" placeholder="https://images.unsplash.com/..." class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32]">
-            </div>
+          <div>
+            <label class="block text-slate-600 font-semibold mb-1">Status</label>
+            <select id="ev-status" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32]">
+              <option value="Upcoming" ${ev.status === 'Upcoming' ? 'selected' : ''}>Upcoming</option>
+              <option value="Completed" ${ev.status === 'Completed' ? 'selected' : ''}>Completed</option>
+              <option value="Cancelled" ${ev.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+            </select>
           </div>
 
           <div>
@@ -2137,6 +2361,9 @@
       const feeAmount = document.getElementById('ev-fee-amount')?.value || '499';
       const cleanFee = isPaid ? `₹${feeAmount.replace(/[^0-9.]/g, '') || '499'}` : 'Free';
       const upiId = document.getElementById('ev-upi-id')?.value || '8807099288@upi';
+      const uploadedData = document.getElementById('ev-image-data')?.value;
+      const urlInput = document.getElementById('ev-image-url')?.value;
+      const finalImg = uploadedData || urlInput || '';
 
       const body = {
         title: document.getElementById('ev-title').value,
@@ -2148,7 +2375,7 @@
         upi_id: upiId,
         event_date: document.getElementById('ev-date').value,
         location: document.getElementById('ev-location').value,
-        image_url: document.getElementById('ev-image-url')?.value || '',
+        image_url: finalImg,
         description: document.getElementById('ev-desc').value,
         status: document.getElementById('ev-status').value
       };
@@ -2914,17 +3141,33 @@
       let dataToExport = [];
       let filenamePrefix = `sst_${currentTab}`;
 
-      if (currentTab === 'leads') dataToExport = tableData.leads;
-      else if (currentTab === 'registrations') dataToExport = tableData.registrations;
-      else if (currentTab === 'events') dataToExport = tableData.events;
-      else if (currentTab === 'careers') dataToExport = tableData.careers;
-      else if (currentTab === 'applications') dataToExport = tableData.applications;
-      else if (currentTab === 'announcements') dataToExport = tableData.announcements;
-      else if (currentTab === 'offerings') dataToExport = tableData.offerings;
-      else if (currentTab === 'users') dataToExport = tableData.users;
-      else if (currentTab === 'slider') dataToExport = tableData.slides;
-      else if (currentTab === 'audit') dataToExport = tableData.audit;
-      else if (currentTab === 'analytics') dataToExport = (tableData.analytics && tableData.analytics.recentTransactions) ? tableData.analytics.recentTransactions : [];
+      if (currentTab === 'leads') {
+        dataToExport = tableData.leads;
+      } else if (currentTab === 'registrations') {
+        const selectedEv = document.getElementById('filter-registration-event')?.value || 'ALL';
+        dataToExport = window.currentFilteredRegistrations || tableData.registrations;
+        if (selectedEv !== 'ALL') {
+          filenamePrefix = `sst_event_${selectedEv}_registrations`;
+        }
+      } else if (currentTab === 'events') {
+        dataToExport = tableData.events;
+      } else if (currentTab === 'careers') {
+        dataToExport = tableData.careers;
+      } else if (currentTab === 'applications') {
+        dataToExport = tableData.applications;
+      } else if (currentTab === 'announcements') {
+        dataToExport = tableData.announcements;
+      } else if (currentTab === 'offerings') {
+        dataToExport = tableData.offerings;
+      } else if (currentTab === 'users') {
+        dataToExport = tableData.users;
+      } else if (currentTab === 'slider') {
+        dataToExport = tableData.slides;
+      } else if (currentTab === 'audit') {
+        dataToExport = tableData.audit;
+      } else if (currentTab === 'analytics') {
+        dataToExport = (tableData.analytics && tableData.analytics.recentTransactions) ? tableData.analytics.recentTransactions : [];
+      }
 
       if (!dataToExport || dataToExport.length === 0) {
         showToast('No records available to export', 'error');
@@ -2954,6 +3197,41 @@
         showToast(`Exported ${dataToExport.length} records to CSV!`);
       } else if (format === 'print') {
         window.print();
+      }
+    }
+
+    function exportSpecificEventRegistrations(eventId, format = 'csv') {
+      const ev = (tableData.events || []).find(e => String(e.id) === String(eventId)) || {};
+      const registrations = (tableData.registrations || []).filter(r => String(r.event_id) === String(eventId) || (ev.title && r.event_title === ev.title));
+      
+      if (!registrations || registrations.length === 0) {
+        showToast(`No attendees registered yet for "${ev.title || 'this event'}"`, 'info');
+        return;
+      }
+
+      const sanitizedTitle = (ev.title || `event_${eventId}`).replace(/[^a-zA-Z0-9_-]/g, '_');
+      const todayStr = new Date().toISOString().slice(0, 10);
+      const filenamePrefix = `sst_${sanitizedTitle}_attendees_${todayStr}`;
+
+      if (format === 'json') {
+        const jsonStr = JSON.stringify(registrations, null, 2);
+        const blob = new Blob([jsonStr], { type: 'application/json' });
+        downloadBlob(blob, `${filenamePrefix}.json`);
+        showToast(`Exported ${registrations.length} attendees to JSON!`);
+      } else {
+        const keys = Object.keys(registrations[0]).filter(k => k !== 'password_hash' && k !== 'payment_screenshot_url');
+        let csv = keys.join(',') + '\n';
+        registrations.forEach(row => {
+          const line = keys.map(k => {
+            let val = row[k] === null || row[k] === undefined ? '' : String(row[k]);
+            val = val.replace(/"/g, '""');
+            return `"${val}"`;
+          }).join(',');
+          csv += line + '\n';
+        });
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        downloadBlob(blob, `${filenamePrefix}.csv`);
+        showToast(`Exported ${registrations.length} attendees for "${ev.title || 'Event'}" to CSV!`);
       }
     }
 
@@ -3115,7 +3393,9 @@
           </div>
         `;
         actionsHtml = `
-          <button onclick="openEventModal(${item.id});" class="px-4 py-2 bg-[#123B32] hover:bg-[#2F5B4E] text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-xs"><i class="bi bi-pencil"></i> Edit Event</button>
+          <button onclick="viewEventRegistrations(${item.id}); closeModal();" class="px-4 py-2 bg-[#123B32] hover:bg-[#2F5B4E] text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-xs"><i class="bi bi-people-fill"></i> View Attendees</button>
+          <button onclick="exportSpecificEventRegistrations(${item.id});" class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-xs"><i class="bi bi-download"></i> Export CSV</button>
+          <button onclick="openEventModal(${item.id});" class="px-4 py-2 bg-slate-100 hover:bg-amber-600 hover:text-white text-slate-700 rounded-xl text-xs font-semibold flex items-center gap-1.5"><i class="bi bi-pencil"></i> Edit Event</button>
           <button onclick="confirmDeleteEvent(${item.id}); closeModal();" class="px-4 py-2 bg-red-50 hover:bg-red-100 text-red-700 rounded-xl text-xs font-semibold">Delete Event</button>
         `;
       } else if (tabName === 'careers') {

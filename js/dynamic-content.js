@@ -475,6 +475,361 @@
     document.body.insertAdjacentHTML('beforeend', modalHtml);
   };
 
+  window.closePublicModal = function () {
+    const backdrop = document.getElementById('public-modal-backdrop');
+    if (backdrop) backdrop.remove();
+  };
+
+  window.copyUpiId = function(upiId = '8807099288@upi') {
+    navigator.clipboard.writeText(upiId).then(() => {
+      const copyBtn = document.getElementById('upi-copy-btn');
+      if (copyBtn) {
+        copyBtn.innerHTML = '<i class="bi bi-check2 text-emerald-400"></i> Copied!';
+        setTimeout(() => {
+          copyBtn.innerHTML = '<i class="bi bi-clipboard"></i> Copy UPI ID';
+        }, 2000);
+      }
+      if (window.toast) window.toast.success(`UPI ID copied: ${upiId}`);
+    }).catch(() => {
+      prompt('Copy UPI ID:', upiId);
+    });
+  };
+
+  window.openRegisterModal = async function (eventId, fallbackTitle = '', fallbackFee = 'Free') {
+    let ev = (window.allEventsCache || []).find(e => String(e.id) === String(eventId));
+    
+    if (!ev && eventId) {
+      try {
+        const res = await fetch(`${API_BASE}/api/public/events`);
+        if (res.ok) {
+          const data = await res.json();
+          window.allEventsCache = data.events || [];
+          ev = (window.allEventsCache || []).find(e => String(e.id) === String(eventId));
+        }
+      } catch (err) {
+        console.warn('Could not refresh events cache:', err);
+      }
+    }
+
+    if (!ev) {
+      ev = {
+        id: eventId,
+        title: fallbackTitle ? decodeURIComponent(fallbackTitle) : 'Event Registration',
+        registration_fee: fallbackFee ? decodeURIComponent(fallbackFee) : 'Free',
+        target_audience: 'College',
+        is_paid: fallbackFee && fallbackFee !== 'Free' && fallbackFee !== '0',
+        upi_id: '8807099288@upi'
+      };
+    }
+
+    const title = ev.title || 'Event Registration';
+    const fee = ev.registration_fee || 'Free';
+    const isPaid = ev.is_paid || (fee !== 'Free' && fee !== '0' && fee !== '');
+    const feeAmount = ev.fee_amount || (isPaid ? (fee.replace(/[^0-9.]/g, '') || '499') : '0');
+    const numericAmount = feeAmount.replace(/[^0-9.]/g, '') || '499';
+    const upiId = ev.upi_id || '8807099288@upi';
+    const audience = ev.target_audience || 'College';
+    const upiNote = `${title} (ID: ${ev.id || 'SST'})`;
+
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi://pay?pa=${encodeURIComponent(upiId)}%26pn=Shazu%20Soft%20Technologies%26am=${numericAmount}%26cu=INR%26tn=${encodeURIComponent(upiNote)}`;
+
+    let audienceBadgeLabel = 'College / University';
+    if (audience === 'School') audienceBadgeLabel = 'School Students (K-12)';
+    else if (audience === 'Professional') audienceBadgeLabel = 'Working Professionals';
+    else if (audience === 'General') audienceBadgeLabel = 'Open to All';
+
+    const modalHtml = `
+      <div id="public-modal-backdrop" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+        <div class="bg-white dark:bg-slate-900 border border-[#D3DDD7] dark:border-slate-800 w-full max-w-xl rounded-3xl p-5 sm:p-7 shadow-2xl space-y-4 text-[#0F172A] dark:text-slate-100 my-auto max-h-[92vh] overflow-y-auto">
+          
+          <!-- Header -->
+          <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+            <div class="space-y-1">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="px-2.5 py-0.5 bg-[#123B32] text-white text-[10px] font-mono font-bold uppercase rounded-full">
+                  ${audienceBadgeLabel}
+                </span>
+                <span class="px-2.5 py-0.5 ${isPaid ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-emerald-100 text-emerald-900 border border-emerald-300'} text-[10px] font-mono font-bold rounded-full">
+                  ${isPaid ? `Fee: ₹${numericAmount}` : 'Free Entry'}
+                </span>
+              </div>
+              <h3 class="text-lg sm:text-xl font-black font-heading text-[#0F172A] dark:text-white leading-tight">${title}</h3>
+            </div>
+            <button onclick="closePublicModal()" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center transition-colors cursor-pointer shrink-0">
+              <i class="bi bi-x-lg text-sm pointer-events-none"></i>
+            </button>
+          </div>
+
+          <!-- Dynamic UPI Payment Card (If Paid) -->
+          ${isPaid ? `
+            <div class="bg-gradient-to-br from-amber-50 to-orange-50/70 dark:from-slate-800 dark:to-slate-850 border border-amber-200/90 dark:border-amber-800/60 p-4 rounded-2xl space-y-3">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <i class="bi bi-qr-code text-amber-700 dark:text-amber-400 text-lg"></i>
+                  <span class="text-xs font-bold uppercase tracking-wider text-amber-950 dark:text-amber-300">Registration Fee: ₹${numericAmount}</span>
+                </div>
+                <span class="px-2.5 py-1 bg-amber-600 text-white font-mono font-black text-xs rounded-lg shadow-xs">UPI Required</span>
+              </div>
+
+              <div class="flex flex-col sm:flex-row items-center gap-4 bg-white dark:bg-slate-900 p-3.5 rounded-xl border border-amber-100 dark:border-slate-700 shadow-xs">
+                <div class="bg-white p-2 rounded-xl shadow-sm border border-slate-200 shrink-0 text-center">
+                  <img src="${qrUrl}" alt="UPI Payment QR" class="w-28 h-28 object-contain mx-auto">
+                  <span class="text-[9px] font-mono text-slate-500 block mt-1">Scan via GPay / PhonePe</span>
+                </div>
+                <div class="space-y-2 text-center sm:text-left text-xs flex-1">
+                  <div>
+                    <span class="block font-bold text-slate-900 dark:text-white">Payee: Shazu Soft Technologies</span>
+                  </div>
+                  <div class="p-2 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 text-[11px] space-y-1 text-slate-700 dark:text-slate-300">
+                    <div><strong>Transfer Amount:</strong> <span class="font-mono font-bold text-emerald-700 dark:text-emerald-400">₹${numericAmount}</span></div>
+                    <div class="truncate"><strong>UPI Note / Ref:</strong> <span class="font-mono font-bold text-slate-900 dark:text-white">${upiNote}</span></div>
+                  </div>
+                  <p class="text-[10.5px] text-slate-500 dark:text-slate-400 leading-snug">
+                    Scan QR to pay with any UPI app (GPay / PhonePe / Paytm), enter the 12-digit UTR/Ref No. and attach receipt screenshot below.
+                  </p>
+                </div>
+              </div>
+            </div>
+          ` : ''}
+
+          <!-- Registration Form -->
+          <form onsubmit="submitEventRegistration(event, '${ev.id}')" class="space-y-3.5 text-xs">
+            <input type="hidden" id="pub-reg-audience" value="${audience}">
+            <input type="hidden" id="pub-reg-ispaid" value="${isPaid ? 'true' : 'false'}">
+            <input type="hidden" id="pub-reg-fee" value="${fee}">
+            <input type="hidden" id="pub-reg-screenshot-base64" value="">
+
+            <!-- General Contact Info -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block font-bold text-xs text-[#1E292B] dark:text-slate-200 mb-1">Full Name *</label>
+                <input type="text" id="pub-reg-name" required placeholder="Full Name" class="w-full p-2.5 bg-[#F8FAFC] dark:bg-[#0B0F19] border border-[#D3DDD7] dark:border-slate-800 rounded-xl text-xs text-[#0F172A] dark:text-white placeholder:text-[#64748B] focus:outline-none focus:border-[#123B32]">
+              </div>
+              <div>
+                <label class="block font-bold text-xs text-[#1E292B] dark:text-slate-200 mb-1">Email Address *</label>
+                <input type="email" id="pub-reg-email" required placeholder="name@domain.com" class="w-full p-2.5 bg-[#F8FAFC] dark:bg-[#0B0F19] border border-[#D3DDD7] dark:border-slate-800 rounded-xl text-xs text-[#0F172A] dark:text-white placeholder:text-[#64748B] focus:outline-none focus:border-[#123B32]">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block font-bold text-xs text-[#1E292B] dark:text-slate-200 mb-1">Phone / WhatsApp Number *</label>
+                <input type="tel" id="pub-reg-phone" required placeholder="+91 98765 43210" class="w-full p-2.5 bg-[#F8FAFC] dark:bg-[#0B0F19] border border-[#D3DDD7] dark:border-slate-800 rounded-xl text-xs text-[#0F172A] dark:text-white placeholder:text-[#64748B] focus:outline-none focus:border-[#123B32]">
+              </div>
+              <div>
+                <label class="block font-bold text-xs text-[#1E292B] dark:text-slate-200 mb-1">City / Town *</label>
+                <input type="text" id="pub-reg-city" required placeholder="Salem / Chennai / Coimbatore" class="w-full p-2.5 bg-[#F8FAFC] dark:bg-[#0B0F19] border border-[#D3DDD7] dark:border-slate-800 rounded-xl text-xs text-[#0F172A] dark:text-white placeholder:text-[#64748B] focus:outline-none focus:border-[#123B32]">
+              </div>
+            </div>
+
+            <!-- AUDIENCE SPECIFIC FIELDS -->
+            ${audience === 'School' ? `
+              <div class="p-3.5 bg-blue-50/60 dark:bg-slate-800/60 rounded-2xl border border-blue-100 dark:border-slate-700 space-y-3">
+                <div class="text-[11px] font-bold text-blue-900 dark:text-blue-300 flex items-center gap-1.5 uppercase tracking-wide">
+                  <i class="bi bi-backpack-fill text-blue-600"></i> School & Student Particulars
+                </div>
+                <div>
+                  <label class="block font-bold text-xs text-slate-700 dark:text-slate-300 mb-1">School / Academy Name *</label>
+                  <input type="text" id="pub-reg-school-name" required placeholder="e.g. St. Joseph Matriculation Higher Secondary School" class="w-full p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#123B32]">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block font-bold text-xs text-slate-700 dark:text-slate-300 mb-1">Standard / Grade *</label>
+                    <select id="pub-reg-grade" required class="w-full p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#123B32]">
+                      <option value="6th Standard">6th Standard</option>
+                      <option value="7th Standard">7th Standard</option>
+                      <option value="8th Standard">8th Standard</option>
+                      <option value="9th Standard">9th Standard</option>
+                      <option value="10th Standard">10th Standard</option>
+                      <option value="11th Standard" selected>11th Standard</option>
+                      <option value="12th Standard">12th Standard</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block font-bold text-xs text-slate-700 dark:text-slate-300 mb-1">Section / Roll No *</label>
+                    <input type="text" id="pub-reg-section-roll" required placeholder="e.g. 11-A / Roll #24" class="w-full p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#123B32]">
+                  </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block font-bold text-xs text-slate-700 dark:text-slate-300 mb-1">Parent / Guardian Name *</label>
+                    <input type="text" id="pub-reg-guardian-name" required placeholder="Parent or Teacher Name" class="w-full p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#123B32]">
+                  </div>
+                  <div>
+                    <label class="block font-bold text-xs text-slate-700 dark:text-slate-300 mb-1">Guardian Phone *</label>
+                    <input type="tel" id="pub-reg-guardian-phone" required placeholder="Emergency Contact No" class="w-full p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#123B32]">
+                  </div>
+                </div>
+              </div>
+            ` : audience === 'Professional' ? `
+              <div class="p-3.5 bg-purple-50/60 dark:bg-slate-800/60 rounded-2xl border border-purple-100 dark:border-slate-700 space-y-3">
+                <div class="text-[11px] font-bold text-purple-900 dark:text-purple-300 flex items-center gap-1.5 uppercase tracking-wide">
+                  <i class="bi bi-briefcase-fill text-purple-600"></i> Organization / Professional Particulars
+                </div>
+                <div>
+                  <label class="block font-bold text-xs text-slate-700 dark:text-slate-300 mb-1">Company / Organization *</label>
+                  <input type="text" id="pub-reg-company-name" required placeholder="e.g. Infosys / TCS / SST / Freelance" class="w-full p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#123B32]">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block font-bold text-xs text-slate-700 dark:text-slate-300 mb-1">Job Designation *</label>
+                    <input type="text" id="pub-reg-designation" required placeholder="e.g. Software Engineer / Lead" class="w-full p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#123B32]">
+                  </div>
+                  <div>
+                    <label class="block font-bold text-xs text-slate-700 dark:text-slate-300 mb-1">Experience (Years) *</label>
+                    <input type="text" id="pub-reg-experience" required placeholder="e.g. 2+ Years / Full Stack" class="w-full p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#123B32]">
+                  </div>
+                </div>
+              </div>
+            ` : `
+              <!-- College / University Default -->
+              <div class="p-3.5 bg-emerald-50/60 dark:bg-slate-800/60 rounded-2xl border border-emerald-100 dark:border-slate-700 space-y-3">
+                <div class="text-[11px] font-bold text-emerald-900 dark:text-emerald-300 flex items-center gap-1.5 uppercase tracking-wide">
+                  <i class="bi bi-mortarboard-fill text-emerald-600"></i> College / University Particulars
+                </div>
+                <div>
+                  <label class="block font-bold text-xs text-slate-700 dark:text-slate-300 mb-1">College / University Name *</label>
+                  <input type="text" id="pub-reg-college-name" required placeholder="e.g. Mahendra Engineering College / Anna University" class="w-full p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#123B32]">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block font-bold text-xs text-slate-700 dark:text-slate-300 mb-1">Degree *</label>
+                    <select id="pub-reg-degree" required class="w-full p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#123B32]">
+                      <option value="B.E / B.Tech" selected>B.E / B.Tech</option>
+                      <option value="B.Sc">B.Sc</option>
+                      <option value="BCA">BCA</option>
+                      <option value="M.E / M.Tech">M.E / M.Tech</option>
+                      <option value="MCA">MCA</option>
+                      <option value="MBA">MBA</option>
+                      <option value="Diploma">Diploma</option>
+                      <option value="Ph.D / Research">Ph.D / Research</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block font-bold text-xs text-slate-700 dark:text-slate-300 mb-1">Department / Branch *</label>
+                    <input type="text" id="pub-reg-dept" required placeholder="e.g. CSE / IT / AI & DS" class="w-full p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#123B32]">
+                  </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block font-bold text-xs text-slate-700 dark:text-slate-300 mb-1">Year of Study *</label>
+                    <select id="pub-reg-year" required class="w-full p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#123B32]">
+                      <option value="1st Year">1st Year</option>
+                      <option value="2nd Year">2nd Year</option>
+                      <option value="3rd Year" selected>3rd Year</option>
+                      <option value="Final Year">Final Year</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block font-bold text-xs text-slate-700 dark:text-slate-300 mb-1">Register / Roll Number *</label>
+                    <input type="text" id="pub-reg-regno" required placeholder="e.g. 712022104001" class="w-full p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#123B32]">
+                  </div>
+                </div>
+              </div>
+            `}
+
+            <!-- Payment UTR & Screenshot Section (if Paid) -->
+            ${isPaid ? `
+              <div class="p-3.5 bg-amber-50/70 dark:bg-slate-800/70 rounded-2xl border border-amber-200 dark:border-amber-800 space-y-3">
+                <div class="text-[11px] font-bold text-amber-900 dark:text-amber-300 flex items-center gap-1.5 uppercase tracking-wide">
+                  <i class="bi bi-shield-check text-amber-600"></i> Payment Proof & Verification
+                </div>
+                <div>
+                  <label class="block font-bold text-xs text-slate-700 dark:text-slate-300 mb-1">12-Digit UPI Transaction / UTR Ref No *</label>
+                  <input type="text" id="pub-reg-utr" required placeholder="e.g. 423589102456" maxlength="20" class="w-full p-2.5 bg-white dark:bg-slate-900 border border-amber-300 dark:border-amber-700 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#123B32] font-mono">
+                  <span class="text-[10px] text-slate-500 mt-0.5 block">Find this 12-digit UTR/Ref number on your UPI payment confirmation screen.</span>
+                </div>
+                <div>
+                  <label class="block font-bold text-xs text-slate-700 dark:text-slate-300 mb-1">Upload Payment Screenshot (Optional/Recommended)</label>
+                  <input type="file" accept="image/*" onchange="handleReceiptScreenshotUpload(event)" class="w-full p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-700 dark:text-slate-300 cursor-pointer">
+                  <div id="pub-reg-screenshot-preview-container" class="hidden mt-2 flex items-center gap-2">
+                    <img id="pub-reg-screenshot-preview" src="" alt="Receipt Preview" class="w-14 h-14 object-cover rounded-lg border border-slate-200 shadow-xs">
+                    <span class="text-[11px] text-emerald-600 font-bold"><i class="bi bi-check-circle-fill"></i> Screenshot Attached</span>
+                  </div>
+                </div>
+              </div>
+            ` : ''}
+
+            <!-- Action Buttons -->
+            <div class="flex justify-end items-center gap-3 pt-2">
+              <button type="button" onclick="closePublicModal()" class="px-5 py-2.5 bg-[#F1F5F3] hover:bg-[#E2E8F0] dark:bg-slate-800 dark:hover:bg-slate-700 text-[#0F172A] dark:text-slate-300 rounded-xl font-bold text-xs transition-all cursor-pointer">Cancel</button>
+              <button type="submit" class="px-6 py-2.5 bg-[#123B32] hover:bg-[#1A4B40] dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-extrabold rounded-xl transition-all shadow-md text-xs inline-flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">
+                <span>Complete Registration</span>
+                <i class="bi bi-arrow-right"></i>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+  };
+
+  window.submitEventRegistration = async function (e, eventId) {
+    e.preventDefault();
+    const ev = (window.allEventsCache || []).find(event => String(event.id) === String(eventId)) || {};
+    const title = ev.title || 'Event Registration';
+    const audience = document.getElementById('pub-reg-audience')?.value || 'College';
+    const fee = document.getElementById('pub-reg-fee')?.value || 'Free';
+    const utrEl = document.getElementById('pub-reg-utr');
+    const screenshotEl = document.getElementById('pub-reg-screenshot-base64');
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn ? submitBtn.innerHTML : 'Complete Registration';
+
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<svg class="animate-spin h-3.5 w-3.5 text-white inline-block mr-1.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg><span>Registering...</span>`;
+    }
+
+    const body = {
+      event_id: eventId,
+      event_title: title,
+      name: document.getElementById('pub-reg-name')?.value || '',
+      email: document.getElementById('pub-reg-email')?.value || '',
+      phone: document.getElementById('pub-reg-phone')?.value || '',
+      organization: document.getElementById('pub-reg-college-name')?.value || document.getElementById('pub-reg-school-name')?.value || document.getElementById('pub-reg-company-name')?.value || '',
+      registration_fee: fee,
+      payment_method: 'UPI QR',
+      transaction_id: utrEl ? utrEl.value.trim() : '',
+      payment_screenshot_url: screenshotEl ? screenshotEl.value : '',
+      target_audience: audience,
+      // School fields
+      school_name: document.getElementById('pub-reg-school-name')?.value || '',
+      grade_standard: document.getElementById('pub-reg-grade')?.value || '',
+      section_roll: document.getElementById('pub-reg-section-roll')?.value || '',
+      guardian_name: document.getElementById('pub-reg-guardian-name')?.value || '',
+      guardian_phone: document.getElementById('pub-reg-guardian-phone')?.value || '',
+      // College fields
+      college_name: document.getElementById('pub-reg-college-name')?.value || '',
+      degree: document.getElementById('pub-reg-degree')?.value || '',
+      department: document.getElementById('pub-reg-dept')?.value || '',
+      year_of_study: document.getElementById('pub-reg-year')?.value || '',
+      register_no: document.getElementById('pub-reg-regno')?.value || '',
+      // Professional fields
+      company_name: document.getElementById('pub-reg-company-name')?.value || '',
+      designation: document.getElementById('pub-reg-designation')?.value || '',
+      experience_years: document.getElementById('pub-reg-experience')?.value || ''
+    };
+
+    try {
+      const res = await fetch(`${API_BASE}/api/public/events/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Registration failed');
+      closePublicModal();
+      showPublicModalNotice('Registration Confirmed!', `You have successfully registered for ${title}! An official pass reference has been sent to ${body.email}.`);
+    } catch (err) {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+      }
+      showPublicModalNotice('Registration Error', err.message, true);
+    }
+  };
+
   window.showPublicModalNotice = function (title, message, isError = false) {
     if (window.toast) {
       if (isError) {
