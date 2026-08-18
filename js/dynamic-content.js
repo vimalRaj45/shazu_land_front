@@ -54,19 +54,32 @@
     if (el) el.remove();
   };
 
-  // 1. Telemetry / Analytics Tracker (Mobile, Tablet, Desktop)
+  // 1. Telemetry / Analytics Tracker (Strict Mobile / Desktop only with client-side deduplication)
+  let lastTrackedPath = null;
+  let lastTrackedTimestamp = 0;
+
   function trackPageView() {
     try {
-      const isMobile = window.innerWidth < 768;
-      const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024;
-      const device = isMobile ? 'Mobile' : (isTablet ? 'Tablet' : 'Desktop');
+      const now = Date.now();
       const pagePath = window.location.pathname ? window.location.pathname.replace(/^\/+/, '') : 'index.html';
+      const cleanPath = pagePath || 'index.html';
+
+      // Prevent duplicate client-side triggers for the same page within 2 seconds
+      if (lastTrackedPath === cleanPath && (now - lastTrackedTimestamp < 2000)) {
+        return;
+      }
+      lastTrackedPath = cleanPath;
+      lastTrackedTimestamp = now;
+
+      // Device: Mobile or Desktop only (Tablets treated as Mobile)
+      const isMobile = window.innerWidth < 1024;
+      const device = isMobile ? 'Mobile' : 'Desktop';
 
       fetch(`${API_BASE}/api/public/analytics/track`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          page_path: pagePath || 'index.html',
+          page_path: cleanPath,
           device_type: device,
           referrer: document.referrer || 'Direct'
         })
@@ -1096,8 +1109,18 @@
     }
   };
 
-  // Initialize on DOM Ready
-  document.addEventListener('DOMContentLoaded', () => {
-    window.initDynamicContent();
-  });
+  // Initialize on DOM Ready (guarded to prevent double execution)
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!window.__sstDynamicInitialized) {
+        window.__sstDynamicInitialized = true;
+        window.initDynamicContent();
+      }
+    });
+  } else {
+    if (!window.__sstDynamicInitialized) {
+      window.__sstDynamicInitialized = true;
+      window.initDynamicContent();
+    }
+  }
 })();

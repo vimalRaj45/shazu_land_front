@@ -597,7 +597,7 @@
           <!-- 3-COL RESPONSIVE ANALYTICS GRID -->
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
             
-            <!-- Column 1: Device Type Distribution (Mobile / Desktop / Tablet) -->
+            <!-- Column 1: Device Type Distribution (Mobile / Desktop) -->
             <div class="p-4 bg-slate-50 rounded-xl border border-slate-200/80 space-y-3">
               <div class="flex items-center justify-between">
                 <span class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
@@ -606,10 +606,10 @@
                 <span id="traffic-mobile-pct" class="text-[11px] font-mono font-bold text-emerald-700">0% Mobile</span>
               </div>
               
-              <div class="space-y-2.5 text-xs">
+              <div class="space-y-3 text-xs pt-1">
                 <div>
                   <div class="flex justify-between text-[11px] text-slate-600 mb-1">
-                    <span class="flex items-center gap-1"><i class="bi bi-phone text-emerald-600"></i> Mobile Users</span>
+                    <span class="flex items-center gap-1.5 font-medium"><i class="bi bi-phone text-emerald-600"></i> Mobile Users</span>
                     <span id="device-mobile-count" class="font-mono font-semibold text-slate-900">0 (0%)</span>
                   </div>
                   <div class="h-2 w-full bg-slate-200 rounded-full overflow-hidden">
@@ -619,21 +619,11 @@
 
                 <div>
                   <div class="flex justify-between text-[11px] text-slate-600 mb-1">
-                    <span class="flex items-center gap-1"><i class="bi bi-laptop text-blue-600"></i> Desktop / Laptop</span>
+                    <span class="flex items-center gap-1.5 font-medium"><i class="bi bi-laptop text-blue-600"></i> Desktop / Laptop</span>
                     <span id="device-desktop-count" class="font-mono font-semibold text-slate-900">0 (0%)</span>
                   </div>
                   <div class="h-2 w-full bg-slate-200 rounded-full overflow-hidden">
                     <div id="device-desktop-bar" class="h-full bg-blue-600 rounded-full transition-all duration-500" style="width: 0%"></div>
-                  </div>
-                </div>
-
-                <div>
-                  <div class="flex justify-between text-[11px] text-slate-600 mb-1">
-                    <span class="flex items-center gap-1"><i class="bi bi-tablet text-purple-600"></i> Tablet Devices</span>
-                    <span id="device-tablet-count" class="font-mono font-semibold text-slate-900">0 (0%)</span>
-                  </div>
-                  <div class="h-2 w-full bg-slate-200 rounded-full overflow-hidden">
-                    <div id="device-tablet-bar" class="h-full bg-purple-600 rounded-full transition-all duration-500" style="width: 0%"></div>
                   </div>
                 </div>
               </div>
@@ -1762,11 +1752,10 @@
 
         // Render Page Views & Live Web Traffic Telemetry
         const pv = data.pageViews || {};
-        const devCounts = pv.deviceCounts || { Mobile: 0, Desktop: 0, Tablet: 0 };
-        const totalTraffic = pv.total || (devCounts.Mobile + devCounts.Desktop + devCounts.Tablet) || 1;
-        const mobilePct = Math.round((devCounts.Mobile / totalTraffic) * 100) || 0;
-        const desktopPct = Math.round((devCounts.Desktop / totalTraffic) * 100) || 0;
-        const tabletPct = Math.max(0, 100 - mobilePct - desktopPct);
+        const devCounts = pv.deviceCounts || { Mobile: 0, Desktop: 0 };
+        const totalDevTraffic = (devCounts.Mobile + devCounts.Desktop) || pv.total || 1;
+        const mobilePct = Math.round((devCounts.Mobile / totalDevTraffic) * 100) || 0;
+        const desktopPct = Math.max(0, 100 - mobilePct);
 
         document.getElementById('traffic-today-count').textContent = (pv.today || 0).toLocaleString();
         document.getElementById('traffic-total-count').textContent = (pv.total || 0).toLocaleString();
@@ -1777,9 +1766,6 @@
 
         document.getElementById('device-desktop-count').textContent = `${devCounts.Desktop || 0} (${desktopPct}%)`;
         document.getElementById('device-desktop-bar').style.width = `${desktopPct}%`;
-
-        document.getElementById('device-tablet-count').textContent = `${devCounts.Tablet || 0} (${tabletPct}%)`;
-        document.getElementById('device-tablet-bar').style.width = `${tabletPct}%`;
 
         // Render Top Visited Pages
         const topPagesList = document.getElementById('top-pages-list');
