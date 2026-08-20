@@ -43,7 +43,7 @@
           },
           fontFamily: {
             sans: ['Inter', 'sans-serif'],
-            heading: ['Outfit', 'sans-serif']
+            heading: ['Inter', 'sans-serif']
           }
         }
       }
@@ -160,17 +160,17 @@
     <div id="dynamic-announcement-bar"></div>
     <header class="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-[#E2E8F0] dark:border-slate-800 transition-all duration-200 shadow-xs">
       <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-      <!-- Brand Logo & Name -->
-      <a href="index.html" class="flex items-center space-x-3 group">
-        <img loading="lazy" decoding="async" src="https://shazusofttechnologies.org/sst.svg" alt="Shazu Soft Technologies Logo" class="h-14 w-auto">
-        <div>
-          <span class="block font-heading font-black text-lg tracking-tight leading-tight text-[#0F172A]">SHAZU SOFT</span>
-          <span class="block text-xs font-bold tracking-wider text-[#123B32] uppercase">Technologies</span>
-        </div>
-      </a>
+        <!-- Brand Logo & Name -->
+        <a href="index.html" class="flex items-center space-x-3 group shrink-0">
+          <img loading="lazy" decoding="async" src="https://shazusofttechnologies.org/sst.svg" alt="Shazu Soft Technologies Logo" class="h-14 w-auto">
+          <div class="brand-text-container">
+            <span class="brand-title-text text-lg">SHAZU SOFT</span>
+            <span class="brand-sub-text"><span>T</span><span>E</span><span>C</span><span>H</span><span>N</span><span>O</span><span>L</span><span>O</span><span>G</span><span>I</span><span>E</span><span>S</span></span>
+          </div>
+        </a>
 
       <!-- Navigation Links with Dropdown Sub-Menus -->
-      <nav class="hidden lg:flex items-center space-x-1 font-heading">
+      <nav class="hidden lg:flex items-center space-x-1 font-heading shrink-0">
         <a href="index.html" class="nav-link-pill"><i class="uil uil-estate text-[14px]"></i>Home</a>
 
         <!-- About Us Dropdown -->
@@ -237,7 +237,27 @@
         </div>
 
         <a href="careers.html" class="nav-link-pill"><i class="uil uil-briefcase-alt text-[14px]"></i>Career</a>
-        <a href="contact.html" class="nav-link-pill"><i class="uil uil-envelope text-[14px]"></i>Contact Us</a>
+
+        <!-- Contact Dropdown -->
+        <div class="relative group">
+          <a href="contact.html" class="nav-link-pill flex items-center gap-1">
+            <i class="uil uil-envelope text-[14px]"></i>
+            <span>Contact Us</span>
+            <i class="bi bi-chevron-down text-[10px] ml-0.5 transition-transform duration-200 group-hover:rotate-180"></i>
+          </a>
+          <div class="absolute right-0 top-full pt-2 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 z-50 min-w-[230px]">
+            <div class="nav-dropdown-menu p-1.5 space-y-1">
+              <a href="contact.html" class="nav-dropdown-item block px-3.5 py-2">
+                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32] leading-tight">Contact Us</span>
+                <span class="block text-[11px] text-[#334E43] dark:text-[#cbd5e1] mt-0.5 font-normal">Inquiries & Support</span>
+              </a>
+              <a href="track.html" class="nav-dropdown-item block px-3.5 py-2 border-t border-slate-100 dark:border-slate-800/80 mt-0.5">
+                <span class="block text-xs font-bold text-[#123B32] dark:text-emerald-400 leading-tight"><i class="uil uil-search mr-1 text-[13px]"></i>Track Status</span>
+                <span class="block text-[11px] text-[#334E43] dark:text-[#cbd5e1] mt-0.5 font-normal">Check Token & Application Status</span>
+              </a>
+            </div>
+          </div>
+        </div>
       </nav>
 
       <!-- CTA Action Button & Theme Toggle -->
@@ -322,104 +342,166 @@
   <!-- Main Content -->
   <main>
     <!-- Education Hero -->
-    <section data-aos="fade-up" class="hero-bg py-12 md:py-16 border-b border-brand-border">
-      <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-        <div class="lg:col-span-7 text-left space-y-4 animate-fade-up">
-          <span class="text-xs font-bold uppercase tracking-wider text-brand-green bg-[#E8EFEB] dark:bg-emerald-950/60 px-3 py-1 rounded-full inline-block">ACADEMIC & EDUCATION DIVISION</span>
-          <h1 class="text-3xl md:text-5xl font-extrabold text-brand-darkText dark:text-[#f8fafc] font-heading">
+    <section data-aos="fade-up" class="hero-bg py-12 md:py-20 border-b border-brand-border relative overflow-hidden">
+      <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+        <div class="lg:col-span-7 text-left space-y-6 animate-fade-up">
+          
+          <!-- Badges Bar -->
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="text-xs font-bold uppercase tracking-wider text-brand-green bg-[#E8EFEB] dark:bg-emerald-950/70 px-3.5 py-1 rounded-full border border-emerald-300/50 dark:border-emerald-800/60 inline-flex items-center gap-1.5">
+              <i class="bi bi-mortarboard-fill text-xs"></i> ACADEMIC & EDUCATION DIVISION
+            </span>
+            <span class="text-xs font-bold uppercase tracking-wider text-amber-800 dark:text-amber-300 bg-amber-100 dark:bg-amber-950/60 px-3 py-1 rounded-full border border-amber-300/50 dark:border-amber-800/50 inline-flex items-center gap-1.5">
+              <i class="bi bi-lightning-charge-fill text-xs"></i> Industry 4.0 Ready
+            </span>
+          </div>
+
+          <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-brand-darkText dark:text-[#f8fafc] font-heading leading-tight tracking-tight">
             Education Services
           </h1>
+
           <p class="text-brand-secText dark:text-[#cbd5e1] text-base md:text-lg max-w-2xl leading-relaxed">
-            Bridging the curriculum gap through certified training, practical problem-solving contests, and comprehensive faculty development programs.
+            Empowering students and faculty through structured educational programs, immersive industry-academia collaborations, hands-on technological training, and career-accelerating experiential learning modules.
           </p>
-        </div>
-        <div class="lg:col-span-5 flex justify-center">
-          <div class="w-full max-w-sm sm:max-w-md rounded-2xl overflow-hidden shadow-xl border border-brand-border dark:border-[#334155] bg-white dark:bg-[#1e293b] hover-lift">
-            <img loading="lazy" decoding="async" src="images/education.png" alt="Education Services Illustration" class="w-full h-auto object-cover img-interactive img-float block">
+
+          <!-- Core Feature Bullets -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            <div class="flex items-start gap-2.5 text-xs font-medium text-slate-700 dark:text-slate-300">
+              <div class="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5"><i class="bi bi-check-lg text-xs font-bold"></i></div>
+              <span>Outcome-Based Engineering Pedagogy & Practical Labs</span>
+            </div>
+            <div class="flex items-start gap-2.5 text-xs font-medium text-slate-700 dark:text-slate-300">
+              <div class="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5"><i class="bi bi-check-lg text-xs font-bold"></i></div>
+              <span>Corporate Internship Residencies & Live Projects</span>
+            </div>
+            <div class="flex items-start gap-2.5 text-xs font-medium text-slate-700 dark:text-slate-300">
+              <div class="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5"><i class="bi bi-check-lg text-xs font-bold"></i></div>
+              <span>Faculty Development Programs (FDP) & AI Masterclasses</span>
+            </div>
+            <div class="flex items-start gap-2.5 text-xs font-medium text-slate-700 dark:text-slate-300">
+              <div class="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5"><i class="bi bi-check-lg text-xs font-bold"></i></div>
+              <span>Verifiable Digital Credentials & Industry Certifications</span>
+            </div>
           </div>
+
+          <!-- CTAs & Impact Badges -->
+          <div class="pt-3 flex flex-wrap items-center gap-4">
+            <a href="#core-modules" class="px-6 py-3 bg-[#123B32] hover:bg-[#2F5B4E] text-white text-xs sm:text-sm font-bold rounded-xl transition-all shadow-md inline-flex items-center gap-2">
+              <i class="bi bi-collection"></i>
+              <span>Explore 6 Core Modules</span>
+            </a>
+            <a href="contact.html" class="px-6 py-3 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-800 dark:text-white border border-slate-200 dark:border-slate-700 text-xs sm:text-sm font-bold rounded-xl transition-all inline-flex items-center gap-2">
+              <i class="bi bi-building"></i>
+              <span>Institutional MoU Inquiries</span>
+            </a>
+          </div>
+
+        </div>
+
+        <div class="lg:col-span-5 flex flex-col justify-center space-y-4">
+          <div class="p-4 bg-white dark:bg-[#1e293b] border border-brand-border dark:border-[#334155] rounded-3xl shadow-2xl hover-lift relative overflow-hidden">
+            <img loading="lazy" decoding="async" src="images/education.png" alt="Education Services Illustration" class="w-full max-h-72 object-contain img-interactive img-float mx-auto">
+          </div>
+
+          <!-- Impact Metrics Grid -->
+          <div class="grid grid-cols-3 gap-2.5 text-center">
+            <div class="p-3 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs">
+              <span class="block text-lg sm:text-xl font-extrabold font-mono text-[#123B32] dark:text-emerald-400">50+</span>
+              <span class="block text-[10px] text-slate-500 dark:text-slate-400 uppercase font-semibold">Institutions</span>
+            </div>
+            <div class="p-3 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs">
+              <span class="block text-lg sm:text-xl font-extrabold font-mono text-[#123B32] dark:text-emerald-400">15,000+</span>
+              <span class="block text-[10px] text-slate-500 dark:text-slate-400 uppercase font-semibold">Students</span>
+            </div>
+            <div class="p-3 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs">
+              <span class="block text-lg sm:text-xl font-extrabold font-mono text-[#123B32] dark:text-emerald-400">100%</span>
+              <span class="block text-[10px] text-slate-500 dark:text-slate-400 uppercase font-semibold">Hands-on</span>
+            </div>
+          </div>
+
         </div>
       </div>
     </section>
 
     <!-- Services Grid Layout -->
-    <section data-aos="fade-up" class="py-12 md:py-16 bg-white">
+    <section id="core-modules" data-aos="fade-up" class="py-12 md:py-16 bg-white dark:bg-[#0f172a]">
       <div class="max-w-7xl mx-auto px-6">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           
           <!-- Hackathon -->
-          <div class="bg-white border border-brand-border rounded-2xl p-7 hover-lift shadow-sm flex flex-col justify-between">
+          <div class="bg-white dark:bg-[#1e293b] border border-brand-border dark:border-[#334155] rounded-2xl p-7 hover-lift shadow-sm flex flex-col justify-between transition-all">
             <div class="space-y-4">
-              <div class="w-12 h-12 rounded-lg bg-white border border-brand-border text-brand-green flex items-center justify-center text-xl shadow-sm">
+              <div class="w-12 h-12 rounded-xl bg-[#E8EFEB] dark:bg-emerald-950/60 text-brand-green dark:text-emerald-400 flex items-center justify-center text-xl shadow-xs">
                 <i class="bi bi-laptop"></i>
               </div>
-              <h3 class="text-base font-extrabold font-heading text-brand-darkText mb-1">Hackathon</h3>
-              <p class="text-brand-secText text-[11.5px] leading-relaxed">
-                Coordinating intra-college and open hackathon tournaments where participants develop minimal prototypes of software programs to tackle contemporary global needs.
+              <h3 class="text-lg font-bold font-heading text-brand-darkText dark:text-[#f8fafc] mb-1">Hackathon</h3>
+              <p class="text-brand-secText dark:text-[#cbd5e1] text-xs leading-relaxed">
+                Competitive coding and innovation events to solve real-world problems under time constraints.
               </p>
             </div>
           </div>
 
           <!-- Internship -->
-          <div class="bg-white border border-brand-border rounded-2xl p-7 hover-lift shadow-sm flex flex-col justify-between">
+          <div class="bg-white dark:bg-[#1e293b] border border-brand-border dark:border-[#334155] rounded-2xl p-7 hover-lift shadow-sm flex flex-col justify-between transition-all">
             <div class="space-y-4">
-              <div class="w-12 h-12 rounded-lg bg-white border border-brand-border text-brand-green flex items-center justify-center text-xl shadow-sm">
-                <i class="text-[15px] uil uil-briefcase-alt"></i>
+              <div class="w-12 h-12 rounded-xl bg-[#E8EFEB] dark:bg-emerald-950/60 text-brand-green dark:text-emerald-400 flex items-center justify-center text-xl shadow-xs">
+                <i class="uil uil-briefcase-alt text-xl"></i>
               </div>
-              <h3 class="text-base font-extrabold font-heading text-brand-darkText mb-1">Internship</h3>
-              <p class="text-brand-secText text-[11.5px] leading-relaxed">
-                Certified internship arrangements covering web application development, computational algorithms, and quantitative auditing for final-year engineering scholars.
+              <h3 class="text-lg font-bold font-heading text-brand-darkText dark:text-[#f8fafc] mb-1">Internship</h3>
+              <p class="text-brand-secText dark:text-[#cbd5e1] text-xs leading-relaxed">
+                Hands-on industry exposure programs connecting students with professional work environments.
               </p>
             </div>
           </div>
 
           <!-- Innovative Project -->
-          <div class="bg-white border border-brand-border rounded-2xl p-7 hover-lift shadow-sm flex flex-col justify-between">
+          <div class="bg-white dark:bg-[#1e293b] border border-brand-border dark:border-[#334155] rounded-2xl p-7 hover-lift shadow-sm flex flex-col justify-between transition-all">
             <div class="space-y-4">
-              <div class="w-12 h-12 rounded-lg bg-white border border-brand-border text-brand-green flex items-center justify-center text-xl shadow-sm">
-                <i class="uil uil-lightbulb"></i>
+              <div class="w-12 h-12 rounded-xl bg-[#E8EFEB] dark:bg-emerald-950/60 text-brand-green dark:text-emerald-400 flex items-center justify-center text-xl shadow-xs">
+                <i class="uil uil-lightbulb text-xl"></i>
               </div>
-              <h3 class="text-base font-extrabold font-heading text-brand-darkText mb-1">Innovative Project</h3>
-              <p class="text-brand-secText text-[11.5px] leading-relaxed">
-                Specialized project advisory groups matching senior developers with student teams to construct innovative projects using real datasets.
+              <h3 class="text-lg font-bold font-heading text-brand-darkText dark:text-[#f8fafc] mb-1">Innovative Project</h3>
+              <p class="text-brand-secText dark:text-[#cbd5e1] text-xs leading-relaxed">
+                Guided project development fostering creative thinking and practical problem-solving skills.
               </p>
             </div>
           </div>
 
           <!-- Hands-on Training -->
-          <div class="bg-white border border-brand-border rounded-2xl p-7 hover-lift shadow-sm flex flex-col justify-between">
+          <div class="bg-white dark:bg-[#1e293b] border border-brand-border dark:border-[#334155] rounded-2xl p-7 hover-lift shadow-sm flex flex-col justify-between transition-all">
             <div class="space-y-4">
-              <div class="w-12 h-12 rounded-lg bg-white border border-brand-border text-brand-green flex items-center justify-center text-xl shadow-sm">
-                <i class="uil uil-setting-wide-connected"></i>
+              <div class="w-12 h-12 rounded-xl bg-[#E8EFEB] dark:bg-emerald-950/60 text-brand-green dark:text-emerald-400 flex items-center justify-center text-xl shadow-xs">
+                <i class="uil uil-setting text-xl"></i>
               </div>
-              <h3 class="text-base font-extrabold font-heading text-brand-darkText mb-1">Hands-on Training</h3>
-              <p class="text-brand-secText text-[11.5px] leading-relaxed">
-                Direct lab configurations and instructional workshops detailing modern scripting environments, layout libraries, and versioning toolsets.
+              <h3 class="text-lg font-bold font-heading text-brand-darkText dark:text-[#f8fafc] mb-1">Hands-on Training</h3>
+              <p class="text-brand-secText dark:text-[#cbd5e1] text-xs leading-relaxed">
+                Practical lab-based training sessions focused on real tools and technologies.
               </p>
             </div>
           </div>
 
           <!-- FDP / Seminar -->
-          <div class="bg-white border border-brand-border rounded-2xl p-7 hover-lift shadow-sm flex flex-col justify-between">
+          <div class="bg-white dark:bg-[#1e293b] border border-brand-border dark:border-[#334155] rounded-2xl p-7 hover-lift shadow-sm flex flex-col justify-between transition-all">
             <div class="space-y-4">
-              <div class="w-12 h-12 rounded-lg bg-white border border-brand-border text-brand-green flex items-center justify-center text-xl shadow-sm">
-                <i class="uil uil-users-alt"></i>
+              <div class="w-12 h-12 rounded-xl bg-[#E8EFEB] dark:bg-emerald-950/60 text-brand-green dark:text-emerald-400 flex items-center justify-center text-xl shadow-xs">
+                <i class="uil uil-users-alt text-xl"></i>
               </div>
-              <h3 class="text-base font-extrabold font-heading text-brand-darkText mb-1">FDP / Seminar</h3>
-              <p class="text-brand-secText text-[11.5px] leading-relaxed">
-                Faculty Development Programs (FDP) structured to align college lecturers with contemporary software lifecycle methodologies and research patterns.
+              <h3 class="text-lg font-bold font-heading text-brand-darkText dark:text-[#f8fafc] mb-1">FDP / Seminar</h3>
+              <p class="text-brand-secText dark:text-[#cbd5e1] text-xs leading-relaxed">
+                Faculty Development Programs and seminars to upgrade knowledge and teaching methodologies.
               </p>
             </div>
           </div>
 
           <!-- Skills Development -->
-          <div class="bg-white border border-brand-border rounded-2xl p-7 hover-lift shadow-sm flex flex-col justify-between">
+          <div class="bg-white dark:bg-[#1e293b] border border-brand-border dark:border-[#334155] rounded-2xl p-7 hover-lift shadow-sm flex flex-col justify-between transition-all">
             <div class="space-y-4">
-              <div class="w-12 h-12 rounded-lg bg-white border border-brand-border text-brand-green flex items-center justify-center text-xl shadow-sm">
-                <i class="uil uil-award"></i>
+              <div class="w-12 h-12 rounded-xl bg-[#E8EFEB] dark:bg-emerald-950/60 text-brand-green dark:text-emerald-400 flex items-center justify-center text-xl shadow-xs">
+                <i class="uil uil-award text-xl"></i>
               </div>
-              <h3 class="text-base font-extrabold font-heading text-brand-darkText mb-1">Skills Development</h3>
-              <p class="text-brand-secText text-[11.5px] leading-relaxed">
-                Comprehensive training programs covering behavioral communications, logical reasoning, and industry programming languages to boost job placement rates.
+              <h3 class="text-lg font-bold font-heading text-brand-darkText dark:text-[#f8fafc] mb-1">Skills Development</h3>
+              <p class="text-brand-secText dark:text-[#cbd5e1] text-xs leading-relaxed">
+                Structured programs to enhance technical and soft skills for career readiness.
               </p>
             </div>
           </div>
@@ -429,7 +511,7 @@
     </section>
 
     <!-- Accreditation Advisory Banner with glassmorphism-blue -->
-    <section data-aos="fade-up" class="py-12 md:py-16 bg-brand-lightGreen">
+    <section data-aos="fade-up" class="py-12 md:py-10 md:py-12 bg-brand-lightGreen">
       <div class="max-w-4xl mx-auto px-6 text-center">
         <div class="glassmorphism-blue p-6 md:p-12 rounded-2xl border border-brand-green/20 space-y-6">
           <h3 class="text-2xl font-extrabold font-heading text-brand-darkText">Collaborating with Mahendra Engineering College</h3>
@@ -461,6 +543,28 @@
         <p class="text-[#66736D] text-xs leading-relaxed max-w-sm">
           Shazu Soft Technologies is a technology-driven organization integrating software solutions, education, research, professional development, and industry-academia collaboration.
         </p>
+
+        <!-- Social Media Links -->
+        <div class="pt-2 flex items-center gap-2.5">
+          <a href="https://www.linkedin.com/company/shazu-soft-technologies" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-[#123B32] border border-white/10 hover:border-emerald-500/50 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-xs" title="LinkedIn" aria-label="LinkedIn">
+            <i class="bi bi-linkedin text-xs"></i>
+          </a>
+          <a href="https://x.com/shazusoft" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-[#123B32] border border-white/10 hover:border-emerald-500/50 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-xs" title="Twitter / X" aria-label="Twitter">
+            <i class="bi bi-twitter-x text-xs"></i>
+          </a>
+          <a href="https://www.instagram.com/shazusofttechnologies" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-[#123B32] border border-white/10 hover:border-emerald-500/50 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-xs" title="Instagram" aria-label="Instagram">
+            <i class="bi bi-instagram text-xs"></i>
+          </a>
+          <a href="https://www.facebook.com/shazusofttechnologies" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-[#123B32] border border-white/10 hover:border-emerald-500/50 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-xs" title="Facebook" aria-label="Facebook">
+            <i class="bi bi-facebook text-xs"></i>
+          </a>
+          <a href="https://github.com/shazusoft" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-[#123B32] border border-white/10 hover:border-emerald-500/50 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-xs" title="GitHub" aria-label="GitHub">
+            <i class="bi bi-github text-xs"></i>
+          </a>
+          <a href="https://youtube.com/@shazusofttechnologies" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-[#123B32] border border-white/10 hover:border-emerald-500/50 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-xs" title="YouTube" aria-label="YouTube">
+            <i class="bi bi-youtube text-xs"></i>
+          </a>
+        </div>
       </div>
 
       <!-- Quick Links -->

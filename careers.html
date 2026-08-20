@@ -43,7 +43,7 @@
           },
           fontFamily: {
             sans: ['Inter', 'sans-serif'],
-            heading: ['Outfit', 'sans-serif']
+            heading: ['Inter', 'sans-serif']
           }
         }
       }
@@ -162,16 +162,17 @@
     <header class="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-[#E2E8F0] dark:border-slate-800 transition-all duration-200 shadow-xs">
       <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
       <!-- Brand Logo & Name -->
-      <a href="index.html" class="flex items-center space-x-3 group">
-        <img loading="lazy" decoding="async" src="https://shazusofttechnologies.org/sst.svg" alt="Shazu Soft Technologies Logo" class="h-14 w-auto">
-        <div>
-          <span class="block font-heading font-black text-lg tracking-tight leading-tight text-[#0F172A]">SHAZU SOFT</span>
-          <span class="block text-xs font-bold tracking-wider text-[#123B32] uppercase">Technologies</span>
-        </div>
-      </a>
+        <!-- Brand Logo & Name -->
+        <a href="index.html" class="flex items-center space-x-3 group shrink-0">
+          <img loading="lazy" decoding="async" src="https://shazusofttechnologies.org/sst.svg" alt="Shazu Soft Technologies Logo" class="h-14 w-auto">
+          <div class="brand-text-container">
+            <span class="brand-title-text text-lg">SHAZU SOFT</span>
+            <span class="brand-sub-text"><span>T</span><span>E</span><span>C</span><span>H</span><span>N</span><span>O</span><span>L</span><span>O</span><span>G</span><span>I</span><span>E</span><span>S</span></span>
+          </div>
+        </a>
 
       <!-- Navigation Links with Dropdown Sub-Menus -->
-      <nav class="hidden lg:flex items-center space-x-1 font-heading">
+      <nav class="hidden lg:flex items-center space-x-1 font-heading shrink-0">
         <a href="index.html" class="nav-link-pill"><i class="uil uil-estate text-[14px]"></i>Home</a>
 
         <!-- About Us Dropdown -->
@@ -238,7 +239,27 @@
         </div>
 
         <a href="careers.html" class="nav-link-pill active"><i class="uil uil-briefcase-alt text-[14px]"></i>Career</a>
-        <a href="contact.html" class="nav-link-pill"><i class="uil uil-envelope text-[14px]"></i>Contact Us</a>
+
+        <!-- Contact Dropdown -->
+        <div class="relative group">
+          <a href="contact.html" class="nav-link-pill flex items-center gap-1">
+            <i class="uil uil-envelope text-[14px]"></i>
+            <span>Contact Us</span>
+            <i class="bi bi-chevron-down text-[10px] ml-0.5 transition-transform duration-200 group-hover:rotate-180"></i>
+          </a>
+          <div class="absolute right-0 top-full pt-2 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 z-50 min-w-[230px]">
+            <div class="nav-dropdown-menu p-1.5 space-y-1">
+              <a href="contact.html" class="nav-dropdown-item block px-3.5 py-2">
+                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32] leading-tight">Contact Us</span>
+                <span class="block text-[11px] text-[#334E43] dark:text-[#cbd5e1] mt-0.5 font-normal">Inquiries & Support</span>
+              </a>
+              <a href="track.html" class="nav-dropdown-item block px-3.5 py-2 border-t border-slate-100 dark:border-slate-800/80 mt-0.5">
+                <span class="block text-xs font-bold text-[#123B32] dark:text-emerald-400 leading-tight"><i class="uil uil-search mr-1 text-[13px]"></i>Track Status</span>
+                <span class="block text-[11px] text-[#334E43] dark:text-[#cbd5e1] mt-0.5 font-normal">Check Token & Application Status</span>
+              </a>
+            </div>
+          </div>
+        </div>
       </nav>
 
       <!-- CTA Action Button & Theme Toggle -->
@@ -335,63 +356,27 @@
           </p>
         </div>
         <div class="lg:col-span-5 flex justify-center">
-          <div class="w-full max-w-sm sm:max-w-md rounded-2xl overflow-hidden shadow-xl border border-brand-border dark:border-[#334155] bg-white dark:bg-[#1e293b] hover-lift">
-            <img loading="lazy" decoding="async" src="images/business_growth.png" alt="Careers Illustration" class="w-full h-auto object-cover img-interactive img-float block">
+          <div class="p-3 bg-white dark:bg-[#1e293b] border border-brand-border dark:border-[#334155] rounded-2xl shadow-xl hover-lift">
+            <img loading="lazy" decoding="async" src="images/business_growth.png" alt="Careers Illustration" class="max-h-72 w-auto object-contain img-interactive img-float">
           </div>
         </div>
       </div>
     </section>
 
     <!-- Jobs Grid Section -->
-    <section data-aos="fade-up" class="py-12 md:py-16 bg-white">
+    <section data-aos="fade-up" class="py-12 md:py-10 md:py-12 bg-white">
       <div class="max-w-7xl mx-auto px-6">
         <div class="mb-12">
           <h2 class="text-2xl font-extrabold tracking-tight font-heading text-brand-darkText">Available Roles</h2>
           <div class="w-12 h-1 bg-brand-green mt-2 rounded"></div>
         </div>
 
-        <div id="dynamic-jobs-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div id="dynamic-careers-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <!-- Dynamic jobs populated by js/dynamic-content.js -->
         </div>
       </div>
     </section>
   </main>
-
-  <!-- Job Application Modal -->
-  <div id="apply-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-xl shadow-xl w-full max-w-lg p-5 relative border border-brand-border glassmorphism animate-fade-in">
-      <button onclick="closeApplyModal()" class="absolute top-4 right-4 text-brand-secText hover:text-brand-green text-xl"><i class="bi bi-x-lg"></i></button>
-      <h3 class="font-heading font-extrabold text-xl text-brand-darkText mb-1">Apply for <span id="modal-role" class="text-brand-green">Role</span></h3>
-      <p class="text-xs text-brand-secText mb-6">Shazu Soft Technologies — Salem Headquarters</p>
-      
-      <form id="mock-job-form" class="space-y-4">
-        <div class="space-y-1">
-          <label for="app-name" class="block text-xs font-bold text-brand-darkText">Full Name *</label>
-          <input type="text" id="app-name" required class="w-full border border-brand-border bg-brand-lightGreen/50 p-2.5 rounded-lg text-sm text-brand-darkText focus:bg-white focus:outline-none">
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div class="space-y-1">
-            <label for="app-email" class="block text-xs font-bold text-brand-darkText">Email *</label>
-            <input type="email" id="app-email" required class="w-full border border-brand-border bg-brand-lightGreen/50 p-2.5 rounded-lg text-sm text-brand-darkText focus:bg-white focus:outline-none">
-          </div>
-          <div class="space-y-1">
-            <label for="app-phone" class="block text-xs font-bold text-brand-darkText">Phone *</label>
-            <input type="tel" id="app-phone" required class="w-full border border-brand-border bg-brand-lightGreen/50 p-2.5 rounded-lg text-sm text-brand-darkText focus:bg-white focus:outline-none">
-          </div>
-        </div>
-        <div class="space-y-1">
-          <label class="block text-xs font-bold text-brand-darkText">Resume (Mock Upload) *</label>
-          <div class="border-2 border-dashed border-brand-border hover:border-brand-green/50 rounded-lg p-5 text-center cursor-pointer bg-brand-lightGreen/30">
-            <i class="uil uil-cloud-computing text-2xl text-brand-green mb-2 block"></i>
-            <span class="text-xs text-brand-secText font-semibold">Click to select PDF or Doc file</span>
-          </div>
-        </div>
-        <button type="submit" class="w-full py-3 bg-brand-green hover:bg-brand-hoverGreen text-white text-sm font-bold rounded-lg transition-all mt-4">
-          Submit Application
-        </button>
-      </form>
-    </div>
-  </div>
 
   <!-- Footer Section -->
   <footer class="bg-[#17211D] text-[#E4EBE7] pt-16 pb-12 border-t border-emerald-950">
@@ -408,6 +393,28 @@
         <p class="text-[#66736D] text-xs leading-relaxed max-w-sm">
           Shazu Soft Technologies is a technology-driven organization integrating software solutions, education, research, professional development, and industry-academia collaboration.
         </p>
+
+        <!-- Social Media Links -->
+        <div class="pt-2 flex items-center gap-2.5">
+          <a href="https://www.linkedin.com/company/shazu-soft-technologies" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-[#123B32] border border-white/10 hover:border-emerald-500/50 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-xs" title="LinkedIn" aria-label="LinkedIn">
+            <i class="bi bi-linkedin text-xs"></i>
+          </a>
+          <a href="https://x.com/shazusoft" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-[#123B32] border border-white/10 hover:border-emerald-500/50 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-xs" title="Twitter / X" aria-label="Twitter">
+            <i class="bi bi-twitter-x text-xs"></i>
+          </a>
+          <a href="https://www.instagram.com/shazusofttechnologies" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-[#123B32] border border-white/10 hover:border-emerald-500/50 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-xs" title="Instagram" aria-label="Instagram">
+            <i class="bi bi-instagram text-xs"></i>
+          </a>
+          <a href="https://www.facebook.com/shazusofttechnologies" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-[#123B32] border border-white/10 hover:border-emerald-500/50 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-xs" title="Facebook" aria-label="Facebook">
+            <i class="bi bi-facebook text-xs"></i>
+          </a>
+          <a href="https://github.com/shazusoft" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-[#123B32] border border-white/10 hover:border-emerald-500/50 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-xs" title="GitHub" aria-label="GitHub">
+            <i class="bi bi-github text-xs"></i>
+          </a>
+          <a href="https://youtube.com/@shazusofttechnologies" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-[#123B32] border border-white/10 hover:border-emerald-500/50 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-xs" title="YouTube" aria-label="YouTube">
+            <i class="bi bi-youtube text-xs"></i>
+          </a>
+        </div>
       </div>
 
       <!-- Quick Links -->
@@ -537,46 +544,6 @@
   <script defer src="js/main.js"></script>
   <script defer src="js/chatbot.js"></script>
   
-  <!-- Careers Dynamic Modal Handler -->
-  <script>
-    const modal = document.getElementById('apply-modal');
-    const roleSpan = document.getElementById('modal-role');
-
-    function openApplyModal(roleName) {
-      if (modal && roleSpan) {
-        roleSpan.textContent = roleName;
-        modal.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-      }
-    }
-
-    function closeApplyModal() {
-      if (modal) {
-        modal.classList.add('hidden');
-        document.body.style.overflow = '';
-      }
-    }
-
-    // Modal submit listener
-    const mockForm = document.getElementById('mock-job-form');
-    if (mockForm) {
-      mockForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const name = document.getElementById('app-name').value.trim();
-        const role = roleSpan.textContent;
-        
-        closeApplyModal();
-        mockForm.reset();
-
-        // Trigger dynamic success popup helper from main.js
-        if (typeof window.showSuccessModal === 'function') {
-          window.showSuccessModal('Application Received!', `Thank you, ${name}. Your application for the position of "${role}" has been successfully logged.`);
-        } else {
-          alert(`Application Submitted! Thank you ${name} for applying for the ${role} position.`);
-        }
-      });
-    }
-  </script>
   <script defer src="js/hot-toast.js"></script>
   <script defer src="js/dynamic-content.js"></script>
 </body>

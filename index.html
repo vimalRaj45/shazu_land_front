@@ -43,7 +43,7 @@
           },
           fontFamily: {
             sans: ['Inter', 'sans-serif'],
-            heading: ['Outfit', 'sans-serif']
+            heading: ['Inter', 'sans-serif']
           }
         }
       }
@@ -138,10 +138,22 @@
             <span>Career</span>
           </div>
         </a>
+        <a href="membership.html" class="flex items-center justify-between px-3.5 py-2.5 rounded-lg font-medium text-xs text-[#475569] hover:text-[#123B32] hover:bg-[#E8EFEB] transition-all">
+          <div class="flex items-center gap-3">
+            <i class="uil uil-award text-base text-[#123B32]"></i>
+            <span>Membership</span>
+          </div>
+        </a>
         <a href="contact.html" class="flex items-center justify-between px-3.5 py-2.5 rounded-lg font-medium text-xs text-[#475569] hover:text-[#123B32] hover:bg-[#E8EFEB] transition-all">
           <div class="flex items-center gap-3">
             <i class="uil uil-envelope text-base text-[#123B32]"></i>
             <span>Contact Us</span>
+          </div>
+        </a>
+        <a href="track.html" class="flex items-center justify-between px-3.5 py-2.5 rounded-lg font-bold text-xs text-[#123B32] bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 transition-all">
+          <div class="flex items-center gap-3">
+            <i class="uil uil-search text-base text-[#123B32]"></i>
+            <span>Track Reference Token</span>
           </div>
         </a>
       </nav>
@@ -155,13 +167,12 @@
     </div>
   </aside>
 
-  <!-- Combined Sticky Top Announcement Bar & Header Section -->
+  <!-- Combined Sticky Top Header Section -->
   <div class="sticky top-0 z-40 w-full">
-    <div id="dynamic-announcement-bar"></div>
     <header class="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-[#E2E8F0] dark:border-slate-800 transition-all duration-200 shadow-xs">
       <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
         <!-- Brand Logo & Name -->
-        <a href="index.html" class="flex items-center space-x-3 group">
+        <a href="index.html" class="flex items-center space-x-3 group shrink-0">
           <img loading="lazy" decoding="async" src="https://shazusofttechnologies.org/sst.svg" alt="Shazu Soft Technologies Logo" class="h-14 w-auto">
           <div class="brand-text-container">
             <span class="brand-title-text text-lg">SHAZU SOFT</span>
@@ -170,7 +181,7 @@
         </a>
 
       <!-- Navigation Links with Dropdown Sub-Menus -->
-      <nav class="hidden lg:flex items-center space-x-1 font-heading text-[#26322E] dark:text-[#E2E8F0]">
+      <nav class="hidden lg:flex items-center space-x-1 font-heading text-[#26322E] dark:text-[#E2E8F0] shrink-0">
         <a href="index.html" class="nav-link-pill active"><i class="uil uil-estate text-[14px]"></i>Home</a>
 
         <!-- About Us Dropdown -->
@@ -237,7 +248,27 @@
         </div>
 
         <a href="careers.html" class="nav-link-pill dark:text-[#E2E8F0] dark:hover:text-[#6EE7B7]"><i class="uil uil-briefcase-alt text-[14px]"></i>Career</a>
-        <a href="contact.html" class="nav-link-pill dark:text-[#E2E8F0] dark:hover:text-[#6EE7B7]"><i class="uil uil-envelope text-[14px]"></i>Contact Us</a>
+
+        <!-- Contact Dropdown -->
+        <div class="relative group">
+          <a href="contact.html" class="nav-link-pill flex items-center gap-1 dark:text-[#E2E8F0] dark:hover:text-[#6EE7B7]">
+            <i class="uil uil-envelope text-[14px]"></i>
+            <span>Contact Us</span>
+            <i class="bi bi-chevron-down text-[10px] ml-0.5 transition-transform duration-200 group-hover:rotate-180"></i>
+          </a>
+          <div class="absolute right-0 top-full pt-2 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 z-50 min-w-[230px]">
+            <div class="nav-dropdown-menu p-1.5 space-y-1">
+              <a href="contact.html" class="nav-dropdown-item block px-3.5 py-2">
+                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32] leading-tight">Contact Us</span>
+                <span class="block text-[11px] text-[#334E43] dark:text-[#cbd5e1] mt-0.5 font-normal">Inquiries & Support</span>
+              </a>
+              <a href="track.html" class="nav-dropdown-item block px-3.5 py-2 border-t border-slate-100 dark:border-slate-800/80 mt-0.5">
+                <span class="block text-xs font-bold text-[#123B32] dark:text-emerald-400 leading-tight"><i class="uil uil-search mr-1 text-[13px]"></i>Track Status</span>
+                <span class="block text-[11px] text-[#334E43] dark:text-[#cbd5e1] mt-0.5 font-normal">Check Token & Application Status</span>
+              </a>
+            </div>
+          </div>
+        </div>
       </nav>
 
       <!-- CTA Action Button & Theme Toggle -->
@@ -321,7 +352,7 @@
 
   <!-- Hero Section -->
   <main>
-    <section data-aos="fade-up" class="hero-bg py-14 md:py-16 relative overflow-hidden border-b border-brand-border">
+    <section data-aos="fade-up" class="hero-bg py-14 md:py-12 md:py-10 md:py-12 relative overflow-hidden border-b border-brand-border">
       <div class="dot-grid"></div>
       <div class="ambient-blob-1"></div>
       <div class="ambient-blob-2"></div>
@@ -404,8 +435,11 @@
       </div>
     </section>
 
+    <!-- Dynamic Announcement Bar (Below Hero) -->
+    <div id="dynamic-announcement-bar"></div>
+
     <!-- Milestone Announcement Section -->
-    <section class="py-12 md:py-16 bg-white border-y border-brand-border overflow-hidden">
+    <section class="py-12 md:py-10 md:py-12 bg-white border-y border-brand-border overflow-hidden">
       <div class="max-w-7xl mx-auto px-6">
         <div class="sec-eyebrow inline-flex items-center gap-1 px-3 py-1.5 bg-brand-lightGreen border border-brand-border/60 text-brand-green font-bold text-[11px] tracking-wide uppercase rounded-full mb-3 shadow-sm">
           NEW BEGINNING
@@ -479,7 +513,7 @@
     </section>
 
     <!-- Latest Updates Section -->
-    <section class="py-12 md:py-16 bg-brand-lightGreen/50 overflow-hidden">
+    <section class="py-12 md:py-10 md:py-12 bg-brand-lightGreen/50 overflow-hidden">
       <div class="max-w-7xl mx-auto px-6">
         <div class="flex justify-between items-end mb-12">
           <div>
@@ -531,7 +565,7 @@
     </section>
 
     <!-- Services Overview Section -->
-    <section class="py-12 md:py-16 bg-white overflow-hidden">
+    <section class="py-12 md:py-10 md:py-12 bg-white overflow-hidden">
       <div class="max-w-7xl mx-auto px-6 text-center">
         <h2 class="text-xl md:text-2xl font-black text-brand-darkText tracking-tighter leading-snug font-heading">Solutions Built Around Growth</h2>
         <p class="text-brand-secText text-sm max-w-md mx-auto mt-1 mb-8 leading-relaxed">
@@ -542,8 +576,8 @@
           <!-- Education Services -->
           <div data-aos="fade-up" class="bg-white dark:bg-[#1e293b] border border-brand-border dark:border-[#334155] rounded-2xl overflow-hidden hover-lift shadow-sm flex flex-col justify-between group">
             <!-- Full Width Top Illustration Banner -->
-            <div class="w-full h-52 bg-gradient-to-b from-[#E8EFEB] to-[#eef5fc] dark:from-slate-800/80 dark:to-slate-900/60 overflow-hidden border-b border-slate-100 dark:border-slate-800">
-              <img loading="lazy" decoding="async" src="images/education.png" alt="Education Services Illustration" class="w-full h-full object-cover img-interactive img-float drop-shadow-md">
+            <div class="w-full h-56 bg-gradient-to-b from-[#E8EFEB] to-[#eef5fc] dark:from-slate-800/80 dark:to-slate-900/60 flex items-center justify-center p-4 border-b border-slate-100 dark:border-slate-800">
+              <img loading="lazy" decoding="async" src="images/education.png" alt="Education Services Illustration" class="h-full w-auto object-contain img-interactive img-float drop-shadow-md">
             </div>
             <!-- Bottom Content -->
             <div class="p-6 flex flex-col justify-between flex-1 space-y-4">
@@ -567,8 +601,8 @@
           <!-- Software Services -->
           <div data-aos="fade-up" data-aos-delay="100" class="bg-white dark:bg-[#1e293b] border border-brand-border dark:border-[#334155] rounded-2xl overflow-hidden hover-lift shadow-sm flex flex-col justify-between group">
             <!-- Full Width Top Illustration Banner -->
-            <div class="w-full h-52 bg-gradient-to-b from-[#E8EFEB] to-[#eef5fc] dark:from-slate-800/80 dark:to-slate-900/60 overflow-hidden border-b border-slate-100 dark:border-slate-800">
-              <img loading="lazy" decoding="async" src="images/software.png" alt="Software Services Illustration" class="w-full h-full object-cover img-interactive img-float drop-shadow-md">
+            <div class="w-full h-56 bg-gradient-to-b from-[#E8EFEB] to-[#eef5fc] dark:from-slate-800/80 dark:to-slate-900/60 flex items-center justify-center p-4 border-b border-slate-100 dark:border-slate-800">
+              <img loading="lazy" decoding="async" src="images/software.png" alt="Software Services Illustration" class="h-full w-auto object-contain img-interactive img-float drop-shadow-md">
             </div>
             <!-- Bottom Content -->
             <div class="p-6 flex flex-col justify-between flex-1 space-y-4">
@@ -592,8 +626,8 @@
           <!-- Research Services -->
           <div data-aos="fade-up" data-aos-delay="200" class="bg-white dark:bg-[#1e293b] border border-brand-border dark:border-[#334155] rounded-2xl overflow-hidden hover-lift shadow-sm flex flex-col justify-between group">
             <!-- Full Width Top Illustration Banner -->
-            <div class="w-full h-52 bg-gradient-to-b from-[#E8EFEB] to-[#eef5fc] dark:from-slate-800/80 dark:to-slate-900/60 overflow-hidden border-b border-slate-100 dark:border-slate-800">
-              <img loading="lazy" decoding="async" src="images/research.png" alt="Research Services Illustration" class="w-full h-full object-cover img-interactive img-float drop-shadow-md">
+            <div class="w-full h-56 bg-gradient-to-b from-[#E8EFEB] to-[#eef5fc] dark:from-slate-800/80 dark:to-slate-900/60 flex items-center justify-center p-4 border-b border-slate-100 dark:border-slate-800">
+              <img loading="lazy" decoding="async" src="images/research.png" alt="Research Services Illustration" class="h-full w-auto object-contain img-interactive img-float drop-shadow-md">
             </div>
             <!-- Bottom Content -->
             <div class="p-6 flex flex-col justify-between flex-1 space-y-4">
@@ -643,7 +677,7 @@
     </section>
 
     <!-- Mission & Gap Bridging Section -->
-    <section class="py-12 md:py-16 bg-white overflow-hidden">
+    <section class="py-12 md:py-10 md:py-12 bg-white overflow-hidden">
       <div class="max-w-7xl mx-auto px-6">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           <div class="lg:col-span-6 space-y-4" data-aos="fade-right">
@@ -662,7 +696,7 @@
     </section>
 
     <!-- Core Capabilities (Editorial Layout) -->
-    <section data-aos="fade-up" class="py-12 md:py-16 bg-brand-lightGreen/30 border-t border-brand-border">
+    <section data-aos="fade-up" class="py-12 md:py-10 md:py-12 bg-brand-lightGreen/30 border-t border-brand-border">
       <div class="max-w-7xl mx-auto px-6">
         <div class="mb-12">
           <h2 class="text-2xl md:text-[30px] font-black text-brand-darkText tracking-tighter leading-[1.12] font-heading">Centralized Innovation Operations</h2>
@@ -738,7 +772,7 @@
     </section>
 
     <!-- Events Highlight Section -->
-    <section data-aos="fade-up" class="py-12 md:py-16 bg-white border-t border-brand-border">
+    <section data-aos="fade-up" class="py-12 md:py-10 md:py-12 bg-white border-t border-brand-border">
       <div class="max-w-7xl mx-auto px-6">
         <div class="flex flex-col md:flex-row md:items-end justify-between mb-12">
           <div>
@@ -831,7 +865,7 @@
     </section>
 
     <!-- Final CTA Section with Glassmorphism green -->
-    <section class="py-12 md:py-16 bg-brand-lightGreen dark:bg-[#0b0f19] overflow-hidden">
+    <section class="py-12 md:py-10 md:py-12 bg-brand-lightGreen dark:bg-[#0b0f19] overflow-hidden">
       <div class="max-w-4xl mx-auto px-6 text-center">
         <!-- Accent green overlay card -->
         <div data-aos="zoom-in" class="bg-white/90 dark:bg-slate-900/90 rounded-2xl p-6 md:p-12 shadow-sm border border-[#D3DDD7] dark:border-slate-800 space-y-6">
@@ -869,6 +903,28 @@
         <p class="text-slate-400 text-xs leading-relaxed max-w-sm">
           Shazu Soft Technologies is a technology-driven organization integrating software solutions, education, research, professional development, and industry-academia collaboration.
         </p>
+
+        <!-- Social Media Links -->
+        <div class="pt-2 flex items-center gap-2.5">
+          <a href="https://www.linkedin.com/company/shazu-soft-technologies" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-[#123B32] border border-white/10 hover:border-emerald-500/50 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-xs" title="LinkedIn" aria-label="LinkedIn">
+            <i class="bi bi-linkedin text-xs"></i>
+          </a>
+          <a href="https://x.com/shazusoft" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-[#123B32] border border-white/10 hover:border-emerald-500/50 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-xs" title="Twitter / X" aria-label="Twitter">
+            <i class="bi bi-twitter-x text-xs"></i>
+          </a>
+          <a href="https://www.instagram.com/shazusofttechnologies" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-[#123B32] border border-white/10 hover:border-emerald-500/50 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-xs" title="Instagram" aria-label="Instagram">
+            <i class="bi bi-instagram text-xs"></i>
+          </a>
+          <a href="https://www.facebook.com/shazusofttechnologies" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-[#123B32] border border-white/10 hover:border-emerald-500/50 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-xs" title="Facebook" aria-label="Facebook">
+            <i class="bi bi-facebook text-xs"></i>
+          </a>
+          <a href="https://github.com/shazusoft" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-[#123B32] border border-white/10 hover:border-emerald-500/50 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-xs" title="GitHub" aria-label="GitHub">
+            <i class="bi bi-github text-xs"></i>
+          </a>
+          <a href="https://www.youtube.com/@shazusofttechnologies" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-[#123B32] border border-white/10 hover:border-emerald-500/50 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-xs" title="YouTube" aria-label="YouTube">
+            <i class="bi bi-youtube text-xs"></i>
+          </a>
+        </div>
       </div>
 
       <!-- Quick Links -->

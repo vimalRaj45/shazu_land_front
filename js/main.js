@@ -44,10 +44,10 @@ window.closeMobileDrawer = function(e) {
 // Global Toast Feedback Helper
 function showToast(message, type = 'success') {
   const toast = document.createElement('div');
-  toast.className = `fixed bottom-3 right-3 sm:bottom-5 sm:right-5 max-w-[92vw] sm:max-w-sm px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-lg shadow-lg z-50 text-[10.5px] sm:text-[11px] font-medium text-white transition-all duration-200 transform translate-y-6 opacity-0 flex items-center gap-2 border ${
-    type === 'error' ? 'bg-red-700 border-red-800' : 'bg-[#123B32] border-[#2F5B4E]'
+  toast.className = `fixed bottom-5 right-5 px-3.5 py-2 rounded-md shadow-md z-50 text-[11px] font-medium text-white transition-all duration-200 transform translate-y-6 opacity-0 flex items-center gap-2 border ${
+    type === 'success' ? 'bg-[#123B32] border-[#2F5B4E]' : 'bg-red-700 border-red-800'
   }`;
-  toast.innerHTML = `<i class="bi ${type === 'error' ? 'bi-exclamation-triangle-fill' : 'bi-check-circle-fill'} text-xs shrink-0"></i> <span class="leading-tight">${message}</span>`;
+  toast.innerHTML = `<i class="bi ${type === 'error' ? 'bi-exclamation-triangle-fill' : 'bi-check-circle-fill'} text-xs"></i> <span>${message}</span>`;
   document.body.appendChild(toast);
 
   setTimeout(() => {
@@ -196,26 +196,21 @@ function initForms() {
     contactForm.dataset.mainBound = 'true';
     contactForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const name = document.getElementById('contact-name')?.value.trim();
-      const email = document.getElementById('contact-email')?.value.trim();
-      const phone = document.getElementById('contact-phone')?.value.trim() || '';
-      const subject = document.getElementById('contact-subject')?.value.trim();
-      const message = document.getElementById('contact-message')?.value.trim();
+      const name = (document.getElementById('contact-name') || document.getElementById('name'))?.value?.trim();
+      const email = (document.getElementById('contact-email') || document.getElementById('email'))?.value?.trim();
+      const phone = (document.getElementById('contact-phone') || document.getElementById('phone'))?.value?.trim() || '';
+      const subject = (document.getElementById('contact-subject') || document.getElementById('subject'))?.value?.trim() || 'General Inquiry';
+      const category = (document.getElementById('contact-category') || document.getElementById('service_category'))?.value || 'General';
+      const message = (document.getElementById('contact-message') || document.getElementById('message'))?.value?.trim();
 
-      if (!name || !email || !subject || !message) {
-        showToast('Please fill out all required fields.', 'error');
+      if (!name || !email || !message) {
+        if (typeof showToast === 'function') showToast('Please fill in Name, Email, and Message.', 'error');
         return;
       }
 
-      if (window.submitContactInquiry) {
-        const ok = await window.submitContactInquiry(name, email, phone, subject, 'General', message);
-        if (ok) contactForm.reset();
-      } else {
-        showSuccessModal(
-          'Message Sent!',
-          `Thank you, ${name}. We have received your message regarding "${subject}" and will respond shortly.`
-        );
-        contactForm.reset();
+      if (typeof window.submitContactInquiry === 'function') {
+        const success = await window.submitContactInquiry(name, email, phone, subject, category, message);
+        if (success) contactForm.reset();
       }
     });
   }
@@ -225,79 +220,8 @@ function initForms() {
     membershipForm.dataset.mainBound = 'true';
     membershipForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      
-      const association_name = document.getElementById('member-association')?.value;
-      const membership_type = document.getElementById('member-type')?.value;
-      const name = document.getElementById('member-name')?.value.trim();
-      const dob = document.getElementById('member-dob')?.value;
-      const contact_no = document.getElementById('member-phone')?.value.trim();
-      const email = document.getElementById('member-email')?.value.trim();
-      const qualification = document.getElementById('member-qualification')?.value.trim();
-      const designation = document.getElementById('member-designation')?.value.trim();
-      const area_of_interest = document.getElementById('member-interest')?.value.trim();
-      const organization_address = document.getElementById('member-org-address')?.value.trim();
-      const declaration_accepted = document.getElementById('member-declaration')?.checked;
-
-      if (!association_name || !membership_type || !name || !dob || !contact_no || !email || !qualification || !designation || !area_of_interest || !organization_address) {
-        showToast('Please fill out all mandatory fields.', 'error');
-        return;
-      }
-
-      if (!declaration_accepted) {
-        showToast('Please confirm the declaration checkbox to proceed.', 'error');
-        return;
-      }
-
-      const btnSubmit = document.getElementById('btn-submit-membership');
-      if (btnSubmit) {
-        btnSubmit.disabled = true;
-        btnSubmit.innerHTML = `<span class="sst-spinner !w-4 !h-4 mr-2"></span> <span>Submitting Application...</span>`;
-      }
-
-      if (window.startProgressBar) window.startProgressBar();
-
-      try {
-        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-        const apiBase = isLocal 
-          ? (window.location.port === '5000' ? '' : 'http://localhost:5000')
-          : ((window.SST_CONFIG && window.SST_CONFIG.API_BASE_URL) || 'https://shazu-land-back.onrender.com');
-
-        const response = await fetch(`${apiBase}/api/public/membership/apply`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            association_name,
-            membership_type,
-            name,
-            dob,
-            area_of_interest,
-            contact_no,
-            email,
-            qualification,
-            designation,
-            organization_address,
-            declaration_accepted
-          })
-        });
-
-        const data = await response.json();
-        if (window.finishProgressBar) window.finishProgressBar();
-        if (!response.ok) throw new Error(data.error || 'Failed to submit application');
-
-        const token = data.token || 'SST-MEM-SUBMITTED';
-        showSuccessModal(
-          'Membership Application Submitted!',
-          `Thank you, <strong>${name}</strong>. Your application for <strong>${membership_type}</strong> under <em>${association_name}</em> has been recorded successfully.<br><br><span class="inline-block px-3 py-1 bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-mono font-bold rounded-lg text-xs">Reference Token: ${token}</span><br><br>A confirmation copy has been sent to <strong>${email}</strong>.`
-        );
-        membershipForm.reset();
-      } catch (err) {
-        if (window.finishProgressBar) window.finishProgressBar();
-        showToast(err.message || 'Submission error. Please check your connection.', 'error');
-      } finally {
-        if (btnSubmit) {
-          btnSubmit.disabled = false;
-          btnSubmit.innerHTML = `<i class="bi bi-shield-check text-base"></i> <span>Submit Membership Application</span>`;
-        }
+      if (typeof window.submitMembershipApplication === 'function') {
+        await window.submitMembershipApplication(e);
       }
     });
   }
@@ -305,44 +229,8 @@ function initForms() {
 
 // 4. Events Search & Filtering (events.html)
 function initEventsFilter() {
-  const searchInput = document.getElementById('event-search');
-  const filterPills = document.querySelectorAll('.event-filter-pill');
-  const eventCards = document.querySelectorAll('.event-card');
-
-  if (searchInput || filterPills.length > 0) {
-    let currentCategory = 'all';
-    let searchQuery = '';
-
-    const filterEvents = () => {
-      eventCards.forEach(card => {
-        const text = card.textContent.toLowerCase();
-        const category = card.getAttribute('data-category');
-        const matchesSearch = text.includes(searchQuery);
-        const matchesCategory = currentCategory === 'all' || category === currentCategory;
-        card.style.display = (matchesSearch && matchesCategory) ? 'block' : 'none';
-      });
-    };
-
-    if (searchInput && !searchInput.dataset.mainBound) {
-      searchInput.dataset.mainBound = 'true';
-      searchInput.addEventListener('input', (e) => {
-        searchQuery = e.target.value.toLowerCase();
-        filterEvents();
-      });
-    }
-
-    filterPills.forEach(pill => {
-      if (pill.dataset.mainBound) return;
-      pill.dataset.mainBound = 'true';
-      pill.addEventListener('click', () => {
-        filterPills.forEach(p => p.classList.remove('bg-brand-green', 'text-white'));
-        filterPills.forEach(p => p.classList.add('bg-white', 'text-brand-secText'));
-        pill.classList.remove('bg-white', 'text-brand-secText');
-        pill.classList.add('bg-brand-green', 'text-white');
-        currentCategory = pill.getAttribute('data-filter') || 'all';
-        filterEvents();
-      });
-    });
+  if (typeof window.applyEventFilters === 'function') {
+    return;
   }
 }
 

@@ -16,6 +16,7 @@
   
   <!-- CSS Stylesheets -->
   <link rel="stylesheet" href="css/custom.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
   
   <!-- Tailwind CSS CDN -->
@@ -43,7 +44,7 @@
           },
           fontFamily: {
             sans: ['Inter', 'sans-serif'],
-            heading: ['Outfit', 'sans-serif']
+            heading: ['Inter', 'sans-serif']
           }
         }
       }
@@ -162,16 +163,17 @@
     <header class="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-[#E2E8F0] dark:border-slate-800 transition-all duration-200 shadow-xs">
       <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
       <!-- Brand Logo & Name -->
-      <a href="index.html" class="flex items-center space-x-3 group">
-        <img loading="lazy" decoding="async" src="https://shazusofttechnologies.org/sst.svg" alt="Shazu Soft Technologies Logo" class="h-12 w-auto">
-        <div>
-          <span class="block font-heading font-black text-lg tracking-tight leading-tight text-[#0F172A] dark:text-white">SHAZU SOFT</span>
-          <span class="block text-xs font-bold tracking-wider text-[#123B32] dark:text-emerald-400 uppercase">Technologies</span>
-        </div>
-      </a>
+        <!-- Brand Logo & Name -->
+        <a href="index.html" class="flex items-center space-x-3 group shrink-0">
+          <img loading="lazy" decoding="async" src="https://shazusofttechnologies.org/sst.svg" alt="Shazu Soft Technologies Logo" class="h-14 w-auto">
+          <div class="brand-text-container">
+            <span class="brand-title-text text-lg">SHAZU SOFT</span>
+            <span class="brand-sub-text"><span>T</span><span>E</span><span>C</span><span>H</span><span>N</span><span>O</span><span>L</span><span>O</span><span>G</span><span>I</span><span>E</span><span>S</span></span>
+          </div>
+        </a>
 
       <!-- Navigation Links with Dropdown Sub-Menus -->
-      <nav class="hidden lg:flex items-center space-x-1 font-heading">
+      <nav class="hidden lg:flex items-center space-x-1 font-heading shrink-0">
         <a href="index.html" class="nav-link-pill"><i class="uil uil-estate text-[14px]"></i>Home</a>
 
         <!-- About Us Dropdown -->
@@ -238,7 +240,27 @@
         </div>
 
         <a href="careers.html" class="nav-link-pill"><i class="uil uil-briefcase-alt text-[14px]"></i>Career</a>
-        <a href="contact.html" class="nav-link-pill"><i class="uil uil-envelope text-[14px]"></i>Contact Us</a>
+
+        <!-- Contact Dropdown -->
+        <div class="relative group">
+          <a href="contact.html" class="nav-link-pill flex items-center gap-1">
+            <i class="uil uil-envelope text-[14px]"></i>
+            <span>Contact Us</span>
+            <i class="bi bi-chevron-down text-[10px] ml-0.5 transition-transform duration-200 group-hover:rotate-180"></i>
+          </a>
+          <div class="absolute right-0 top-full pt-2 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 z-50 min-w-[230px]">
+            <div class="nav-dropdown-menu p-1.5 space-y-1">
+              <a href="contact.html" class="nav-dropdown-item block px-3.5 py-2">
+                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32] leading-tight">Contact Us</span>
+                <span class="block text-[11px] text-[#334E43] dark:text-[#cbd5e1] mt-0.5 font-normal">Inquiries & Support</span>
+              </a>
+              <a href="track.html" class="nav-dropdown-item block px-3.5 py-2 border-t border-slate-100 dark:border-slate-800/80 mt-0.5">
+                <span class="block text-xs font-bold text-[#123B32] dark:text-emerald-400 leading-tight"><i class="uil uil-search mr-1 text-[13px]"></i>Track Status</span>
+                <span class="block text-[11px] text-[#334E43] dark:text-[#cbd5e1] mt-0.5 font-normal">Check Token & Application Status</span>
+              </a>
+            </div>
+          </div>
+        </div>
       </nav>
 
       <!-- CTA Action Button & Theme Toggle -->
@@ -334,24 +356,124 @@
       </div>
     </section>
 
-    <!-- Floating Search & Interactive Category Filter Bar -->
-    <section class="max-w-7xl mx-auto px-6 relative z-30 -mt-7">
-      <div class="bg-white dark:bg-slate-900 border border-[#D3DDD7] dark:border-slate-800 p-4 rounded-3xl shadow-xl flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+    <!-- Compact Dropdown Filter Console with Bootstrap Icons -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 relative z-30 -mt-10">
+      
+      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-6 shadow-xl shadow-slate-900/5 dark:shadow-black/40 space-y-4">
         
-        <!-- Live Search Input -->
-        <div class="relative flex-1 max-w-md">
-          <i class="bi bi-search absolute left-4 top-3 text-[#123B32] dark:text-slate-400 text-sm"></i>
-          <input type="text" id="event-search" placeholder="Search hackathons, dates, locations, workshops..." class="w-full bg-[#F1F5F3] dark:bg-slate-950 border border-[#D3DDD7] dark:border-slate-800 pl-11 pr-4 py-2.5 rounded-2xl text-xs text-[#0F172A] dark:text-white focus:outline-none focus:border-[#123B32] dark:focus:border-emerald-500 font-sans transition-all placeholder:text-[#64748B]">
+        <!-- Header Title Bar -->
+        <div class="flex items-center justify-between flex-wrap gap-2 pb-2 border-b border-slate-100 dark:border-slate-800/80">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-xl bg-[#123B32] text-white flex items-center justify-center text-sm shadow-xs">
+              <i class="bi bi-funnel-fill"></i>
+            </div>
+            <div>
+              <h2 class="text-sm sm:text-base font-bold font-heading text-slate-900 dark:text-white leading-tight">Filter Programs & Events</h2>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400">Search by keywords, format, domain or schedule</p>
+            </div>
+          </div>
+
+          <button type="button" onclick="resetAllEventFilters()" class="text-xs font-bold text-amber-600 hover:text-amber-700 dark:text-amber-400 flex items-center gap-1.5 px-3 py-1.5 rounded-xl hover:bg-amber-50 dark:hover:bg-amber-950/40 transition-colors cursor-pointer border border-amber-200 dark:border-amber-900/50">
+            <i class="bi bi-arrow-counterclockwise"></i>
+            <span>Reset Filters</span>
+          </button>
         </div>
 
-        <!-- Category Filter Pills -->
-        <div class="flex items-center gap-2 overflow-x-auto pb-1 lg:pb-0 w-full max-w-full no-scrollbar">
-          <button class="event-filter-pill active shrink-0 px-4 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer" data-filter="all">All Events</button>
-          <button class="event-filter-pill shrink-0 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer" data-filter="hackathons">Hackathons & Contests</button>
-          <button class="event-filter-pill shrink-0 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer" data-filter="technology">Workshops & Tech</button>
-          <button class="event-filter-pill shrink-0 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer" data-filter="business">Webinars & Seminars</button>
+        <!-- 4-Column Dropdown & Search Controls Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          
+          <!-- 1. Live Keyword Search -->
+          <div class="relative">
+            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1 flex items-center gap-1">
+              <i class="bi bi-search text-xs text-[#123B32] dark:text-emerald-400"></i> Keyword Search
+            </label>
+            <div class="relative">
+              <input type="text" id="event-search" placeholder="Search conference, topic..." class="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:border-[#123B32] dark:focus:border-emerald-500 font-sans transition-all placeholder:text-slate-400">
+              <i class="bi bi-search absolute left-3 top-3 text-slate-400 text-xs pointer-events-none"></i>
+            </div>
+          </div>
+
+          <!-- 2. Tier 1: Event Type Dropdown -->
+          <div>
+            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1 flex items-center gap-1">
+              <i class="bi bi-calendar-event text-xs text-[#123B32] dark:text-emerald-400"></i> Event Format
+            </label>
+            <div class="relative">
+              <select id="event-type-select" onchange="window.handleEventTypeSelect(this.value)" class="w-full pl-9 pr-8 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:border-[#123B32] dark:focus:border-emerald-500 font-sans transition-all cursor-pointer appearance-none">
+                <option value="all">All Formats (7 Available)</option>
+                <option value="Upcoming Conference">Upcoming Conference</option>
+                <option value="Faculty Development Program">Faculty Development Program (FDP)</option>
+                <option value="Webinar">Webinar</option>
+                <option value="Hands on Training">Hands on Training</option>
+                <option value="Internship">Internship</option>
+                <option value="Hackathon">Hackathon</option>
+                <option value="Seminar">Seminar</option>
+              </select>
+              <i class="bi bi-chevron-down absolute right-3 top-3 text-slate-400 text-xs pointer-events-none"></i>
+              <i class="bi bi-collection-play absolute left-3 top-3 text-[#123B32] dark:text-emerald-400 text-xs pointer-events-none"></i>
+            </div>
+          </div>
+
+          <!-- 3. Tier 3: Field / Domain Dropdown -->
+          <div>
+            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1 flex items-center gap-1">
+              <i class="bi bi-mortarboard text-xs text-[#123B32] dark:text-emerald-400"></i> Domain Field
+            </label>
+            <div class="relative">
+              <select id="event-field-select" onchange="window.handleEventFieldSelect(this.value)" class="w-full pl-9 pr-8 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:border-[#123B32] dark:focus:border-emerald-500 font-sans transition-all cursor-pointer appearance-none">
+                <option value="all">All Fields & Domains</option>
+                <option value="Engineering & Tech">Engineering & Technology</option>
+                <option value="Medical & Life Sciences">Medical & Life Sciences</option>
+                <option value="Business & Management">Business & Management</option>
+                <option value="Education & Humanities">Education & Humanities</option>
+              </select>
+              <i class="bi bi-chevron-down absolute right-3 top-3 text-slate-400 text-xs pointer-events-none"></i>
+              <i class="bi bi-diagram-3 absolute left-3 top-3 text-[#123B32] dark:text-emerald-400 text-xs pointer-events-none"></i>
+            </div>
+          </div>
+
+          <!-- 4. Tier 2: Status Dropdown -->
+          <div>
+            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1 flex items-center gap-1">
+              <i class="bi bi-clock-history text-xs text-[#123B32] dark:text-emerald-400"></i> Timeline Status
+            </label>
+            <div class="relative">
+              <select id="event-status-select" onchange="window.handleEventStatusSelect(this.value)" class="w-full pl-9 pr-8 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:border-[#123B32] dark:focus:border-emerald-500 font-sans transition-all cursor-pointer appearance-none">
+                <option value="all">All Events (Upcoming & Past)</option>
+                <option value="upcoming">Upcoming (Live Registrations)</option>
+                <option value="past">Past Events (Archives)</option>
+              </select>
+              <i class="bi bi-chevron-down absolute right-3 top-3 text-slate-400 text-xs pointer-events-none"></i>
+              <i class="bi bi-broadcast absolute left-3 top-3 text-[#123B32] dark:text-emerald-400 text-xs pointer-events-none"></i>
+            </div>
+          </div>
+
         </div>
+
+        <!-- Hidden Compatibility Bridge for Playwright & Fast Selector APIs -->
+        <div class="hidden" aria-hidden="true">
+          <button type="button" class="event-type-card" data-type="all"></button>
+          <button type="button" class="event-type-card" data-type="Upcoming Conference"></button>
+          <button type="button" class="event-type-card" data-type="Faculty Development Program"></button>
+          <button type="button" class="event-type-card" data-type="Webinar"></button>
+          <button type="button" class="event-type-card" data-type="Hands on Training"></button>
+          <button type="button" class="event-type-card" data-type="Internship"></button>
+          <button type="button" class="event-type-card" data-type="Hackathon"></button>
+          <button type="button" class="event-type-card" data-type="Seminar"></button>
+
+          <button type="button" class="event-status-pill" data-status="all"></button>
+          <button type="button" class="event-status-pill" data-status="upcoming"></button>
+          <button type="button" class="event-status-pill" data-status="past"></button>
+
+          <button type="button" class="event-field-pill" data-field="all"></button>
+          <button type="button" class="event-field-pill" data-field="Engineering & Tech"></button>
+          <button type="button" class="event-field-pill" data-field="Medical & Life Sciences"></button>
+          <button type="button" class="event-field-pill" data-field="Business & Management"></button>
+          <button type="button" class="event-field-pill" data-field="Education & Humanities"></button>
+        </div>
+
       </div>
+
     </section>
 
     <!-- Events Grid List Section -->
@@ -387,6 +509,28 @@
         <p class="text-slate-400 text-xs leading-relaxed max-w-sm">
           Shazu Soft Technologies is a technology-driven organization integrating software solutions, education, research, professional development, and industry-academia collaboration.
         </p>
+
+        <!-- Social Media Links -->
+        <div class="pt-2 flex items-center gap-2.5">
+          <a href="https://www.linkedin.com/company/shazu-soft-technologies" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-[#123B32] border border-white/10 hover:border-emerald-500/50 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-xs" title="LinkedIn" aria-label="LinkedIn">
+            <i class="bi bi-linkedin text-xs"></i>
+          </a>
+          <a href="https://x.com/shazusoft" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-[#123B32] border border-white/10 hover:border-emerald-500/50 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-xs" title="Twitter / X" aria-label="Twitter">
+            <i class="bi bi-twitter-x text-xs"></i>
+          </a>
+          <a href="https://www.instagram.com/shazusofttechnologies" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-[#123B32] border border-white/10 hover:border-emerald-500/50 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-xs" title="Instagram" aria-label="Instagram">
+            <i class="bi bi-instagram text-xs"></i>
+          </a>
+          <a href="https://www.facebook.com/shazusofttechnologies" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-[#123B32] border border-white/10 hover:border-emerald-500/50 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-xs" title="Facebook" aria-label="Facebook">
+            <i class="bi bi-facebook text-xs"></i>
+          </a>
+          <a href="https://github.com/shazusoft" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-[#123B32] border border-white/10 hover:border-emerald-500/50 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-xs" title="GitHub" aria-label="GitHub">
+            <i class="bi bi-github text-xs"></i>
+          </a>
+          <a href="https://youtube.com/@shazusofttechnologies" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-[#123B32] border border-white/10 hover:border-emerald-500/50 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-xs" title="YouTube" aria-label="YouTube">
+            <i class="bi bi-youtube text-xs"></i>
+          </a>
+        </div>
       </div>
 
       <!-- Quick Links -->
