@@ -1351,8 +1351,7 @@
   };
 
   window.showPublicModalNotice = function (title, message, isError = false, tokenNo = null) {
-    const existing = document.getElementById('public-notice-backdrop');
-    if (existing) existing.remove();
+    document.querySelectorAll('#public-notice-backdrop').forEach(el => el.remove());
 
     const contactBadge = !isError ? `
       <div class="p-2.5 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-2xl text-xs font-bold text-[#123B32] dark:text-emerald-300 flex items-center justify-center gap-2 my-2">
@@ -1385,7 +1384,7 @@
           ${contactBadge}
           ${tokenBox}
           <div class="flex items-center justify-center gap-2 pt-1">
-            <button onclick="document.getElementById('public-notice-backdrop').remove()" class="flex-1 py-2.5 bg-[#123B32] hover:bg-[#2F5B4E] text-white font-semibold text-xs rounded-xl shadow-md cursor-pointer">OK, Got It</button>
+            <button onclick="document.querySelectorAll('#public-notice-backdrop').forEach(el => el.remove())" class="flex-1 py-2.5 bg-[#123B32] hover:bg-[#2F5B4E] text-white font-semibold text-xs rounded-xl shadow-md cursor-pointer">OK, Got It</button>
             ${tokenNo ? `<a href="track.html?token=${encodeURIComponent(tokenNo)}" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs rounded-xl shadow-md text-center">View Status</a>` : ''}
           </div>
         </div>
@@ -1398,6 +1397,11 @@
     const contactForm = document.getElementById('contact-form');
     const submitBtn = contactForm ? contactForm.querySelector('button[type="submit"]') : null;
     const originalText = submitBtn ? submitBtn.innerHTML : 'Send Message';
+
+    if (!name || !email || !message) {
+      showPublicModalNotice('Required Fields Missing', 'Please fill in all required fields (Name, Email, and Message).', true);
+      return false;
+    }
 
     if (submitBtn) {
       submitBtn.disabled = true;

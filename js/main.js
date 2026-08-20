@@ -196,6 +196,7 @@ function initForms() {
     contactForm.dataset.mainBound = 'true';
     contactForm.addEventListener('submit', async (e) => {
       e.preventDefault();
+      e.stopImmediatePropagation();
       const name = (document.getElementById('contact-name') || document.getElementById('name'))?.value?.trim();
       const email = (document.getElementById('contact-email') || document.getElementById('email'))?.value?.trim();
       const phone = (document.getElementById('contact-phone') || document.getElementById('phone'))?.value?.trim() || '';
@@ -204,7 +205,11 @@ function initForms() {
       const message = (document.getElementById('contact-message') || document.getElementById('message'))?.value?.trim();
 
       if (!name || !email || !message) {
-        if (typeof showToast === 'function') showToast('Please fill in Name, Email, and Message.', 'error');
+        if (typeof window.showPublicModalNotice === 'function') {
+          window.showPublicModalNotice('Required Fields Missing', 'Please fill in all required fields (Name, Email, and Message).', true);
+        } else if (typeof showToast === 'function') {
+          showToast('Please fill in Name, Email, and Message.', 'error');
+        }
         return;
       }
 
@@ -220,6 +225,7 @@ function initForms() {
     membershipForm.dataset.mainBound = 'true';
     membershipForm.addEventListener('submit', async (e) => {
       e.preventDefault();
+      e.stopImmediatePropagation();
       if (typeof window.submitMembershipApplication === 'function') {
         await window.submitMembershipApplication(e);
       }
