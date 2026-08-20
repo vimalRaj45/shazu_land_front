@@ -1723,7 +1723,7 @@
           </button>
 
           <!-- 2. Track Pass / Token Button -->
-          <a href="track.html" onclick="event.preventDefault(); window.toggleFloatingHelpMenu(); if (typeof window.openTrackModal === 'function') window.openTrackModal(); else window.location.href='track.html';" class="group relative flex items-center">
+          <a href="track.html" class="group relative flex items-center">
             <span class="absolute right-12 whitespace-nowrap bg-slate-900 dark:bg-slate-800 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none border border-slate-700">Track Status</span>
             <div class="w-9 h-9 rounded-full bg-slate-800 hover:bg-slate-700 text-white flex items-center justify-center shadow-xl transition-all duration-200 hover:scale-110 border border-slate-600 cursor-pointer">
               <i class="bi bi-search text-xs"></i>
