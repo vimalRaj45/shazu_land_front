@@ -53,21 +53,20 @@
         </div>
       `).join('');
 
+      container.className = 'w-full bg-[#123B32] text-white border-b border-[#527A68]/40 py-1.5 px-4 overflow-hidden shadow-xs relative z-30 flex items-center gap-3 transition-all duration-200';
       container.innerHTML = `
-        <div class="bg-[#123B32] text-white border-b border-[#527A68]/40 py-1 px-4 overflow-hidden shadow-xs relative z-30 flex items-center gap-3">
-          <!-- Left Fixed Announcements Trigger Button -->
-          <a href="announcements.html" class="shrink-0 bg-[#C47D4C] hover:bg-[#a66439] text-white text-[11px] font-bold px-3 py-1 rounded-full shadow-md flex items-center gap-1.5 cursor-pointer z-10 transition-colors">
-            <i class="bi bi-megaphone-fill text-[10px]"></i>
-            <span class="hidden sm:inline">Announcements</span>
-            <span class="bg-white/20 px-1.5 py-0.2 rounded-full text-[9px] font-mono">${data.announcements.length}</span>
-          </a>
+        <!-- Left Fixed Announcements Trigger Button -->
+        <a href="announcements.html" class="shrink-0 bg-[#C47D4C] hover:bg-[#a66439] text-white text-[11px] font-bold px-3 py-1 rounded-full shadow-md flex items-center gap-1.5 cursor-pointer z-10 transition-colors">
+          <i class="bi bi-megaphone-fill text-[10px]"></i>
+          <span class="hidden sm:inline">Announcements</span>
+          <span class="bg-white/20 px-1.5 py-0.2 rounded-full text-[9px] font-mono">${data.announcements.length}</span>
+        </a>
 
-          <!-- Continuous Scrolling Ticker -->
-          <div class="flex-1 overflow-hidden">
-            <div class="animate-marquee-track">
-              ${itemsHtml}
-              ${itemsHtml}
-            </div>
+        <!-- Continuous Scrolling Ticker -->
+        <div class="flex-1 overflow-hidden">
+          <div class="animate-marquee-track">
+            ${itemsHtml}
+            ${itemsHtml}
           </div>
         </div>
       `;
@@ -1697,6 +1696,107 @@
         const success = await window.submitContactInquiry(name, email, phone, subject, 'General', message);
         if (success) contactForm.reset();
       });
+    }
+
+    // Initialize Floating Help & Support Widget
+    window.initFloatingHelpWidget();
+  };
+
+  // 6. Global Floating Radial Speed-Dial Support Action Widget
+  window.initFloatingHelpWidget = function () {
+    const existing = document.getElementById('global-floating-help-widget');
+    if (existing) return;
+
+    // Do not render on admin panel
+    if (window.location.pathname.includes('admin.html')) return;
+
+    const widgetHtml = `
+      <div id="global-floating-help-widget" class="fixed bottom-6 right-6 z-50 flex flex-col items-end font-sans">
+        <!-- Floating Speed-Dial Actions Menu -->
+        <div id="floating-help-menu" class="hidden flex-col items-center gap-2.5 mb-2.5 transition-all duration-300 transform scale-90 opacity-0 origin-bottom">
+          <!-- 1. AI Assistant Chatbot Button -->
+          <button type="button" onclick="window.toggleFloatingHelpMenu(); if (typeof window.openChatbot === 'function') window.openChatbot();" class="group relative flex items-center border-none bg-transparent p-0 cursor-pointer">
+            <span class="absolute right-12 whitespace-nowrap bg-slate-900 dark:bg-slate-800 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none border border-slate-700">Ask SST AI</span>
+            <div class="w-9 h-9 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white flex items-center justify-center shadow-xl transition-all duration-200 hover:scale-110 border border-indigo-400/40 cursor-pointer">
+              <i class="bi bi-robot text-sm"></i>
+            </div>
+          </button>
+
+          <!-- 2. Track Pass / Token Button -->
+          <a href="track.html" onclick="event.preventDefault(); window.toggleFloatingHelpMenu(); if (typeof window.openTrackModal === 'function') window.openTrackModal(); else window.location.href='track.html';" class="group relative flex items-center">
+            <span class="absolute right-12 whitespace-nowrap bg-slate-900 dark:bg-slate-800 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none border border-slate-700">Track Status</span>
+            <div class="w-9 h-9 rounded-full bg-slate-800 hover:bg-slate-700 text-white flex items-center justify-center shadow-xl transition-all duration-200 hover:scale-110 border border-slate-600 cursor-pointer">
+              <i class="bi bi-search text-xs"></i>
+            </div>
+          </a>
+
+          <!-- 3. Phone Call Button -->
+          <a href="tel:+919361680077" class="group relative flex items-center">
+            <span class="absolute right-12 whitespace-nowrap bg-slate-900 dark:bg-slate-800 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none border border-slate-700">Call Desk</span>
+            <div class="w-9 h-9 rounded-full bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center shadow-xl transition-all duration-200 hover:scale-110 border border-blue-400/40 cursor-pointer">
+              <i class="bi bi-telephone-fill text-xs"></i>
+            </div>
+          </a>
+
+          <!-- 4. WhatsApp Support Button -->
+          <a href="https://wa.me/919361680077?text=Hi%20SST%20Support%2C%20I%20have%20an%20inquiry" target="_blank" rel="noopener noreferrer" class="group relative flex items-center">
+            <span class="absolute right-12 whitespace-nowrap bg-slate-900 dark:bg-slate-800 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none border border-slate-700">WhatsApp</span>
+            <div class="w-9 h-9 rounded-full bg-emerald-500 hover:bg-emerald-400 text-white flex items-center justify-center shadow-xl transition-all duration-200 hover:scale-110 border border-emerald-300/40 cursor-pointer">
+              <i class="bi bi-whatsapp text-sm"></i>
+            </div>
+          </a>
+        </div>
+
+        <!-- Main Speed-Dial Trigger Button -->
+        <button id="btn-toggle-floating-help" onclick="window.toggleFloatingHelpMenu()" class="w-10 h-10 rounded-full bg-[#123B32] hover:bg-[#1A4B40] text-white shadow-2xl flex items-center justify-center border-2 border-white/20 transition-all duration-300 hover:scale-105 cursor-pointer relative group" title="Help & Support Menu">
+          <div id="floating-help-icon-wrapper" class="relative flex items-center justify-center transition-transform duration-300">
+            <i id="floating-help-icon" class="bi bi-headset text-lg text-emerald-300 group-hover:text-white transition-colors duration-200"></i>
+            <span id="floating-help-ping" class="absolute -top-1 -right-1 flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+          </div>
+        </button>
+      </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', widgetHtml);
+  };
+
+  window.toggleFloatingHelpMenu = function () {
+    const menu = document.getElementById('floating-help-menu');
+    const icon = document.getElementById('floating-help-icon');
+    const ping = document.getElementById('floating-help-ping');
+    const btn = document.getElementById('btn-toggle-floating-help');
+    if (!menu || !icon) return;
+
+    const isHidden = menu.classList.contains('hidden');
+    if (isHidden) {
+      menu.classList.remove('hidden');
+      void menu.offsetWidth; // trigger reflow for css transition
+      menu.classList.remove('scale-90', 'opacity-0');
+      menu.classList.add('flex', 'scale-100', 'opacity-100');
+      
+      icon.className = 'bi bi-x-lg text-lg text-white transition-all duration-300 transform rotate-90';
+      if (ping) ping.style.display = 'none';
+      if (btn) {
+        btn.classList.remove('bg-[#123B32]', 'hover:bg-[#1A4B40]');
+        btn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+      }
+    } else {
+      menu.classList.remove('scale-100', 'opacity-100');
+      menu.classList.add('scale-90', 'opacity-0');
+      setTimeout(() => {
+        menu.classList.add('hidden');
+        menu.classList.remove('flex');
+      }, 200);
+
+      icon.className = 'bi bi-headset text-lg text-emerald-300 group-hover:text-white transition-all duration-300 transform rotate-0';
+      if (ping) ping.style.display = 'flex';
+      if (btn) {
+        btn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+        btn.classList.add('bg-[#123B32]', 'hover:bg-[#1A4B40]');
+      }
     }
   };
 
