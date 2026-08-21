@@ -2553,10 +2553,15 @@
         <tr class="hover:bg-emerald-50/40 cursor-pointer transition-colors" onclick="openRowDetails('events', ${ev.id})">
           <td class="p-3"><span class="px-2 py-0.5 bg-sky-50 text-sky-800 font-bold rounded text-[10px]">${ev.category}</span></td>
           <td class="p-3">
-            <span class="block font-bold text-slate-900">${ev.title}</span>
-            <span class="block text-[11px] text-slate-500 truncate max-w-sm">${ev.description}</span>
+            <div class="flex items-center gap-3">
+              ${ev.image_url ? `<img src="${ev.image_url}" alt="Poster" class="w-10 h-10 object-cover rounded-lg border border-slate-200 shrink-0 shadow-2xs">` : `<div class="w-10 h-10 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 text-xs shrink-0"><i class="bi bi-image"></i></div>`}
+              <div class="min-w-0">
+                <span class="block font-bold text-slate-900 truncate max-w-xs">${ev.title}</span>
+                <span class="block text-[11px] text-slate-500 truncate max-w-xs">${ev.description}</span>
+              </div>
+            </div>
           </td>
-          <td class="p-3 text-slate-600 font-mono text-[11px]">${ev.event_date}</td>
+          <td class="p-3 text-slate-600 font-mono text-[11px]">${ev.event_date || 'N/A'}</td>
           <td class="p-3 text-slate-500">${ev.location}</td>
           <td class="p-3">
             <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
@@ -2615,12 +2620,30 @@
           </div>
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-slate-600 font-semibold mb-1">Event Date</label>
-              <input type="text" id="ev-date" value="${ev.event_date || ''}" placeholder="Sept 25, 2026" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32]">
+              <label class="block text-slate-600 font-semibold mb-1">Event Date (Datepicker)</label>
+              <input type="date" id="ev-date" value="${ev.event_date || ''}" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32]">
             </div>
             <div>
               <label class="block text-slate-600 font-semibold mb-1">Location</label>
               <input type="text" id="ev-location" value="${ev.location || ''}" placeholder="SST Hub, Salem" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32]">
+            </div>
+          </div>
+
+          <!-- EVENT POSTER IMAGE BLOB UPLOAD -->
+          <div class="p-3 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+            <label class="block text-slate-700 font-semibold text-xs flex items-center justify-between">
+              <span class="flex items-center gap-1.5"><i class="bi bi-image text-[#123B32]"></i> Event Poster Banner (File / BLOB Upload)</span>
+              <span class="text-[10px] text-slate-500">Max 5MB (PNG/JPG/WebP)</span>
+            </label>
+            <input type="file" id="ev-poster-file" accept="image/*" onchange="handleEventPosterUpload(event)" class="w-full p-2 bg-white border border-slate-200 rounded-xl text-xs cursor-pointer">
+            <input type="hidden" id="ev-image-url" value="${ev.image_url || ''}">
+            
+            <div id="ev-poster-preview-container" class="${ev.image_url ? '' : 'hidden'} pt-1 flex items-center gap-3">
+              <img id="ev-poster-preview-img" src="${ev.image_url || ''}" alt="Event Poster Preview" class="w-16 h-16 object-cover rounded-xl border border-slate-200 shadow-2xs">
+              <div class="text-[11px] text-slate-600">
+                <span class="font-bold text-emerald-700 flex items-center gap-1"><i class="bi bi-check-circle-fill"></i> Event Poster Attached</span>
+                <span class="text-slate-400 text-[10px] block">Poster image BLOB will be stored in database and shown on event cards.</span>
+              </div>
             </div>
           </div>
           <div class="grid grid-cols-2 gap-3">
@@ -2677,6 +2700,29 @@
       setTimeout(() => updateEventQrPreview(), 50);
     }
 
+    function handleEventPosterUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      if (file.size > 5 * 1024 * 1024) {
+        showToast('Poster file size should be less than 5MB', 'error');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const base64Data = e.target.result;
+        const hiddenInput = document.getElementById('ev-image-url');
+        const previewImg = document.getElementById('ev-poster-preview-img');
+        const container = document.getElementById('ev-poster-preview-container');
+        if (hiddenInput) hiddenInput.value = base64Data;
+        if (previewImg && container) {
+          previewImg.src = base64Data;
+          container.classList.remove('hidden');
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+    window.handleEventPosterUpload = handleEventPosterUpload;
+
     function updateEventQrPreview() {
       const upiInput = document.getElementById('ev-upi');
       const feeInput = document.getElementById('ev-fee');
@@ -2725,6 +2771,7 @@
         registration_fee: fee,
         upi_id: upi,
         payment_qr: payment_qr,
+        image_url: document.getElementById('ev-image-url')?.value || '',
         description: document.getElementById('ev-desc').value,
         status: document.getElementById('ev-status').value
       };
