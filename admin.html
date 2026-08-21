@@ -202,44 +202,46 @@
   <div id="admin-dashboard-view" class="hidden">
 
     <!-- TOP HEADER NAVBAR (Single Compact Row, Sticky) -->
-    <header class="sticky top-0 z-30 bg-[#123B32] text-white px-3 sm:px-6 py-2 flex items-center justify-between gap-2 border-b border-[#2F5B4E] shadow-md h-14 overflow-hidden">
+    <header class="sticky top-0 z-30 bg-[#123B32] text-white px-3 sm:px-6 py-2 flex items-center justify-between gap-2 border-b border-[#2F5B4E] shadow-md h-14">
       <!-- Left: Logo & Brand -->
       <div class="flex items-center gap-2 shrink-0">
         <a href="index.html" class="flex items-center gap-2 group">
           <div class="p-1 bg-white/10 rounded-lg group-hover:bg-white/20 transition-colors flex items-center justify-center">
             <img src="images/sst.svg" onerror="this.onerror=null; this.src='https://shazusofttechnologies.org/sst.svg'" alt="SST Logo" class="h-6 w-auto object-contain">
           </div>
-          <span class="font-heading font-extrabold text-xs sm:text-sm tracking-tight text-white">SHAZU SOFT</span>
+          <span class="font-heading font-extrabold text-xs sm:text-sm tracking-tight text-white whitespace-nowrap">SHAZU SOFT</span>
           <span class="px-1.5 py-0.5 bg-[#C47D4C] text-[9px] font-mono font-bold uppercase rounded text-white tracking-widest hidden lg:inline">CONTROL PANEL</span>
         </a>
       </div>
 
       <!-- Center: Global Search Bar -->
-      <div class="flex items-center flex-1 max-w-[160px] sm:max-w-xs md:max-w-md mx-1 sm:mx-4">
+      <div class="flex items-center flex-1 max-w-[100px] sm:max-w-xs md:max-w-md mx-1 sm:mx-4 min-w-0">
         <div class="relative w-full">
           <i class="bi bi-search absolute left-2.5 top-2 text-slate-400 text-xs pointer-events-none"></i>
           <input type="text" id="global-search" oninput="handleGlobalSearch(this.value)" placeholder="Search..." class="w-full bg-white/10 border border-white/15 pl-7 pr-3 py-1 rounded-lg text-xs text-white placeholder:text-slate-300 focus:outline-none focus:bg-white/20 focus:border-[#C47D4C] transition-all font-sans">
         </div>
       </div>
 
-      <!-- Right: User Identity, Today's Activity Feed & Actions -->
-      <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+      <!-- Right: Activity, Role Badge, Logout — always visible -->
+      <div class="flex items-center gap-1.5 shrink-0">
         
         <!-- TODAY'S ACTIVITY BUTTON -->
-        <button id="btn-today-activity" onclick="openTodayActivityModal()" title="View Today's Live Activity" class="flex items-center gap-1 bg-[#C47D4C]/30 hover:bg-[#C47D4C]/50 border border-[#C47D4C] text-amber-200 px-2 py-1 rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer shrink-0">
+        <button id="btn-today-activity" onclick="openTodayActivityModal()" title="Today's Activity" class="flex items-center gap-1 bg-[#C47D4C]/30 hover:bg-[#C47D4C]/50 border border-[#C47D4C] text-amber-200 px-2 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer shrink-0">
           <i class="bi bi-bell-fill text-amber-300 text-xs"></i>
           <span id="badge-today-total" class="px-1 py-0.5 bg-[#C47D4C] text-white font-mono font-bold text-[10px] rounded leading-none">0</span>
         </button>
 
-        <!-- Live RBAC Role Indicator Badge -->
-        <div class="flex items-center gap-1.5 bg-white/10 border border-white/20 px-2 sm:px-2.5 py-1 rounded-lg text-xs text-white font-medium whitespace-nowrap shrink-0 max-w-[130px] sm:max-w-[200px]">
+        <!-- RBAC Role Indicator — icon + badge only on mobile, full name on sm+ -->
+        <div class="flex items-center gap-1 sm:gap-1.5 bg-white/10 border border-white/20 px-1.5 sm:px-2.5 py-1 rounded-lg text-xs text-white font-medium shrink-0">
           <i id="rbac-role-icon" class="bi bi-shield-lock-fill text-amber-400 shrink-0"></i>
-          <span id="current-user-name" class="font-bold text-[11px] truncate block max-w-[80px] sm:max-w-[120px]">Vimal Raj</span>
-          <span id="current-user-role-badge" class="px-1.5 py-0.5 bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 rounded text-[9px] font-mono font-bold uppercase tracking-wider leading-none hidden lg:inline">SUPER ADMIN</span>
+          <span id="current-user-name" class="font-bold text-[11px] truncate hidden sm:block max-w-[90px] md:max-w-[130px]">Vimal Raj</span>
+          <span id="current-user-role-badge" class="px-1.5 py-0.5 bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 rounded text-[9px] font-mono font-bold uppercase tracking-wider leading-none hidden md:inline">SUPER ADMIN</span>
         </div>
 
-        <button onclick="logout()" title="Logout Admin" class="flex items-center justify-center bg-red-950/60 hover:bg-red-900/80 border border-red-700/50 p-1.5 sm:px-2.5 rounded-lg text-xs text-red-200 font-semibold transition-colors cursor-pointer shrink-0">
+        <!-- LOGOUT — always visible, icon-only on mobile -->
+        <button onclick="logout()" title="Logout" class="flex items-center gap-1 bg-red-950/60 hover:bg-red-900/80 border border-red-700/50 px-2 py-1.5 rounded-lg text-xs text-red-200 font-semibold transition-colors cursor-pointer shrink-0">
           <i class="bi bi-box-arrow-right"></i>
+          <span class="hidden sm:inline">Logout</span>
         </button>
       </div>
     </header>
