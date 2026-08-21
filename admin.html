@@ -199,57 +199,53 @@
   <!-- ========================================== -->
   <!-- 2. MAIN APPLICATION INTERFACE -->
   <!-- ========================================== -->
-  <div id="admin-dashboard-view" class="hidden flex flex-col min-h-screen lg:h-screen overflow-y-auto lg:overflow-hidden bg-[#F8FAFC]">
+  <div id="admin-dashboard-view" class="hidden flex flex-col min-h-screen bg-[#F8FAFC]">
 
-    <!-- TOP HEADER NAVBAR -->
-    <header class="bg-[#123B32] text-white px-3 sm:px-6 py-2.5 sm:py-3 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2.5 border-b border-[#2F5B4E] shadow-md z-30 shrink-0">
+    <!-- TOP HEADER NAVBAR (Single Compact Row) -->
+    <header class="bg-[#123B32] text-white px-3 sm:px-6 py-2 flex items-center justify-between gap-2 border-b border-[#2F5B4E] shadow-md z-30 shrink-0 h-14 overflow-hidden">
       <!-- Left: Logo & Brand -->
-      <div class="flex items-center gap-3 shrink-0">
+      <div class="flex items-center gap-2 shrink-0">
         <a href="index.html" class="flex items-center gap-2 group">
-          <div class="p-1 bg-white/10 rounded-xl group-hover:bg-white/20 transition-colors flex items-center justify-center">
-            <img src="images/sst.svg" onerror="this.onerror=null; this.src='https://shazusofttechnologies.org/sst.svg'" alt="SST Logo" class="h-6 sm:h-7 w-auto object-contain">
+          <div class="p-1 bg-white/10 rounded-lg group-hover:bg-white/20 transition-colors flex items-center justify-center">
+            <img src="images/sst.svg" onerror="this.onerror=null; this.src='https://shazusofttechnologies.org/sst.svg'" alt="SST Logo" class="h-6 w-auto object-contain">
           </div>
-          <span class="font-heading font-extrabold text-xs sm:text-base tracking-tight text-white">SHAZU SOFT</span>
-          <span class="px-1.5 py-0.5 bg-[#C47D4C] text-[9px] font-mono font-bold uppercase rounded text-white tracking-widest hidden md:inline">CONTROL PANEL</span>
+          <span class="font-heading font-extrabold text-xs sm:text-sm tracking-tight text-white">SHAZU SOFT</span>
+          <span class="px-1.5 py-0.5 bg-[#C47D4C] text-[9px] font-mono font-bold uppercase rounded text-white tracking-widest hidden lg:inline">CONTROL PANEL</span>
         </a>
       </div>
 
-      <!-- Center: Global Search Bar (Responsive) -->
-      <div class="flex items-center flex-1 max-w-full sm:max-w-xs md:max-w-md mx-0 sm:mx-4 order-3 sm:order-2 w-full sm:w-auto">
+      <!-- Center: Global Search Bar -->
+      <div class="flex items-center flex-1 max-w-[160px] sm:max-w-xs md:max-w-md mx-1 sm:mx-4">
         <div class="relative w-full">
-          <i class="bi bi-search absolute left-3 top-2 text-slate-400 text-xs"></i>
-          <input type="text" id="global-search" oninput="handleGlobalSearch(this.value)" placeholder="Search leads, events, UTRs, jobs..." class="w-full bg-white/10 border border-white/15 pl-8 pr-8 py-1.5 rounded-lg text-xs text-white placeholder:text-slate-300 focus:outline-none focus:bg-white/20 focus:border-[#C47D4C] transition-all font-sans">
-          <span class="absolute right-2 top-2 text-[9px] font-mono bg-white/10 text-slate-300 px-1 py-0.5 rounded hidden md:inline"><i class="bi bi-command"></i>K</span>
+          <i class="bi bi-search absolute left-2.5 top-2 text-slate-400 text-xs pointer-events-none"></i>
+          <input type="text" id="global-search" oninput="handleGlobalSearch(this.value)" placeholder="Search..." class="w-full bg-white/10 border border-white/15 pl-7 pr-3 py-1 rounded-lg text-xs text-white placeholder:text-slate-300 focus:outline-none focus:bg-white/20 focus:border-[#C47D4C] transition-all font-sans">
         </div>
       </div>
 
       <!-- Right: User Identity, Today's Activity Feed & Actions -->
-      <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0 order-2 sm:order-3 ml-auto sm:ml-0">
+      <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
         
-        <!-- ⚡ TODAY'S ACTIVITY & LIVE NOTIFICATION BUTTON -->
-        <button id="btn-today-activity" onclick="openTodayActivityModal()" title="View Today's Live Applications, Registrations & Updates" class="flex items-center gap-1.5 sm:gap-2 bg-[#C47D4C]/30 hover:bg-[#C47D4C]/50 border border-[#C47D4C] text-amber-200 px-2 sm:px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer shrink-0">
+        <!-- TODAY'S ACTIVITY BUTTON -->
+        <button id="btn-today-activity" onclick="openTodayActivityModal()" title="View Today's Live Activity" class="flex items-center gap-1 bg-[#C47D4C]/30 hover:bg-[#C47D4C]/50 border border-[#C47D4C] text-amber-200 px-2 py-1 rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer shrink-0">
           <i class="bi bi-bell-fill text-amber-300 text-xs"></i>
-          <span class="hidden sm:inline">Today's Activity</span>
-          <span id="badge-today-total" class="px-1.5 py-0.5 bg-[#C47D4C] text-white font-mono font-bold text-[10px] rounded-md leading-none">0</span>
+          <span id="badge-today-total" class="px-1 py-0.5 bg-[#C47D4C] text-white font-mono font-bold text-[10px] rounded leading-none">0</span>
         </button>
 
         <!-- Live RBAC Role Indicator Badge -->
-        <div class="flex items-center gap-1.5 sm:gap-2 bg-white/10 border border-white/20 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs text-white font-medium whitespace-nowrap shrink-0">
-          <i id="rbac-role-icon" class="bi bi-shield-lock-fill text-amber-400"></i>
-          <span id="current-user-name" class="font-bold text-[11px] sm:text-xs">Administrator</span>
-          <span class="text-white/40 hidden sm:inline">|</span>
-          <span id="current-user-role-badge" class="px-1.5 py-0.5 bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 rounded-md text-[9px] sm:text-[10px] font-mono font-bold uppercase tracking-wider leading-none hidden sm:inline">SUPER ADMIN</span>
+        <div class="flex items-center gap-1.5 bg-white/10 border border-white/20 px-2 sm:px-2.5 py-1 rounded-lg text-xs text-white font-medium whitespace-nowrap shrink-0 max-w-[130px] sm:max-w-[200px]">
+          <i id="rbac-role-icon" class="bi bi-shield-lock-fill text-amber-400 shrink-0"></i>
+          <span id="current-user-name" class="font-bold text-[11px] truncate block max-w-[80px] sm:max-w-[120px]">Vimal Raj</span>
+          <span id="current-user-role-badge" class="px-1.5 py-0.5 bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 rounded text-[9px] font-mono font-bold uppercase tracking-wider leading-none hidden lg:inline">SUPER ADMIN</span>
         </div>
 
-        <button onclick="logout()" title="Logout Admin" class="flex items-center gap-1 bg-red-950/60 hover:bg-red-900/80 border border-red-700/50 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs text-red-200 font-semibold transition-colors cursor-pointer shrink-0">
+        <button onclick="logout()" title="Logout Admin" class="flex items-center justify-center bg-red-950/60 hover:bg-red-900/80 border border-red-700/50 p-1.5 sm:px-2.5 rounded-lg text-xs text-red-200 font-semibold transition-colors cursor-pointer shrink-0">
           <i class="bi bi-box-arrow-right"></i>
-          <span class="hidden sm:inline">Logout</span>
         </button>
       </div>
     </header>
 
-    <!-- HORIZONTAL NAVIGATION TABS BAR (Touch-scrollable) -->
-    <div class="bg-white border-b border-slate-200 px-3 md:px-6 py-2 flex items-center justify-start overflow-x-auto whitespace-nowrap shadow-xs z-20 shrink-0 no-scrollbar touch-pan-x -webkit-overflow-scrolling-touch">
+    <!-- HORIZONTAL NAVIGATION TABS BAR (Touch-scrollable & Sticky) -->
+    <div class="bg-white border-b border-slate-200 px-3 md:px-6 py-2 flex items-center justify-start overflow-x-auto whitespace-nowrap shadow-xs z-20 shrink-0 no-scrollbar touch-pan-x -webkit-overflow-scrolling-touch sticky top-14">
       <div class="flex items-center gap-1.5 py-0.5 min-w-max">
         
         <button onclick="switchTab('analytics')" id="nav-analytics" class="nav-tab-pill active flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 cursor-pointer">
@@ -338,7 +334,7 @@
     <!-- ========================================== -->
     <!-- UNIVERSAL MULTI-CRITERIA FILTER & EXPORT TOOLBAR -->
     <!-- ========================================== -->
-    <div id="universal-filter-toolbar" class="bg-slate-100/80 border-b border-slate-200 px-4 md:px-6 py-2.5 flex flex-wrap items-center justify-between gap-3 z-10 shrink-0">
+    <div id="universal-filter-toolbar" class="bg-slate-100/90 backdrop-blur-xs border-b border-slate-200 px-3 md:px-6 py-2.5 flex flex-wrap items-center justify-between gap-3 z-10 shrink-0 sticky top-[102px]">
       
       <!-- Left: Filter Inputs Group -->
       <div class="flex flex-wrap items-center gap-2 flex-1 min-w-[300px]">
@@ -435,8 +431,8 @@
 
     </div>
 
-    <!-- MAIN SCROLLABLE CONTENT BODY -->
-    <main class="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
+    <!-- MAIN UNCONSTRAINED SCROLLABLE CONTENT BODY -->
+    <main class="flex-1 p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-6 max-w-[1600px] mx-auto w-full">
 
       <!-- ========================================== -->
       <!-- TAB 1: BUSINESS & FINANCIAL REVENUE BI DASHBOARD -->
@@ -1338,7 +1334,9 @@
       document.getElementById('admin-dashboard-view').classList.remove('hidden');
       
       if (currentUser) {
-        document.getElementById('current-user-name').textContent = currentUser.name || currentUser.email.split('@')[0];
+        const rawName = currentUser.name || currentUser.email.split('@')[0];
+        const cleanName = rawName.replace(/\s*\(Dev Super Admin\)/gi, '').trim();
+        document.getElementById('current-user-name').textContent = cleanName;
         const roleBadge = document.getElementById('current-user-role-badge');
         const roleIcon = document.getElementById('rbac-role-icon');
 
