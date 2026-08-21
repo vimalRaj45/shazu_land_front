@@ -154,7 +154,6 @@
 
   <!-- Combined Sticky Top Announcement Bar & Header Section -->
   <div class="sticky top-0 z-40 w-full">
-    <div id="dynamic-announcement-bar"></div>
     <header class="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-[#E2E8F0] dark:border-slate-800 transition-all duration-200 shadow-xs">
       <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
         <!-- Brand Logo & Name -->
@@ -333,6 +332,7 @@
         </button>
       </div>
     </header>
+    <div id="dynamic-announcement-bar"></div>
   </div>
 
   <!-- Main Status Checker Body -->
@@ -547,12 +547,13 @@
     let loadingInterval = null;
 
     function quickFillToken(prefix) {
-      const input = document.getElementById('track-token-input');
+      const input = document.getElementById('track-token-input') || document.getElementById('quick-track-input');
       if (input) {
         input.value = prefix;
         input.focus();
       }
     }
+    window.quickFillToken = quickFillToken;
 
     // Mobile menu drawer handlers
     const mobileMenuBtn = document.getElementById('mobile-menu-btn');

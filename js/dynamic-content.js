@@ -5,6 +5,28 @@
 (function () {
   const API_BASE = (window.ENV && window.ENV.API_BASE) || '';
 
+  // Client-side Input Validation Helpers
+  window.isValidEmail = function (email) {
+    if (!email || typeof email !== 'string') return false;
+    return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email.trim());
+  };
+
+  window.isValidPhone = function (phone) {
+    if (!phone || String(phone).trim() === '') return true;
+    const clean = String(phone).trim().replace(/[\s\-\(\)\+]/g, '');
+    return /^\d{7,15}$/.test(clean);
+  };
+
+  window.quickFillToken = function (prefix) {
+    const input = document.getElementById('track-token-input') || document.getElementById('quick-track-input');
+    if (input) {
+      input.value = prefix;
+      input.focus();
+    }
+  };
+
+
+
   // 1. Telemetry / Analytics Tracker (Mobile, Tablet, Desktop)
   function trackPageView() {
     try {
@@ -652,6 +674,27 @@
     const submitBtn = e.target.querySelector('button[type="submit"]');
     const originalText = submitBtn ? submitBtn.innerHTML : 'Submit Application';
 
+    const name = document.getElementById('pub-app-name')?.value?.trim() || '';
+    const email = document.getElementById('pub-app-email')?.value?.trim() || '';
+    const phone = document.getElementById('pub-app-phone')?.value?.trim() || '';
+    const resume = document.getElementById('pub-app-resume')?.value || '';
+    const message = document.getElementById('pub-app-msg')?.value?.trim() || '';
+
+    if (!name || name.length < 2) {
+      showPublicModalNotice('Name Required', 'Please enter your full name (minimum 2 characters).', true);
+      return;
+    }
+
+    if (!window.isValidEmail(email)) {
+      showPublicModalNotice('Invalid Email', 'Please enter a valid email address (e.g., name@domain.com).', true);
+      return;
+    }
+
+    if (phone && !window.isValidPhone(phone)) {
+      showPublicModalNotice('Invalid Phone', 'Please enter a valid contact phone number.', true);
+      return;
+    }
+
     if (submitBtn) {
       submitBtn.disabled = true;
       submitBtn.innerHTML = `<svg class="animate-spin h-3.5 w-3.5 text-white inline-block mr-1.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg><span>Submitting...</span>`;
@@ -660,11 +703,11 @@
     const body = {
       job_id: jobId,
       job_title: title,
-      applicant_name: document.getElementById('pub-app-name').value,
-      email: document.getElementById('pub-app-email').value,
-      phone: document.getElementById('pub-app-phone').value,
-      resume_url: document.getElementById('pub-app-resume').value,
-      message: document.getElementById('pub-app-msg').value
+      applicant_name: name,
+      email: email,
+      phone: phone,
+      resume_url: resume,
+      message: message
     };
 
     try {
@@ -674,7 +717,12 @@
         body: JSON.stringify(body)
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Submission failed');
+      if (!res.ok) {
+        const err = new Error(data.error || 'Submission failed');
+        err.token_no = data.token_no;
+        err.is_duplicate = data.is_duplicate;
+        throw err;
+      }
       closePublicModal();
       const token = data.token_no || (data.application && data.application.token_no);
       if (token) localStorage.setItem('sst_last_token', token);
@@ -684,7 +732,7 @@
         submitBtn.disabled = false;
         submitBtn.innerHTML = originalText;
       }
-      showPublicModalNotice('Submission Error', err.message, true);
+      showPublicModalNotice(err.is_duplicate ? 'Already Applied' : 'Submission Error', err.message, true, err.token_no || null);
     }
   };
 
@@ -1233,13 +1281,39 @@
     e.preventDefault();
     const title = decodeURIComponent(encodedTitle);
     const fee = decodeURIComponent(encodedFee);
+    const isFree = fee.toLowerCase().includes('free') || fee === '0' || fee === '';
     const utrEl = document.getElementById('pub-reg-utr');
     const declEl = document.getElementById('pub-reg-declaration');
     const submitBtn = e.target.querySelector('button[type="submit"]');
     const originalText = submitBtn ? submitBtn.innerHTML : 'Complete Registration & Issue Pass';
 
+    const name = document.getElementById('pub-reg-name')?.value?.trim() || '';
+    const email = document.getElementById('pub-reg-email')?.value?.trim() || '';
+    const phone = document.getElementById('pub-reg-phone')?.value?.trim() || '';
+    const utr = utrEl ? utrEl.value.trim() : '';
+
+    if (!name || name.length < 2) {
+      showPublicModalNotice('Name Required', 'Please enter your full name (minimum 2 characters).', true);
+      return;
+    }
+
+    if (!window.isValidEmail(email)) {
+      showPublicModalNotice('Invalid Email', 'Please enter a valid email address (e.g., name@domain.com).', true);
+      return;
+    }
+
+    if (phone && !window.isValidPhone(phone)) {
+      showPublicModalNotice('Invalid Phone', 'Please enter a valid contact phone number.', true);
+      return;
+    }
+
+    if (!isFree && utr.length < 4) {
+      showPublicModalNotice('Transaction UTR Required', 'Please enter a valid UPI / Bank Transaction UTR Number for payment verification.', true);
+      return;
+    }
+
     if (declEl && !declEl.checked) {
-      alert('Please check the declaration box before submitting.');
+      showPublicModalNotice('Declaration Required', 'Please check the declaration box before submitting.', true);
       return;
     }
 
@@ -1252,9 +1326,9 @@
       event_id: eventId,
       event_title: title,
       attendee_category: document.getElementById('pub-reg-category')?.value || 'College / University Student (UG / PG)',
-      name: document.getElementById('pub-reg-name')?.value || '',
-      email: document.getElementById('pub-reg-email')?.value || '',
-      phone: document.getElementById('pub-reg-phone')?.value || '',
+      name: name,
+      email: email,
+      phone: phone,
       gender: document.getElementById('pub-reg-gender')?.value || 'Male',
       organization: document.getElementById('pub-reg-org')?.value || '',
       department_degree: document.getElementById('pub-reg-dept-degree')?.value || '',
@@ -1263,7 +1337,7 @@
       city_state: document.getElementById('pub-reg-city-state')?.value || '',
       registration_fee: fee,
       payment_method: 'UPI QR',
-      transaction_id: utrEl ? utrEl.value : '',
+      transaction_id: utr,
       declaration_agreed: declEl ? declEl.checked : true
     };
 
@@ -1274,7 +1348,12 @@
         body: JSON.stringify(body)
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Registration failed');
+      if (!res.ok) {
+        const err = new Error(data.error || 'Registration failed');
+        err.token_no = data.token_no;
+        err.is_duplicate = data.is_duplicate;
+        throw err;
+      }
       closePublicModal();
       const token = data.token_no || (data.registration && data.registration.token_no);
       if (token) localStorage.setItem('sst_last_token', token);
@@ -1284,7 +1363,7 @@
         submitBtn.disabled = false;
         submitBtn.innerHTML = originalText;
       }
-      showPublicModalNotice('Registration Error', err.message, true);
+      showPublicModalNotice(err.is_duplicate ? 'Already Registered' : 'Registration Error', err.message, true, err.token_no || null);
     }
   };
 
@@ -1295,11 +1374,6 @@
     const originalText = submitBtn ? submitBtn.innerHTML : 'Submit Application';
 
     const declEl = document.getElementById('member-declaration');
-    if (declEl && !declEl.checked) {
-      showPublicModalNotice('Declaration Required', 'Please accept the declaration checkbox to confirm your details are accurate.', true);
-      return;
-    }
-
     const body = {
       association_name: document.getElementById('member-association')?.value?.trim() || 'SST Academic & Research Network',
       membership_type: document.getElementById('member-category')?.value || 'Professional Member',
@@ -1314,8 +1388,28 @@
       declaration_agreed: declEl ? declEl.checked : true
     };
 
-    if (!body.name || !body.email || !body.membership_type) {
-      showPublicModalNotice('Required Fields Missing', 'Please fill in all required fields (Name, Email, Category, Organization).', true);
+    if (!body.name || body.name.length < 2) {
+      showPublicModalNotice('Name Required', 'Please enter your full name (minimum 2 characters).', true);
+      return;
+    }
+
+    if (!window.isValidEmail(body.email)) {
+      showPublicModalNotice('Invalid Email', 'Please enter a valid email address (e.g., name@domain.com).', true);
+      return;
+    }
+
+    if (body.phone && !window.isValidPhone(body.phone)) {
+      showPublicModalNotice('Invalid Phone', 'Please enter a valid contact phone number.', true);
+      return;
+    }
+
+    if (!body.membership_type) {
+      showPublicModalNotice('Category Required', 'Please select a valid membership category.', true);
+      return;
+    }
+
+    if (declEl && !declEl.checked) {
+      showPublicModalNotice('Declaration Required', 'Please accept the declaration checkbox to confirm your details are accurate.', true);
       return;
     }
 
@@ -1331,7 +1425,12 @@
         body: JSON.stringify(body)
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to submit membership application');
+      if (!res.ok) {
+        const err = new Error(data.error || 'Failed to submit membership application');
+        err.token_no = data.token_no;
+        err.is_duplicate = data.is_duplicate;
+        throw err;
+      }
 
       const form = document.getElementById('membership-form');
       if (form) form.reset();
@@ -1340,7 +1439,7 @@
       if (token) localStorage.setItem('sst_last_token', token);
       showPublicModalNotice('Membership Application Received!', 'Thank you! Your membership dossier has been recorded in the database. We will contact you shortly.', false, token);
     } catch (err) {
-      showPublicModalNotice('Submission Error', err.message, true);
+      showPublicModalNotice(err.is_duplicate ? 'Application Already Exists' : 'Submission Error', err.message, true, err.token_no || null);
     } finally {
       if (submitBtn) {
         submitBtn.disabled = false;
@@ -1397,8 +1496,23 @@
     const submitBtn = contactForm ? contactForm.querySelector('button[type="submit"]') : null;
     const originalText = submitBtn ? submitBtn.innerHTML : 'Send Message';
 
-    if (!name || !email || !message) {
-      showPublicModalNotice('Required Fields Missing', 'Please fill in all required fields (Name, Email, and Message).', true);
+    if (!name || name.length < 2) {
+      showPublicModalNotice('Name Required', 'Please enter your full name (minimum 2 characters).', true);
+      return false;
+    }
+
+    if (!window.isValidEmail(email)) {
+      showPublicModalNotice('Invalid Email', 'Please enter a valid email address (e.g., name@domain.com).', true);
+      return false;
+    }
+
+    if (phone && !window.isValidPhone(phone)) {
+      showPublicModalNotice('Invalid Phone', 'Please enter a valid contact phone number.', true);
+      return false;
+    }
+
+    if (!message || message.length < 5) {
+      showPublicModalNotice('Message Required', 'Please enter a detailed message (minimum 5 characters).', true);
       return false;
     }
 
@@ -1414,13 +1528,18 @@
         body: JSON.stringify({ name, email, phone, subject, service_category, message })
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to submit inquiry');
+      if (!res.ok) {
+        const err = new Error(data.error || 'Failed to submit inquiry');
+        err.token_no = data.token_no;
+        err.is_duplicate = data.is_duplicate;
+        throw err;
+      }
       const token = data.inquiry ? data.inquiry.token_no : (data.token_no || null);
       if (token) localStorage.setItem('sst_last_token', token);
       showPublicModalNotice('Message Sent!', 'Thank you for reaching out! We have recorded your inquiry ticket in the database. We will contact you shortly.', false, token);
       return true;
     } catch (err) {
-      showPublicModalNotice('Submission Error', err.message, true);
+      showPublicModalNotice(err.is_duplicate ? 'Inquiry Recently Submitted' : 'Submission Error', err.message, true, err.token_no || null);
       return false;
     } finally {
       if (submitBtn) {

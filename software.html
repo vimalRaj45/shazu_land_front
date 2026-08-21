@@ -1149,8 +1149,23 @@
         const serviceText = serviceSelect ? serviceSelect.options[serviceSelect.selectedIndex].text : 'Custom Solution';
         const message = document.getElementById('sw-message')?.value.trim() || '';
 
-        if (!name || !email || !message) {
-          alert('Please provide your name, email, and project outline.');
+        if (!name || name.length < 2) {
+          alert('Please enter your full name (minimum 2 characters).');
+          return;
+        }
+
+        if (window.isValidEmail && !window.isValidEmail(email)) {
+          alert('Please enter a valid email address.');
+          return;
+        }
+
+        if (phone && window.isValidPhone && !window.isValidPhone(phone)) {
+          alert('Please enter a valid contact phone number.');
+          return;
+        }
+
+        if (!message || message.length < 5) {
+          alert('Please provide a detailed project outline (minimum 5 characters).');
           return;
         }
 
@@ -1183,16 +1198,22 @@
           const data = await res.json();
 
           if (!res.ok) {
-            throw new Error(data.error || 'Failed to submit proposal request. Please try again.');
+            const err = new Error(data.error || 'Failed to submit proposal request. Please try again.');
+            err.token_no = data.token_no;
+            throw err;
           }
 
           // Show success confirmation modal
-          const token = data.inquiry?.token_no || 'SST-LEAD';
+          const token = data.inquiry?.token_no || data.token_no || 'SST-LEAD';
           showSoftwareSuccessModal(name, token, serviceText);
           leadForm.reset();
 
         } catch (err) {
-          alert(`Submission Notice: ${err.message}`);
+          if (err.token_no && typeof window.showPublicModalNotice === 'function') {
+            window.showPublicModalNotice('Inquiry Recently Submitted', err.message, true, err.token_no);
+          } else {
+            alert(`Submission Notice: ${err.message}`);
+          }
         } finally {
           if (submitBtn) {
             submitBtn.disabled = false;
