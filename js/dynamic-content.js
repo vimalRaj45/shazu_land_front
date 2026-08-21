@@ -47,11 +47,36 @@
     } catch (e) {}
   }
 
-  // 2. Load Dynamic Announcements Top Bar (Moving Ticker with Left Announcements Button)
+  // Helper for standardized announcement badge colors
+  function getAnnouncementBadgeClass(badgeType) {
+    const type = (badgeType || 'ANNOUNCEMENT').toUpperCase().trim();
+    switch (type) {
+      case 'NEW':
+      case 'FEATURE':
+        return 'bg-[#C47D4C] text-white'; // Orange accent
+      case 'ANNOUNCEMENT':
+      case 'NOTICE':
+        return 'bg-[#2F5B4E] text-white'; // Deep green
+      case 'UPDATE':
+      case 'EVENT':
+        return 'bg-teal-600 text-white'; // Teal
+      case 'IMPORTANT':
+      case 'URGENT':
+        return 'bg-rose-600 text-white'; // Crimson
+      default:
+        return 'bg-[#2F5B4E] text-white';
+    }
+  }
+
+  // 2. Load Dynamic Announcements Top Bar (Compact Responsive Toggle & Slide Tray)
   window.allAnnouncementsList = [];
   async function loadAnnouncements() {
     const container = document.getElementById('dynamic-announcement-bar');
     if (!container) return;
+
+    // Clean up any old floating pill if present
+    const oldPill = document.getElementById('announcement-floating-trigger');
+    if (oldPill) oldPill.remove();
 
     try {
       const res = await fetch(`${API_BASE}/api/public/announcements`);
@@ -59,39 +84,91 @@
 
       if (!data.announcements || data.announcements.length === 0) {
         container.innerHTML = '';
+        container.style.display = 'none';
         return;
       }
 
       window.allAnnouncementsList = data.announcements;
 
-      // Build announcement ticker items
-      const itemsHtml = data.announcements.map(ann => `
-        <div class="inline-flex items-center gap-3 px-6 py-0.5 shrink-0">
-          <span class="px-2.5 py-0.5 rounded-full bg-[#C47D4C] text-white text-[10px] font-extrabold uppercase tracking-wider shadow-2xs">${ann.badge_type || 'IMPORTANT'}</span>
-          <span class="font-bold text-white text-xs">${ann.title}:</span>
-          <span class="text-emerald-100 text-xs">${ann.content}</span>
-          ${ann.link_url ? `<a href="${ann.link_url}" class="text-[11px] font-bold text-amber-300 hover:text-white underline transition-colors flex items-center gap-1"><span>Learn More</span> <i class="bi bi-arrow-right"></i></a>` : ''}
-          <span class="text-emerald-700/60 font-mono text-xs mx-3">•</span>
-        </div>
-      `).join('');
+      // Build announcement ticker items with standardized badges and inline Learn More links
+      const itemsHtml = data.announcements.map(ann => {
+        const badgeLabel = (ann.badge_type || 'ANNOUNCEMENT').toUpperCase().trim();
+        const badgeClass = getAnnouncementBadgeClass(badgeLabel);
+        return `
+          <div class="inline-flex items-center gap-2.5 px-4 py-0.5 shrink-0 max-w-full">
+            <span class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider shadow-2xs ${badgeClass} shrink-0">${badgeLabel}</span>
+            <span class="font-bold text-white text-xs whitespace-nowrap">${ann.title}:</span>
+            <span class="text-emerald-100 text-xs truncate max-w-[240px] sm:max-w-md">${ann.content}</span>
+            ${ann.link_url ? `<a href="${ann.link_url}" class="text-[11px] font-bold text-amber-300 hover:text-white underline transition-colors flex items-center gap-1 shrink-0"><span>Learn More</span> <i class="bi bi-arrow-right text-[10px]"></i></a>` : ''}
+            <span class="text-emerald-700/60 font-mono text-xs mx-2 shrink-0">•</span>
+          </div>
+        `;
+      }).join('');
 
-      container.className = 'w-full bg-[#123B32] text-white border-b border-[#527A68]/40 py-1.5 px-4 overflow-hidden shadow-xs relative z-10 flex items-center gap-3 transition-all duration-200';
+      container.className = 'w-full relative z-30 transition-all duration-200';
       container.innerHTML = `
-        <!-- Left Fixed Announcements Trigger Button -->
-        <a href="announcements.html" class="shrink-0 bg-[#C47D4C] hover:bg-[#a66439] text-white text-[11px] font-bold px-3 py-1 rounded-full shadow-md flex items-center gap-1.5 cursor-pointer z-10 transition-colors">
-          <i class="bi bi-megaphone-fill text-[10px]"></i>
-          <span class="hidden sm:inline">Announcements</span>
-          <span class="bg-white/20 px-1.5 py-0.2 rounded-full text-[9px] font-mono">${data.announcements.length}</span>
-        </a>
+        <div class="w-full relative">
+          <!-- Compact Responsive Toggle Bar -->
+          <div class="px-3 sm:px-6 py-1 flex items-center justify-between bg-transparent pointer-events-none">
+            <button id="announcement-toggle-btn" type="button" class="pointer-events-auto bg-[#123B32] hover:bg-[#1a4a40] text-white border border-[#527A68]/60 text-[10px] sm:text-[11px] font-bold px-2.5 py-0.5 rounded-full shadow-xs flex items-center gap-1.5 cursor-pointer transition-all duration-200 group" aria-label="Toggle Announcement Bar">
+              <span class="relative flex h-1.5 w-1.5 shrink-0">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-500"></span>
+              </span>
+              <i class="bi bi-megaphone-fill text-[9px] sm:text-[10px] text-amber-300"></i>
+              <span class="hidden xs:inline">Announcements</span>
+              <span class="bg-amber-500/20 text-amber-300 border border-amber-500/40 px-1.5 py-0.1 rounded-full text-[8px] sm:text-[9px] font-mono font-bold">${data.announcements.length}</span>
+              <i id="announcement-toggle-chevron" class="bi bi-chevron-down text-[9px] text-emerald-300 transition-transform duration-300"></i>
+            </button>
+          </div>
 
-        <!-- Continuous Scrolling Ticker -->
-        <div class="flex-1 overflow-hidden">
-          <div class="animate-marquee-track">
-            ${itemsHtml}
-            ${itemsHtml}
+          <!-- Slide-Out Announcement Tray with Train Arrival Animation -->
+          <div id="announcement-tray" class="announcement-bar-tray w-full bg-[#123B32] text-white border-b border-[#527A68]/40 shadow-md">
+            <div class="py-1 px-3 sm:px-6 flex items-center justify-between gap-2.5">
+              <div class="flex-1 overflow-hidden train-carriage announcement-ticker-wrap">
+                <div class="animate-marquee-track">
+                  ${itemsHtml}
+                  ${itemsHtml}
+                </div>
+              </div>
+              <button id="announcement-close-tray-btn" type="button" class="shrink-0 text-emerald-200/80 hover:text-white hover:bg-white/10 w-5 h-5 rounded-full flex items-center justify-center transition-colors cursor-pointer text-xs focus:outline-none" aria-label="Hide Announcements" title="Hide">
+                <i class="bi bi-x-lg text-[9px] pointer-events-none"></i>
+              </button>
+            </div>
           </div>
         </div>
       `;
+
+      // Interactive Toggle Handlers
+      const toggleBtn = document.getElementById('announcement-toggle-btn');
+      const tray = document.getElementById('announcement-tray');
+      const chevron = document.getElementById('announcement-toggle-chevron');
+      const closeTrayBtn = document.getElementById('announcement-close-tray-btn');
+
+      function setTrayState(isOpen) {
+        if (isOpen) {
+          tray.classList.add('is-open');
+          if (chevron) chevron.style.transform = 'rotate(180deg)';
+        } else {
+          tray.classList.remove('is-open');
+          if (chevron) chevron.style.transform = 'rotate(0deg)';
+        }
+      }
+
+      if (toggleBtn && tray) {
+        toggleBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const willOpen = !tray.classList.contains('is-open');
+          setTrayState(willOpen);
+        });
+      }
+
+      if (closeTrayBtn) {
+        closeTrayBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          setTrayState(false);
+        });
+      }
     } catch (err) {
       console.warn('Could not fetch dynamic announcements:', err);
     }
@@ -492,13 +569,42 @@
     renderEventsList(filtered);
   };
 
+  window.toggleEventDescription = function (eventId) {
+    const descEl = document.getElementById(`event-desc-${eventId}`);
+    const btnEl = document.getElementById(`event-desc-btn-${eventId}`);
+    if (!descEl || !btnEl) return;
+
+    const isClamped = descEl.classList.contains('line-clamp-2');
+    if (isClamped) {
+      descEl.classList.remove('line-clamp-2');
+      btnEl.innerHTML = `<span>Show less</span> <i class="bi bi-chevron-up text-[9px]"></i>`;
+    } else {
+      descEl.classList.add('line-clamp-2');
+      btnEl.innerHTML = `<span>Read more</span> <i class="bi bi-chevron-down text-[9px]"></i>`;
+    }
+  };
+
+  window.scrollToEventCard = function (cardId, dotIdx) {
+    const card = document.getElementById(cardId);
+    if (card) {
+      card.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      document.querySelectorAll('.event-pagination-dot').forEach((dot, i) => {
+        if (i === dotIdx) {
+          dot.className = 'event-pagination-dot w-7 bg-[#123B32] dark:bg-emerald-400 h-2 rounded-full transition-all duration-300 cursor-pointer';
+        } else {
+          dot.className = 'event-pagination-dot w-2 bg-slate-300 dark:bg-slate-700 hover:bg-slate-400 h-2 rounded-full transition-all duration-300 cursor-pointer';
+        }
+      });
+    }
+  };
+
   window.renderEventsList = function (eventsList) {
     const container = document.getElementById('dynamic-events-container');
     if (!container) return;
 
     if (!eventsList || eventsList.length === 0) {
       container.innerHTML = `
-        <div class="col-span-full text-center p-12 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 space-y-3">
+        <div class="col-span-full text-center p-12 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3">
           <div class="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center mx-auto text-2xl">
             <i class="bi bi-calendar-x"></i>
           </div>
@@ -506,6 +612,8 @@
           <p class="text-xs text-slate-500 max-w-sm mx-auto">Try adjusting your search query or selecting a different event category filter.</p>
         </div>
       `;
+      const existingPagination = document.getElementById('events-carousel-pagination');
+      if (existingPagination) existingPagination.innerHTML = '';
       return;
     }
 
@@ -516,71 +624,100 @@
         'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&q=80' : 
         'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=600&q=80';
       const eventImg = ev.image_url || defaultImg;
+      const categoryLabel = ev.category ? ev.category.split('|')[0].trim().toUpperCase() : 'EVENT';
+      const hasLongDesc = ev.description && ev.description.length > 110;
 
       return `
-        <div id="event-card-${ev.id}" data-event-id="${ev.id}" class="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-3xl shadow-lg hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 relative overflow-hidden flex flex-col justify-between group">
-          <!-- Event Cover Image Banner -->
+        <div id="event-card-${ev.id}" data-event-id="${ev.id}" class="event-carousel-card bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden flex flex-col justify-between group">
+          
+          <!-- Event Cover Image with Top Badges & Bottom-Left Date Badge -->
           <div class="h-44 w-full relative overflow-hidden bg-slate-100 dark:bg-slate-800">
             <img src="${eventImg}" alt="${ev.title}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
             <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
             
-            <!-- Category, Fee & Share Overlay Badges -->
+            <!-- Top Badges: Aligned Category & Price Badges (Single Share Icon kept at CTA) -->
             <div class="absolute top-3 left-3 right-3 flex items-center justify-between gap-2 z-10">
-              <span class="px-3 py-1 bg-black/60 backdrop-blur-md text-white font-extrabold text-[10px] rounded-full uppercase tracking-wider border border-white/20">
-                <i class="bi bi-tag-fill text-[9px] mr-1 text-emerald-400"></i>${ev.category ? ev.category.split('|')[0].trim() : 'Event'}
+              <span class="h-7 px-3 inline-flex items-center gap-1.5 bg-black/70 backdrop-blur-md text-white font-extrabold text-[10px] rounded-full uppercase tracking-wider border border-white/20 shadow-sm shrink-0">
+                <i class="bi bi-tag-fill text-[9px] text-emerald-400"></i>${categoryLabel}
               </span>
-              <div class="flex items-center gap-1.5">
-                <button type="button" onclick="event.stopPropagation(); window.openShareModal('${ev.id}')" class="w-7 h-7 rounded-full bg-black/60 hover:bg-[#123B32] dark:hover:bg-emerald-600 backdrop-blur-md text-white border border-white/20 flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-md cursor-pointer" title="Share this Event" aria-label="Share this Event">
-                  <i class="bi bi-share-fill text-[11px] pointer-events-none"></i>
-                </button>
-                <span class="px-3 py-1 ${isPaid ? 'bg-amber-500 text-white font-bold' : 'bg-emerald-600 text-white font-bold'} text-xs rounded-full shadow-md font-mono">
-                  ${fee}
-                </span>
-              </div>
+              <span class="h-7 px-3 inline-flex items-center bg-emerald-600 ${isPaid ? 'bg-amber-600' : 'bg-emerald-600'} text-white font-bold text-xs rounded-full shadow-sm font-mono border border-white/20 shrink-0">
+                ${fee}
+              </span>
             </div>
             
-            <!-- Date Overlay on Image -->
-            <div class="absolute bottom-3 left-4 text-white">
-              <span class="block text-xs font-mono font-bold text-amber-300 flex items-center gap-1.5">
-                <i class="bi bi-calendar3"></i> ${ev.event_date || 'TBA'}
+            <!-- Date Badge: Fully Positioned on Image Bottom-Left with Clean Padding -->
+            <div class="absolute bottom-3 left-3 z-10">
+              <span class="h-7 px-2.5 inline-flex items-center gap-1.5 rounded-lg bg-black/80 backdrop-blur-md text-white font-mono text-[11px] font-bold border border-white/15 shadow-sm">
+                <i class="bi bi-calendar3 text-amber-300 text-xs"></i>
+                <span>${ev.event_date || 'TBA'}</span>
               </span>
             </div>
           </div>
 
-          <div class="p-6 space-y-4 flex-1 flex flex-col justify-between">
-            <div class="space-y-3">
+          <!-- Card Content Body -->
+          <div class="p-5 sm:p-6 space-y-4 flex-1 flex flex-col justify-between">
+            <div class="space-y-2.5">
               <!-- Title -->
-              <h3 class="text-lg font-bold font-heading text-slate-900 dark:text-white group-hover:text-[#123B32] dark:group-hover:text-emerald-400 transition-colors leading-snug">
+              <h3 class="text-base sm:text-lg font-bold font-heading text-slate-900 dark:text-white group-hover:text-[#123B32] dark:group-hover:text-emerald-400 transition-colors leading-snug">
                 ${ev.title}
               </h3>
 
               <!-- Venue Details -->
               <div class="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300 font-medium">
-                <i class="bi bi-geo-alt-fill text-[#123B32] dark:text-emerald-400"></i>
+                <i class="bi bi-geo-alt-fill text-[#123B32] dark:text-emerald-400 text-xs shrink-0"></i>
                 <span class="truncate">${ev.location || 'Salem, Tamil Nadu'}</span>
               </div>
 
-              <!-- Description -->
-              <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-3">
-                ${ev.description}
-              </p>
+              <!-- Description with Read More Toggle -->
+              <div class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                <p id="event-desc-${ev.id}" class="line-clamp-2 transition-all">
+                  ${ev.description || 'Join us for this comprehensive technical session and professional networking event.'}
+                </p>
+                ${hasLongDesc ? `
+                  <button type="button" onclick="toggleEventDescription('${ev.id}')" id="event-desc-btn-${ev.id}" class="text-[11px] font-bold text-[#123B32] dark:text-emerald-400 hover:underline inline-flex items-center gap-1 mt-1 cursor-pointer">
+                    <span>Read more</span> <i class="bi bi-chevron-down text-[9px]"></i>
+                  </button>
+                ` : ''}
+              </div>
             </div>
 
-            <!-- Action Buttons: Register & Share -->
-            <div class="flex items-center gap-2 pt-1">
-              <button onclick="openRegisterModal('${ev.id}', '${encodeURIComponent(ev.title)}', '${encodeURIComponent(fee)}')" class="flex-1 py-3 bg-[#123B32] hover:bg-[#C47D4C] text-white font-bold text-xs rounded-2xl transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-xl cursor-pointer">
+            <!-- Action Buttons: Register CTA & Accessible Share Button -->
+            <div class="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+              <button onclick="openRegisterModal('${ev.id}', '${encodeURIComponent(ev.title)}', '${encodeURIComponent(fee)}')" class="flex-1 py-2.5 px-4 bg-[#123B32] hover:bg-[#C47D4C] text-white font-bold text-xs rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg cursor-pointer">
                 <i class="bi bi-ticket-perforated text-sm"></i>
                 <span>Register For Event</span>
                 <i class="bi bi-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
               </button>
-              <button type="button" onclick="openShareModal('${ev.id}')" class="w-12 h-11 bg-slate-100 hover:bg-[#E8EFEB] dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 hover:text-[#123B32] dark:hover:text-emerald-400 border border-slate-200 dark:border-slate-700 hover:border-emerald-500/40 rounded-2xl transition-all duration-200 flex items-center justify-center shadow-xs cursor-pointer shrink-0 group/share" title="Share Event" aria-label="Share Event">
-                <i class="bi bi-share-fill text-sm group-hover/share:scale-110 transition-transform pointer-events-none"></i>
+              <button type="button" onclick="openShareModal('${ev.id}')" class="w-10 h-10 bg-slate-100 hover:bg-[#E8EFEB] dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 hover:text-[#123B32] dark:hover:text-emerald-400 border border-slate-200 dark:border-slate-700 hover:border-emerald-500/40 rounded-xl transition-all duration-200 flex items-center justify-center shadow-xs cursor-pointer shrink-0 group/share" title="Share Event" aria-label="Share Event">
+                <i class="bi bi-share-fill text-xs group-hover/share:scale-110 transition-transform pointer-events-none"></i>
               </button>
             </div>
           </div>
         </div>
       `;
     }).join('');
+
+    // Render Dot/Line Carousel Pagination Indicators
+    let pagContainer = document.getElementById('events-carousel-pagination');
+    if (!pagContainer && container.parentNode) {
+      pagContainer = document.createElement('div');
+      pagContainer.id = 'events-carousel-pagination';
+      container.parentNode.appendChild(pagContainer);
+    }
+
+    if (pagContainer) {
+      if (eventsList.length <= 1) {
+        pagContainer.innerHTML = '';
+      } else {
+        pagContainer.innerHTML = `
+          <div class="flex items-center justify-center gap-2 pt-6">
+            ${eventsList.map((ev, idx) => `
+              <button type="button" onclick="scrollToEventCard('event-card-${ev.id}', ${idx})" id="event-dot-${idx}" class="event-pagination-dot ${idx === 0 ? 'w-7 bg-[#123B32] dark:bg-emerald-400' : 'w-2 bg-slate-300 dark:bg-slate-700 hover:bg-slate-400'} h-2 rounded-full transition-all duration-300 cursor-pointer" aria-label="Go to event ${idx + 1}" title="Event ${idx + 1}"></button>
+            `).join('')}
+          </div>
+        `;
+      }
+    }
   };
 
   // Base64 File Converter with 10 MB Limit Restriction
@@ -634,8 +771,11 @@
       rawEncodedTitle = encodeURIComponent(title);
     }
 
+    window.closePublicModal();
+    document.body.style.overflow = 'hidden';
+
     const modalHtml = `
-      <div id="public-modal-backdrop" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+      <div id="public-modal-backdrop" onclick="if(event.target === this) closePublicModal()" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-900 border border-[#D3DDD7] dark:border-slate-800 w-full max-w-lg rounded-3xl p-6 sm:p-7 shadow-2xl space-y-4 text-[#0F172A] dark:text-slate-100 max-h-[90vh] overflow-y-auto no-scrollbar">
           <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
             <div>
@@ -828,67 +968,72 @@
     const upiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=Shazu%20Soft%20Technologies&am=${numAmount}&cu=INR&tn=${encodeURIComponent(title.slice(0, 30))}`;
     const qrUrl = eventObj.payment_qr || `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiUri)}`;
 
+    // Close any previous modal and lock background scrolling
+    window.closePublicModal();
+    document.body.style.overflow = 'hidden';
+
     const modalHtml = `
-      <div id="public-modal-backdrop" onclick="if(event.target === this) closePublicModal()" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
-        <div class="bg-white dark:bg-slate-900 border border-[#D3DDD7] dark:border-slate-800 w-full max-w-2xl rounded-3xl p-5 sm:p-7 shadow-2xl space-y-4 text-[#0F172A] dark:text-slate-100 max-h-[92vh] overflow-y-auto no-scrollbar">
+      <div id="public-modal-backdrop" onclick="if(event.target === this) closePublicModal()" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5 md:p-6 animate-in fade-in duration-200 overflow-y-auto">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 w-full max-w-xl md:max-w-2xl rounded-3xl p-5 sm:p-7 md:p-8 shadow-2xl space-y-5 sm:space-y-6 text-[#0F172A] dark:text-slate-100 max-h-[90vh] overflow-y-auto no-scrollbar relative my-auto">
           
-          <!-- Header -->
-          <div class="flex items-start justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
-            <div>
-              <div class="flex items-center gap-2">
+          <!-- Modal Header with Single Consolidated Share Icon & Visible Close Button -->
+          <div class="flex items-start justify-between gap-3 pb-4 border-b border-slate-200/80 dark:border-slate-800">
+            <div class="space-y-1 flex-1 min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
                 <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase ${isPaid ? 'bg-amber-100 text-amber-900 border border-amber-300 dark:bg-amber-950/60 dark:text-amber-300' : 'bg-emerald-100 text-emerald-900 border border-emerald-300 dark:bg-emerald-950/60 dark:text-emerald-300'}">
                   ${isPaid ? `Fee: ${fee}` : 'Free Entry'}
                 </span>
-                <span class="text-xs text-slate-400 font-mono">Official Registration</span>
+                <span class="text-[11px] text-slate-400 font-mono">Official Registration Pass</span>
               </div>
-              <h3 class="text-base sm:text-lg font-black font-heading text-[#0F172A] dark:text-white leading-tight mt-1">${title}</h3>
-              <p class="text-xs text-[#527A68] dark:text-emerald-400 font-medium">Multi-Category Registration Form for Schools, Colleges & Faculty (FDP)</p>
+              <h3 class="text-base sm:text-xl font-black font-heading text-[#0F172A] dark:text-white leading-snug truncate">${title}</h3>
+              <p class="text-xs text-[#527A68] dark:text-emerald-400 font-medium">Shazu Soft Technologies Event &amp; Training Portal</p>
             </div>
-            <button onclick="closePublicModal()" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center transition-colors cursor-pointer shrink-0"><i class="bi bi-x-lg text-sm pointer-events-none"></i></button>
-          </div>
-
-          <!-- Quick Share Strip -->
-          <div class="flex items-center justify-between flex-wrap gap-2 bg-slate-50 dark:bg-slate-800/60 px-3.5 py-2 rounded-2xl border border-slate-200/80 dark:border-slate-700/80">
-            <span class="text-[11px] font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
-              <i class="bi bi-share-fill text-[#123B32] dark:text-emerald-400 text-xs"></i> Invite peers or share this event:
-            </span>
-            <div class="flex items-center gap-1.5">
-              <button type="button" onclick="window.quickShareEvent('whatsapp', '${eventId}')" class="w-7 h-7 rounded-lg bg-[#25D366] hover:bg-[#20bd5a] text-white flex items-center justify-center text-xs transition-transform hover:scale-110 shadow-2xs cursor-pointer" title="Share on WhatsApp"><i class="bi bi-whatsapp"></i></button>
-              <button type="button" onclick="window.quickShareEvent('linkedin', '${eventId}')" class="w-7 h-7 rounded-lg bg-[#0077b5] hover:bg-[#006097] text-white flex items-center justify-center text-xs transition-transform hover:scale-110 shadow-2xs cursor-pointer" title="Share on LinkedIn"><i class="bi bi-linkedin"></i></button>
-              <button type="button" onclick="window.quickShareEvent('x', '${eventId}')" class="w-7 h-7 rounded-lg bg-black dark:bg-slate-950 hover:bg-slate-800 text-white flex items-center justify-center text-xs transition-transform hover:scale-110 shadow-2xs cursor-pointer" title="Share on X / Twitter"><i class="bi bi-twitter-x"></i></button>
-              <button type="button" onclick="window.quickShareEvent('copy', '${eventId}')" class="w-7 h-7 rounded-lg bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 flex items-center justify-center text-xs transition-transform hover:scale-110 shadow-2xs cursor-pointer" title="Copy Event Link"><i class="bi bi-link-45deg text-sm"></i></button>
-              <button type="button" onclick="window.openShareModal('${eventId}')" class="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-[10px] font-bold text-slate-700 dark:text-slate-200 hover:text-[#123B32] dark:hover:text-emerald-400 transition-colors shadow-2xs cursor-pointer" title="More Share Options">All Options</button>
+            
+            <div class="flex items-center gap-2 shrink-0">
+              <!-- Single Consolidated Share Button -->
+              <button type="button" onclick="window.openShareModal('${eventId}')" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-[#E8EFEB] dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 hover:text-[#123B32] dark:hover:text-emerald-400 border border-slate-200 dark:border-slate-700 flex items-center justify-center transition-all cursor-pointer shadow-xs group" title="Share Event" aria-label="Share Event">
+                <i class="bi bi-share-fill text-xs group-hover:scale-110 transition-transform pointer-events-none"></i>
+              </button>
+              <!-- Close Button -->
+              <button type="button" onclick="closePublicModal()" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center transition-colors cursor-pointer shrink-0 shadow-xs" title="Close" aria-label="Close">
+                <i class="bi bi-x-lg text-sm pointer-events-none"></i>
+              </button>
             </div>
           </div>
 
           ${isPaid ? `
-            <!-- Payment QR Card -->
-            <div class="bg-[#E8EFEB] dark:bg-emerald-950/40 border border-[#D3DDD7] dark:border-emerald-800 p-4 rounded-2xl space-y-3">
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-extrabold uppercase tracking-wider text-[#123B32] dark:text-emerald-300">Registration Fee: <span class="font-mono text-amber-700 dark:text-amber-400 font-black">${fee}</span></span>
-                <span class="px-2.5 py-1 bg-[#123B32] dark:bg-emerald-700 text-white font-mono font-bold text-[11px] rounded-lg">UPI Instant QR</span>
+            <!-- Payment QR Card with Clean Spacing & Mobile Touch Targets -->
+            <div class="bg-emerald-50/60 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/80 p-4 sm:p-5 rounded-2xl space-y-3.5 shadow-xs">
+              <div class="flex items-center justify-between flex-wrap gap-2">
+                <div class="flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span class="text-xs font-black uppercase tracking-wider text-[#123B32] dark:text-emerald-300">Registration Fee: <span class="font-mono text-amber-700 dark:text-amber-400 text-sm font-black ml-1">${fee}</span></span>
+                </div>
+                <span class="px-2.5 py-1 bg-[#123B32] dark:bg-emerald-700 text-white font-mono font-bold text-[11px] rounded-lg">Instant UPI QR</span>
               </div>
-              <div class="flex flex-col sm:flex-row items-center gap-4 bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200 dark:border-emerald-900/60 shadow-xs">
-                <div class="bg-white p-2 rounded-xl shadow-md border-2 border-emerald-600/30 shrink-0">
+              
+              <div class="flex flex-col sm:flex-row items-center gap-4 bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-emerald-900/60 shadow-xs">
+                <div class="bg-white p-2.5 rounded-2xl shadow-md border-2 border-emerald-600/30 shrink-0">
                   <img src="${qrUrl}" alt="Scan QR Code to Pay" class="w-28 h-28 object-contain mx-auto">
                 </div>
-                <div class="space-y-1 text-center sm:text-left">
-                  <span class="block font-black text-xs text-[#0F172A] dark:text-white">Scan &amp; Pay using any UPI App (GPay, PhonePe, Paytm)</span>
-                  <span class="block text-[11px] text-slate-500 dark:text-slate-400 leading-tight">Instant UPI verification. After payment, enter your 12-digit UPI UTR reference number below.</span>
+                <div class="space-y-2 text-center sm:text-left flex-1 min-w-0">
+                  <span class="block font-black text-xs sm:text-sm text-[#0F172A] dark:text-white">Scan &amp; Pay using any UPI App (GPay, PhonePe, Paytm)</span>
+                  <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">UPI ID: <code class="font-mono font-bold text-[#123B32] dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800 select-all">${upiId}</code></p>
+                  <span class="block text-[11px] text-slate-500 dark:text-slate-400 leading-tight">After making payment, enter your 12-digit UPI UTR reference number in the field below to confirm your pass.</span>
                 </div>
               </div>
             </div>
           ` : ''}
 
-          <form onsubmit="submitEventRegistration(event, '${eventId}', '${encodedTitle}', '${encodedFee}')" class="space-y-4 text-xs">
+          <form onsubmit="submitEventRegistration(event, '${eventId}', '${encodedTitle}', '${encodedFee}')" class="space-y-5 text-xs">
             
             <!-- 1. CATEGORY SELECTION -->
-            <div class="p-3.5 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-2xl">
-              <label class="block font-bold text-xs text-[#123B32] dark:text-emerald-400 mb-1.5 flex items-center gap-1.5">
+            <div class="p-4 bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-2xl space-y-1.5">
+              <label class="block font-bold text-xs text-[#123B32] dark:text-emerald-400 flex items-center gap-1.5">
                 <i class="bi bi-person-badge-fill text-amber-600 dark:text-amber-400"></i>
                 <span>Select Attendee Category *</span>
               </label>
-              <select id="pub-reg-category" onchange="window.updateAttendeeCategoryFields(this.value)" required class="w-full p-2.5 bg-white dark:bg-[#0B0F19] border border-emerald-300 dark:border-emerald-700 rounded-xl text-xs font-bold text-[#0F172A] dark:text-white focus:outline-none focus:border-[#123B32] cursor-pointer shadow-2xs">
+              <select id="pub-reg-category" onchange="window.updateAttendeeCategoryFields(this.value)" required class="w-full p-3 bg-white dark:bg-[#0B0F19] border border-emerald-300 dark:border-emerald-700 rounded-xl text-xs font-bold text-[#0F172A] dark:text-white focus:outline-none focus:border-[#123B32] cursor-pointer shadow-2xs">
                 <option value="College / University Student (UG / PG)" selected>🎓 College / University Student (UG / PG)</option>
                 <option value="School Student (Grade 6 - 12 / Higher Secondary)">🎒 School Student (Grade 6 - 12 / Higher Secondary)</option>
                 <option value="College / University Faculty (FDP / Conference)">🧑‍🏫 College / University Faculty (FDP / Conference / Seminar)</option>
@@ -898,26 +1043,26 @@
             </div>
 
             <!-- 2. PERSONAL INFORMATION -->
-            <div>
-              <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2 flex items-center gap-1">
-                <i class="bi bi-person-fill"></i> <span>Personal Details</span>
+            <div class="space-y-3">
+              <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                <i class="bi bi-person-fill text-[#123B32] dark:text-emerald-400"></i> <span>Personal Details</span>
               </h4>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div>
                   <label class="block font-bold text-[11px] text-[#1E292B] dark:text-slate-200 mb-1">Full Name *</label>
-                  <input type="text" id="pub-reg-name" required placeholder="e.g. Jane Doe" class="w-full p-2.5 bg-[#F8FAFC] dark:bg-[#0B0F19] border border-[#D3DDD7] dark:border-slate-800 rounded-xl text-xs text-[#0F172A] dark:text-white placeholder:text-[#64748B] dark:placeholder:text-slate-500 focus:outline-none focus:border-[#123B32]">
+                  <input type="text" id="pub-reg-name" required placeholder="e.g. Jane Doe" class="w-full p-3 bg-[#F8FAFC] dark:bg-[#0B0F19] border border-[#D3DDD7] dark:border-slate-800 rounded-xl text-xs text-[#0F172A] dark:text-white placeholder:text-[#64748B] dark:placeholder:text-slate-500 focus:outline-none focus:border-[#123B32]">
                 </div>
                 <div>
                   <label class="block font-bold text-[11px] text-[#1E292B] dark:text-slate-200 mb-1">Email Address *</label>
-                  <input type="email" id="pub-reg-email" required placeholder="e.g. jane@example.com" class="w-full p-2.5 bg-[#F8FAFC] dark:bg-[#0B0F19] border border-[#D3DDD7] dark:border-slate-800 rounded-xl text-xs text-[#0F172A] dark:text-white placeholder:text-[#64748B] dark:placeholder:text-slate-500 focus:outline-none focus:border-[#123B32]">
+                  <input type="email" id="pub-reg-email" required placeholder="e.g. jane@example.com" class="w-full p-3 bg-[#F8FAFC] dark:bg-[#0B0F19] border border-[#D3DDD7] dark:border-slate-800 rounded-xl text-xs text-[#0F172A] dark:text-white placeholder:text-[#64748B] dark:placeholder:text-slate-500 focus:outline-none focus:border-[#123B32]">
                 </div>
                 <div>
                   <label class="block font-bold text-[11px] text-[#1E292B] dark:text-slate-200 mb-1">Phone / WhatsApp Number *</label>
-                  <input type="tel" id="pub-reg-phone" required placeholder="e.g. +91 98765 43210" class="w-full p-2.5 bg-[#F8FAFC] dark:bg-[#0B0F19] border border-[#D3DDD7] dark:border-slate-800 rounded-xl text-xs text-[#0F172A] dark:text-white placeholder:text-[#64748B] dark:placeholder:text-slate-500 focus:outline-none focus:border-[#123B32]">
+                  <input type="tel" id="pub-reg-phone" required placeholder="e.g. +91 98765 43210" class="w-full p-3 bg-[#F8FAFC] dark:bg-[#0B0F19] border border-[#D3DDD7] dark:border-slate-800 rounded-xl text-xs text-[#0F172A] dark:text-white placeholder:text-[#64748B] dark:placeholder:text-slate-500 focus:outline-none focus:border-[#123B32]">
                 </div>
                 <div>
                   <label class="block font-bold text-[11px] text-[#1E292B] dark:text-slate-200 mb-1">Gender</label>
-                  <select id="pub-reg-gender" class="w-full p-2.5 bg-[#F8FAFC] dark:bg-[#0B0F19] border border-[#D3DDD7] dark:border-slate-800 rounded-xl text-xs text-[#0F172A] dark:text-white focus:outline-none focus:border-[#123B32] cursor-pointer">
+                  <select id="pub-reg-gender" class="w-full p-3 bg-[#F8FAFC] dark:bg-[#0B0F19] border border-[#D3DDD7] dark:border-slate-800 rounded-xl text-xs text-[#0F172A] dark:text-white focus:outline-none focus:border-[#123B32] cursor-pointer">
                     <option value="Male">Male</option>
                     <option value="Female">Female</option>
                     <option value="Other">Other</option>
@@ -928,57 +1073,69 @@
             </div>
 
             <!-- 3. ACADEMIC / INSTITUTIONAL PROFILE -->
-            <div>
-              <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2 flex items-center gap-1">
-                <i class="bi bi-building"></i> <span>Institutional &amp; Academic Details</span>
+            <div class="space-y-3">
+              <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                <i class="bi bi-building text-[#123B32] dark:text-emerald-400"></i> <span>Institutional &amp; Academic Details</span>
               </h4>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div class="sm:col-span-2">
                   <label id="lbl-reg-org" class="block font-bold text-[11px] text-[#1E292B] dark:text-slate-200 mb-1">College / University Name *</label>
-                  <input type="text" id="pub-reg-org" required placeholder="e.g. Anna University / Sona College of Technology, Salem" class="w-full p-2.5 bg-[#F8FAFC] dark:bg-[#0B0F19] border border-[#D3DDD7] dark:border-slate-800 rounded-xl text-xs text-[#0F172A] dark:text-white placeholder:text-[#64748B] dark:placeholder:text-slate-500 focus:outline-none focus:border-[#123B32]">
+                  <input type="text" id="pub-reg-org" required placeholder="e.g. Anna University / Sona College of Technology, Salem" class="w-full p-3 bg-[#F8FAFC] dark:bg-[#0B0F19] border border-[#D3DDD7] dark:border-slate-800 rounded-xl text-xs text-[#0F172A] dark:text-white placeholder:text-[#64748B] dark:placeholder:text-slate-500 focus:outline-none focus:border-[#123B32]">
                 </div>
                 <div>
                   <label id="lbl-reg-dept" class="block font-bold text-[11px] text-[#1E292B] dark:text-slate-200 mb-1">Degree &amp; Department / Branch *</label>
-                  <input type="text" id="pub-reg-dept-degree" required placeholder="e.g. B.E CSE / B.Tech AI / MCA" class="w-full p-2.5 bg-[#F8FAFC] dark:bg-[#0B0F19] border border-[#D3DDD7] dark:border-slate-800 rounded-xl text-xs text-[#0F172A] dark:text-white placeholder:text-[#64748B] dark:placeholder:text-slate-500 focus:outline-none focus:border-[#123B32]">
+                  <input type="text" id="pub-reg-dept-degree" required placeholder="e.g. B.E CSE / B.Tech AI / MCA" class="w-full p-3 bg-[#F8FAFC] dark:bg-[#0B0F19] border border-[#D3DDD7] dark:border-slate-800 rounded-xl text-xs text-[#0F172A] dark:text-white placeholder:text-[#64748B] dark:placeholder:text-slate-500 focus:outline-none focus:border-[#123B32]">
                 </div>
                 <div>
                   <label id="lbl-reg-desig" class="block font-bold text-[11px] text-[#1E292B] dark:text-slate-200 mb-1">Year of Study / Designation *</label>
-                  <input type="text" id="pub-reg-desig-year" required placeholder="e.g. 3rd Year (Semester 6) / Final Year" class="w-full p-2.5 bg-[#F8FAFC] dark:bg-[#0B0F19] border border-[#D3DDD7] dark:border-slate-800 rounded-xl text-xs text-[#0F172A] dark:text-white placeholder:text-[#64748B] dark:placeholder:text-slate-500 focus:outline-none focus:border-[#123B32]">
+                  <input type="text" id="pub-reg-desig-year" required placeholder="e.g. 3rd Year (Semester 6) / Final Year" class="w-full p-3 bg-[#F8FAFC] dark:bg-[#0B0F19] border border-[#D3DDD7] dark:border-slate-800 rounded-xl text-xs text-[#0F172A] dark:text-white placeholder:text-[#64748B] dark:placeholder:text-slate-500 focus:outline-none focus:border-[#123B32]">
                 </div>
                 <div>
                   <label id="lbl-reg-id" class="block font-bold text-[11px] text-[#1E292B] dark:text-slate-200 mb-1">Roll No / Reg No / Staff ID</label>
-                  <input type="text" id="pub-reg-id-no" placeholder="e.g. 731621104055 / EMP-4091" class="w-full p-2.5 bg-[#F8FAFC] dark:bg-[#0B0F19] border border-[#D3DDD7] dark:border-slate-800 rounded-xl text-xs text-[#0F172A] dark:text-white placeholder:text-[#64748B] dark:placeholder:text-slate-500 focus:outline-none focus:border-[#123B32]">
+                  <input type="text" id="pub-reg-id-no" placeholder="e.g. 731621104055 / EMP-4091" class="w-full p-3 bg-[#F8FAFC] dark:bg-[#0B0F19] border border-[#D3DDD7] dark:border-slate-800 rounded-xl text-xs text-[#0F172A] dark:text-white placeholder:text-[#64748B] dark:placeholder:text-slate-500 focus:outline-none focus:border-[#123B32]">
                 </div>
                 <div>
                   <label class="block font-bold text-[11px] text-[#1E292B] dark:text-slate-200 mb-1">City &amp; State</label>
-                  <input type="text" id="pub-reg-city-state" placeholder="e.g. Salem, Tamil Nadu" class="w-full p-2.5 bg-[#F8FAFC] dark:bg-[#0B0F19] border border-[#D3DDD7] dark:border-slate-800 rounded-xl text-xs text-[#0F172A] dark:text-white placeholder:text-[#64748B] dark:placeholder:text-slate-500 focus:outline-none focus:border-[#123B32]">
+                  <input type="text" id="pub-reg-city-state" placeholder="e.g. Salem, Tamil Nadu" class="w-full p-3 bg-[#F8FAFC] dark:bg-[#0B0F19] border border-[#D3DDD7] dark:border-slate-800 rounded-xl text-xs text-[#0F172A] dark:text-white placeholder:text-[#64748B] dark:placeholder:text-slate-500 focus:outline-none focus:border-[#123B32]">
                 </div>
               </div>
             </div>
 
             <!-- 4. PAYMENT REFERENCE (FOR PAID EVENTS) -->
             ${isPaid ? `
-              <div class="p-3.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-2xl space-y-2">
-                <label class="block font-bold text-xs text-amber-900 dark:text-amber-300">12-Digit UPI Transaction / UTR Reference No *</label>
-                <input type="text" id="pub-reg-utr" required placeholder="e.g. 423589102456" class="w-full p-2.5 bg-white dark:bg-[#0B0F19] border border-amber-300 dark:border-amber-700 rounded-xl text-xs text-[#0F172A] dark:text-white focus:outline-none focus:border-[#123B32] font-mono">
-                <span class="text-[10px] text-slate-500 dark:text-slate-400 block leading-tight">Find the 12-digit UTR in your Google Pay, PhonePe, or Paytm receipt.</span>
+              <div class="p-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-2xl space-y-2">
+                <label class="block font-bold text-xs text-amber-900 dark:text-amber-300 flex items-center gap-1.5">
+                  <i class="bi bi-receipt"></i>
+                  <span>12-Digit UPI Transaction / UTR Reference No *</span>
+                </label>
+                <input type="text" id="pub-reg-utr" required placeholder="e.g. 423589102456" class="w-full p-3 bg-white dark:bg-[#0B0F19] border border-amber-300 dark:border-amber-700 rounded-xl text-xs font-bold text-[#0F172A] dark:text-white focus:outline-none focus:border-[#123B32] font-mono tracking-wider">
+                <span class="text-[11px] text-slate-500 dark:text-slate-400 block leading-tight">Enter the 12-digit UTR found on your payment confirmation screen (GPay, PhonePe, Paytm).</span>
               </div>
             ` : ''}
 
             <!-- 5. DECLARATION -->
-            <div class="flex items-start gap-2.5 p-3 bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 rounded-xl">
-              <input type="checkbox" id="pub-reg-declaration" required checked class="w-4 h-4 mt-0.5 text-emerald-600 rounded cursor-pointer">
+            <div class="flex items-start gap-2.5 p-3.5 bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 rounded-xl">
+              <input type="checkbox" id="pub-reg-declaration" required checked class="w-4 h-4 mt-0.5 text-emerald-600 rounded cursor-pointer shrink-0">
               <label for="pub-reg-declaration" class="text-[11px] text-slate-600 dark:text-slate-300 leading-tight cursor-pointer">
                 I hereby declare that all academic, institutional, and personal information provided above is true and authentic.
               </label>
             </div>
 
-            <!-- Action Buttons -->
-            <div class="flex justify-end items-center gap-3 pt-2 border-t border-slate-200 dark:border-slate-800">
-              <button type="button" onclick="closePublicModal()" class="px-4 py-2 bg-[#F1F5F3] hover:bg-[#E2E8F0] dark:bg-slate-800 dark:hover:bg-slate-700 text-[#0F172A] dark:text-slate-300 rounded-xl font-bold text-xs transition-all cursor-pointer">Cancel</button>
-              <button type="submit" class="px-6 py-2.5 bg-[#123B32] hover:bg-[#1A4B40] dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-extrabold rounded-xl transition-all shadow-md text-xs inline-flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">
-                <span>Complete Registration &amp; Issue Pass</span>
-              </button>
+            <!-- 6. Clear Primary CTA Button -->
+            <div class="pt-2">
+              ${isPaid ? `
+                <button type="submit" id="pub-reg-submit-btn" class="w-full py-3.5 px-6 bg-[#123B32] hover:bg-[#1A4B40] dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-extrabold rounded-xl transition-all shadow-lg hover:shadow-xl text-xs sm:text-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">
+                  <i class="bi bi-shield-check text-base"></i>
+                  <span>I've Paid — Submit UTR &amp; Complete Registration</span>
+                  <i class="bi bi-arrow-right text-xs"></i>
+                </button>
+              ` : `
+                <button type="submit" id="pub-reg-submit-btn" class="w-full py-3.5 px-6 bg-[#123B32] hover:bg-[#1A4B40] dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-extrabold rounded-xl transition-all shadow-lg hover:shadow-xl text-xs sm:text-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">
+                  <i class="bi bi-ticket-perforated text-base"></i>
+                  <span>Confirm &amp; Complete Registration</span>
+                  <i class="bi bi-arrow-right text-xs"></i>
+                </button>
+              `}
             </div>
           </form>
         </div>
@@ -990,7 +1147,18 @@
   window.closePublicModal = function () {
     const backdrop = document.getElementById('public-modal-backdrop');
     if (backdrop) backdrop.remove();
+    document.body.style.overflow = '';
   };
+
+  // Global Escape Key Listener for Modals
+  if (!window._modalEscListenerAttached) {
+    window._modalEscListenerAttached = true;
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        window.closePublicModal();
+      }
+    });
+  }
 
   // 6. Share Event Functions (Social Channels, Direct URL, QR & Native Share)
   window.getEventShareDetails = function (eventId) {
@@ -1045,6 +1213,7 @@
 
     // Remove any existing active modal
     window.closePublicModal();
+    document.body.style.overflow = 'hidden';
 
     const hasNativeShare = typeof navigator !== 'undefined' && typeof navigator.share === 'function';
 
