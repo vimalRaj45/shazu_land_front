@@ -94,10 +94,30 @@
         </div>
 
         <div class="flex items-center gap-2 flex-wrap">
-          <button onclick="exportAttendanceCSV()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-md flex items-center gap-2 transition-all cursor-pointer">
-            <i class="bi bi-file-earmark-spreadsheet-fill text-sm"></i> Export CSV Report
-          </button>
-          <button onclick="window.print()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white rounded-xl text-xs font-bold shadow-md flex items-center gap-2 transition-all cursor-pointer">
+          <div class="relative group">
+            <button type="button" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-md flex items-center gap-2 transition-all cursor-pointer">
+              <i class="bi bi-file-earmark-spreadsheet-fill text-sm"></i>
+              <span>Export CSV Report</span>
+              <i class="bi bi-chevron-down text-[10px]"></i>
+            </button>
+            <div class="absolute right-0 top-full pt-1 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-150 z-50 min-w-[210px]">
+              <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl p-1.5 space-y-1 text-xs text-slate-700 dark:text-slate-200">
+                <button type="button" onclick="exportAttendanceCSV('all')" class="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2 font-medium cursor-pointer">
+                  <i class="bi bi-file-earmark-text text-slate-500"></i>
+                  <span>Export All Roster (CSV)</span>
+                </button>
+                <button type="button" onclick="exportAttendanceCSV('present')" class="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2 font-medium text-emerald-600 dark:text-emerald-400 cursor-pointer">
+                  <i class="bi bi-check-circle-fill"></i>
+                  <span>Export Present Only (CSV)</span>
+                </button>
+                <button type="button" onclick="exportAttendanceCSV('verified')" class="w-full text-left px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2 font-medium text-amber-600 dark:text-amber-400 cursor-pointer">
+                  <i class="bi bi-shield-check"></i>
+                  <span>Export Verified Paid Only (CSV)</span>
+                </button>
+              </div>
+            </div>
+          </div>
+          <button type="button" onclick="window.print()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white rounded-xl text-xs font-bold shadow-md flex items-center gap-2 transition-all cursor-pointer">
             <i class="bi bi-printer-fill text-sm"></i> Print Roster
           </button>
         </div>
@@ -324,7 +344,22 @@
           <option value="${ev.id}">${ev.title} (${ev.event_date || 'Upcoming'})</option>
         `).join('');
 
-        currentEventId = events[0].id;
+        // Parse URL parameters for event pre-selection (e.g. ?event=ICET-2026 or ?event_id=1 or ?title=Hackathon)
+        const urlParams = new URLSearchParams(window.location.search);
+        const paramEvent = (urlParams.get('event') || urlParams.get('event_id') || urlParams.get('title') || urlParams.get('id') || '').toLowerCase().trim();
+
+        let matched = events[0];
+        if (paramEvent) {
+          const found = events.find(ev => 
+            String(ev.id).toLowerCase() === paramEvent || 
+            (ev.title || '').toLowerCase().includes(paramEvent) ||
+            paramEvent.includes((ev.title || '').toLowerCase())
+          );
+          if (found) matched = found;
+        }
+
+        currentEventId = matched.id;
+        select.value = currentEventId;
         loadEventRoster(currentEventId);
       } catch (err) {
         console.error('Failed to load events dropdown:', err);
@@ -478,6 +513,17 @@
       }).join('');
     }
 
+    function recalculateStatsAndRender() {
+      const total = currentRosterData.length;
+      const verified = currentRosterData.filter(r => (r.payment_status || '').toLowerCase().includes('verif') || (r.registration_fee || '').toLowerCase().includes('free')).length;
+      const present = currentRosterData.filter(r => (r.attendance_status || '').toLowerCase() === 'present').length;
+      const absent = total - present;
+      const checkInPercentage = total > 0 ? ((present / total) * 100).toFixed(0) : 0;
+
+      updateSummaryStats({ total, verified, present, absent, checkInPercentage });
+      applyRosterFilters();
+    }
+
     async function toggleRowAttendance(id, newStatus, btnElem) {
       if (btnElem) {
         btnElem.disabled = true;
@@ -499,8 +545,24 @@
         }
         if (!res.ok) throw new Error('Failed to update attendance');
         
-        showToast(`Attendance updated to ${newStatus}`);
-        await loadEventRoster(currentEventId);
+        const data = await res.json();
+        if (data && data.registration) {
+          const updatedReg = data.registration;
+          const idx = currentRosterData.findIndex(r => String(r.id) === String(updatedReg.id) || (r.token_no && r.token_no === updatedReg.token_no));
+          if (idx !== -1) {
+            currentRosterData[idx] = updatedReg;
+          } else {
+            currentRosterData.unshift(updatedReg);
+          }
+
+          if (activeRegistration && (String(activeRegistration.id) === String(updatedReg.id) || activeRegistration.token_no === updatedReg.token_no)) {
+            activeRegistration = updatedReg;
+            renderActiveAttendeeCard(activeRegistration);
+          }
+        }
+
+        recalculateStatsAndRender();
+        showToast(`Attendance updated to ${newStatus} for ${data.registration ? data.registration.name : 'attendee'}`);
       } catch (err) {
         showToast(err.message, 'error');
       } finally {
@@ -609,10 +671,22 @@
         }
         if (!res.ok) throw new Error('Check-in failed');
         const data = await res.json();
-        activeRegistration = data.registration;
-        renderActiveAttendeeCard(activeRegistration);
+        
+        if (data && data.registration) {
+          const updatedReg = data.registration;
+          activeRegistration = updatedReg;
+          renderActiveAttendeeCard(activeRegistration);
+
+          const idx = currentRosterData.findIndex(r => String(r.id) === String(updatedReg.id) || (r.token_no && r.token_no === updatedReg.token_no));
+          if (idx !== -1) {
+            currentRosterData[idx] = updatedReg;
+          } else {
+            currentRosterData.unshift(updatedReg);
+          }
+          recalculateStatsAndRender();
+        }
+
         showToast(`Attendance marked as ${status} for ${activeRegistration.name}`);
-        await loadEventRoster(currentEventId);
       } catch (err) {
         showToast(err.message, 'error');
       } finally {
@@ -635,7 +709,7 @@
 
     function startCameraScanner() {
       if (typeof Html5Qrcode === 'undefined') {
-        alert('QR Scanner library loading... Please retry in a moment.');
+        showToast('QR Scanner library loading... Please retry in a moment.', 'error');
         return;
       }
 
@@ -652,7 +726,7 @@
         },
         () => {}
       ).catch(err => {
-        alert('Camera access notice: ' + err);
+        showToast('Camera access notice: ' + err, 'error');
         document.getElementById('scanner-placeholder').classList.remove('hidden');
       });
 
@@ -669,15 +743,27 @@
       }
     }
 
-    // Export CSV Attendance Report
-    function exportAttendanceCSV() {
+    // Export CSV Attendance Report (Filtered / All)
+    function exportAttendanceCSV(filterMode = 'all') {
       if (!currentRosterData || currentRosterData.length === 0) {
-        alert('No attendance data available to export.');
+        showToast('No attendance data available to export.', 'error');
+        return;
+      }
+
+      let exportRows = currentRosterData;
+      if (filterMode === 'present') {
+        exportRows = currentRosterData.filter(r => (r.attendance_status || '').toLowerCase() === 'present');
+      } else if (filterMode === 'verified') {
+        exportRows = currentRosterData.filter(r => (r.payment_status || '').toLowerCase().includes('verif') || (r.registration_fee || '').toLowerCase().includes('free'));
+      }
+
+      if (exportRows.length === 0) {
+        showToast(`No records match "${filterMode}" export criteria.`, 'error');
         return;
       }
 
       const headers = ['Token No', 'Name', 'Email', 'Phone', 'Category', 'Organization', 'Department', 'Fee', 'Txn UTR', 'Payment Status', 'Attendance Status', 'Checked-In Timestamp'];
-      const rows = currentRosterData.map(r => [
+      const rows = exportRows.map(r => [
         `"${r.token_no || ''}"`,
         `"${r.name || ''}"`,
         `"${r.email || ''}"`,
@@ -696,10 +782,11 @@
       const encodedUri = encodeURI(csvContent);
       const link = document.createElement('a');
       link.setAttribute('href', encodedUri);
-      link.setAttribute('download', `SST_Event_Attendance_Report_${Date.now()}.csv`);
+      link.setAttribute('download', `SST_${filterMode.toUpperCase()}_Attendance_Report_${Date.now()}.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      showToast(`Exported ${exportRows.length} ${filterMode} attendance records to CSV!`);
     }
   </script>
 </body>
