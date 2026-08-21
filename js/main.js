@@ -220,17 +220,7 @@ function initForms() {
     });
   }
 
-  const membershipForm = document.getElementById('membership-form');
-  if (membershipForm && !membershipForm.dataset.mainBound) {
-    membershipForm.dataset.mainBound = 'true';
-    membershipForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      if (typeof window.submitMembershipApplication === 'function') {
-        await window.submitMembershipApplication(e);
-      }
-    });
-  }
+  // membership-form submission is handled directly via onsubmit in membership.html & dynamic-content.js
 }
 
 // 4. Events Search & Filtering (events.html)

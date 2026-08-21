@@ -392,7 +392,7 @@
     `).join('');
   }
 
-  // 4. Load Dynamic Events Listing
+  // 4. Load Dynamic Events & Courses Listing
   async function loadEvents() {
     const container = document.getElementById('dynamic-events-container');
     if (!container) return;
@@ -400,13 +400,29 @@
     renderEventsSkeleton(container);
 
     try {
-      const res = await fetch(`${API_BASE}/api/public/events`);
-      const data = await res.json();
-      window.allEventsData = data.events || [];
+      const [evRes, courseRes] = await Promise.all([
+        fetch(`${API_BASE}/api/public/events`).then(r => r.json()).catch(() => ({ events: [] })),
+        fetch(`${API_BASE}/api/public/courses-services`).then(r => r.json()).catch(() => ({ courses: [] }))
+      ]);
+
+      const coursesAsEvents = (courseRes.courses || []).map(c => ({
+        id: `course-${c.id}`,
+        is_course: true,
+        title: c.title,
+        category: `Courses & Training | ${c.category || 'Professional Course'}`,
+        description: c.description || '',
+        event_date: c.duration ? `Duration: ${c.duration}` : 'Flexible Cohort Batch',
+        location: c.mode || 'Online / Hybrid Hands-on',
+        registration_fee: c.pricing || 'Contact for Fee',
+        image_url: c.image_url || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=600&q=80',
+        status: c.status || 'Upcoming'
+      }));
+
+      window.allEventsData = [...(evRes.events || []), ...coursesAsEvents];
       window.applyEventFilters();
       if (typeof window.handleSharedEventParam === 'function') window.handleSharedEventParam();
     } catch (err) {
-      console.warn('Could not fetch events from DB:', err);
+      console.warn('Could not fetch events/courses from DB:', err);
       window.allEventsData = [];
       window.applyEventFilters();
     }
@@ -433,11 +449,12 @@
         return false;
       }
 
-      // 2. Event Type Filter (Tier 1)
+      // 2. Event Type & Courses Filter (Tier 1)
       if (type && type !== 'all') {
         const t = type.toLowerCase();
         let matches = false;
-        if (t.includes('conference') && combined.includes('conference')) matches = true;
+        if ((t.includes('course') || t.includes('professional training')) && (combined.includes('course') || combined.includes('training') || ev.is_course)) matches = true;
+        else if (t.includes('conference') && combined.includes('conference')) matches = true;
         else if ((t.includes('faculty') || t.includes('fdp')) && (combined.includes('faculty') || combined.includes('fdp'))) matches = true;
         else if (t.includes('webinar') && combined.includes('webinar')) matches = true;
         else if ((t.includes('training') || t.includes('hands')) && (combined.includes('hands on') || combined.includes('hands-on') || combined.includes('training') || combined.includes('workshop'))) matches = true;
@@ -1379,6 +1396,9 @@
   // 11-Field Membership Application Submission Handler
   window.submitMembershipApplication = async function (e) {
     if (e && e.preventDefault) e.preventDefault();
+    if (window.isMembershipSubmitting) return;
+    window.isMembershipSubmitting = true;
+
     const submitBtn = document.getElementById('member-submit-btn');
     const originalText = submitBtn ? submitBtn.innerHTML : 'Submit Application';
 
@@ -1398,26 +1418,31 @@
     };
 
     if (!body.name || body.name.length < 2) {
+      window.isMembershipSubmitting = false;
       showPublicModalNotice('Name Required', 'Please enter your full name (minimum 2 characters).', true);
       return;
     }
 
     if (!window.isValidEmail(body.email)) {
+      window.isMembershipSubmitting = false;
       showPublicModalNotice('Invalid Email', 'Please enter a valid email address (e.g., name@domain.com).', true);
       return;
     }
 
     if (body.phone && !window.isValidPhone(body.phone)) {
+      window.isMembershipSubmitting = false;
       showPublicModalNotice('Invalid Phone', 'Please enter a valid contact phone number.', true);
       return;
     }
 
     if (!body.membership_type) {
+      window.isMembershipSubmitting = false;
       showPublicModalNotice('Category Required', 'Please select a valid membership category.', true);
       return;
     }
 
     if (declEl && !declEl.checked) {
+      window.isMembershipSubmitting = false;
       showPublicModalNotice('Declaration Required', 'Please accept the declaration checkbox to confirm your details are accurate.', true);
       return;
     }
@@ -1450,6 +1475,7 @@
     } catch (err) {
       showPublicModalNotice(err.is_duplicate ? 'Application Already Exists' : 'Submission Error', err.message, true, err.token_no || null);
     } finally {
+      window.isMembershipSubmitting = false;
       if (submitBtn) {
         submitBtn.disabled = false;
         submitBtn.innerHTML = originalText;
