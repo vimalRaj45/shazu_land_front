@@ -1355,9 +1355,18 @@
         throw err;
       }
       closePublicModal();
-      const token = data.token_no || (data.registration && data.registration.token_no);
-      if (token) localStorage.setItem('sst_last_token', token);
-      showPublicModalNotice('Registration Confirmed!', 'Thank you for registering! Your event pass dossier has been recorded and emailed to you. We will contact you shortly.', false, token);
+      if (data.is_pending_payment) {
+        showPublicModalNotice(
+          'Payment Verification Pending ⏳',
+          'Thank you for registering! Your registration has been received. Because this is a paid event, your official entry pass token and attendance QR code will be dispatched to your registered email once payment (UTR) is verified by Admin.',
+          false,
+          null
+        );
+      } else {
+        const token = data.token_no || (data.registration && data.registration.token_no);
+        if (token) localStorage.setItem('sst_last_token', token);
+        showPublicModalNotice('Registration Confirmed!', 'Thank you for registering! Your event pass dossier has been recorded and emailed to you. We will contact you shortly.', false, token);
+      }
     } catch (err) {
       if (submitBtn) {
         submitBtn.disabled = false;
