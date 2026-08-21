@@ -339,9 +339,10 @@
     async function loadEventRoster(eventId) {
       if (!eventId) return;
       try {
-        const res = await fetch(`${API_BASE}/api/admin/events/${eventId}/attendance-roster`, {
-          headers: getAuthHeaders()
-        });
+        let res = await fetch(`${API_BASE}/api/public/events/${eventId}/attendance-roster`);
+        if (!res.ok) {
+          res = await fetch(`${API_BASE}/api/admin/events/${eventId}/attendance-roster`, { headers: getAuthHeaders() });
+        }
         if (!res.ok) throw new Error('Could not load roster');
         const data = await res.json();
 
@@ -393,7 +394,7 @@
       if (!tbody) return;
 
       if (!roster || roster.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-slate-400">No registered attendees matching criteria.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-slate-400">No registered attendees matching criteria for this event.</td></tr>`;
         return;
       }
 
@@ -431,11 +432,18 @@
 
     async function toggleRowAttendance(id, newStatus) {
       try {
-        const res = await fetch(`${API_BASE}/api/admin/event-registrations/${id}/attendance`, {
+        let res = await fetch(`${API_BASE}/api/public/event-registrations/${id}/attendance`, {
           method: 'POST',
-          headers: getAuthHeaders(),
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ status: newStatus })
         });
+        if (!res.ok) {
+          res = await fetch(`${API_BASE}/api/admin/event-registrations/${id}/attendance`, {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ status: newStatus })
+          });
+        }
         if (!res.ok) throw new Error('Failed to update attendance');
         loadEventRoster(currentEventId);
       } catch (err) {
@@ -445,9 +453,12 @@
 
     async function lookupToken(token) {
       try {
-        const res = await fetch(`${API_BASE}/api/admin/event-registrations/scan/${encodeURIComponent(token)}`, {
-          headers: getAuthHeaders()
-        });
+        let res = await fetch(`${API_BASE}/api/public/event-registrations/scan/${encodeURIComponent(token)}`);
+        if (!res.ok) {
+          res = await fetch(`${API_BASE}/api/admin/event-registrations/scan/${encodeURIComponent(token)}`, {
+            headers: getAuthHeaders()
+          });
+        }
         if (!res.ok) throw new Error(`Token "${token}" not found in system.`);
         const data = await res.json();
         activeRegistration = data.registration;
