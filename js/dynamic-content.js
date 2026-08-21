@@ -75,7 +75,7 @@
         </div>
       `).join('');
 
-      container.className = 'w-full bg-[#123B32] text-white border-b border-[#527A68]/40 py-1.5 px-4 overflow-hidden shadow-xs relative z-30 flex items-center gap-3 transition-all duration-200';
+      container.className = 'w-full bg-[#123B32] text-white border-b border-[#527A68]/40 py-1.5 px-4 overflow-hidden shadow-xs relative z-10 flex items-center gap-3 transition-all duration-200';
       container.innerHTML = `
         <!-- Left Fixed Announcements Trigger Button -->
         <a href="announcements.html" class="shrink-0 bg-[#C47D4C] hover:bg-[#a66439] text-white text-[11px] font-bold px-3 py-1 rounded-full shadow-md flex items-center gap-1.5 cursor-pointer z-10 transition-colors">
