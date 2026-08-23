@@ -282,41 +282,7 @@
   };
 
   // 3. Load Dynamic Careers Listing
-  const DEFAULT_SAMPLE_CAREERS = [
-    {
-      id: 1,
-      title: 'Full Stack Web Developer (Node.js & React)',
-      department: 'Software Engineering',
-      location: 'Salem, TN (On-site / Hybrid)',
-      job_type: 'Full-time',
-      salary_range: '₹4.5L - ₹7.5L / year',
-      description: 'Design and develop scalable full-stack web applications, REST APIs, and microservices.',
-      requirements: 'Node.js, React, PostgreSQL, REST APIs',
-      status: 'Open'
-    },
-    {
-      id: 2,
-      title: 'Junior UI/UX & Web Designer',
-      department: 'Design',
-      location: 'Salem, TN',
-      job_type: 'Full-time / Internship',
-      salary_range: '₹3.0L - ₹5.0L / year',
-      description: 'Create modern, interactive, and responsive UI components and design systems.',
-      requirements: 'Figma, Tailwind CSS, HTML5, UI/UX',
-      status: 'Open'
-    },
-    {
-      id: 3,
-      title: 'Process Associate / Operations Analyst',
-      department: 'Operations',
-      location: 'Salem, TN',
-      job_type: 'Internship',
-      salary_range: '₹2.8L - ₹4.0L / year',
-      description: 'Assist in research documentation, corporate communications, and project workflows.',
-      requirements: 'Research, MS Excel, Communication, Documentation',
-      status: 'Open'
-    }
-  ];
+  const DEFAULT_SAMPLE_CAREERS = [];
 
   function renderCareers(jobs) {
     const container = document.getElementById('dynamic-careers-container') || document.getElementById('dynamic-jobs-container');
@@ -356,7 +322,7 @@
             </div>
 
             <div>
-              <h3 class="text-lg font-bold font-heading text-brand-darkText dark:text-white group-hover:text-brand-green transition-colors leading-snug">
+              <h3 onclick="openJobDetailsModal('${job.id}')" class="text-lg font-bold font-heading text-brand-darkText dark:text-white hover:text-brand-green dark:hover:text-emerald-400 cursor-pointer transition-colors leading-snug">
                 ${job.title}
               </h3>
               <div class="flex items-center gap-3 mt-2 text-xs text-slate-500 dark:text-slate-400 flex-wrap">
@@ -381,11 +347,15 @@
             ` : ''}
           </div>
 
-          <div class="pt-5 mt-5 border-t border-slate-100 dark:border-slate-800">
-            <button onclick="openApplyModal('${job.id}', '${encodeURIComponent(job.title)}')" class="w-full py-3 bg-[#123B32] hover:bg-[#C47D4C] text-white font-bold text-xs rounded-2xl transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-xl cursor-pointer">
-              <i class="bi bi-file-earmark-person text-sm"></i>
+          <div class="pt-5 mt-5 border-t border-slate-100 dark:border-slate-800 flex flex-col gap-2">
+            <button type="button" onclick="openJobDetailsModal('${job.id}')" class="w-full py-2.5 bg-slate-100 hover:bg-[#E8EFEB] dark:bg-slate-800 dark:hover:bg-slate-700 text-[#123B32] dark:text-emerald-400 font-bold text-xs rounded-xl transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer">
+              <i class="bi bi-eye text-xs"></i>
+              <span>View Full Details</span>
+            </button>
+            <button type="button" onclick="openApplyModal('${job.id}', '${encodeURIComponent(job.title)}')" class="w-full py-2.5 bg-[#123B32] hover:bg-[#C47D4C] text-white font-bold text-xs rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-xs hover:shadow-md cursor-pointer">
+              <i class="bi bi-file-earmark-person text-xs"></i>
               <span>Apply For Position</span>
-              <i class="bi bi-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
+              <i class="bi bi-arrow-right text-xs group-hover:translate-x-0.5 transition-transform"></i>
             </button>
           </div>
         </div>
@@ -754,7 +724,123 @@
     }
   };
 
-  // 5. Global Modal Helpers for Apply & Event Register
+  // 5. Global Modal Helpers for Job Details, Apply & Event Register
+  window.openJobDetailsModal = async function(jobId) {
+    let job = (window.allCareersData || []).find(j => String(j.id) === String(jobId));
+    if (!job) {
+      try {
+        const res = await fetch(`${API_BASE}/api/public/careers`);
+        if (res.ok) {
+          const list = await res.json();
+          window.allCareersData = list;
+          job = (list || []).find(j => String(j.id) === String(jobId));
+        }
+      } catch (e) {
+        console.warn('Failed to fetch job details:', e);
+      }
+    }
+    if (!job) {
+      if (window.toast) window.toast.error('Job opening details not found');
+      else alert('Job opening details not found');
+      return;
+    }
+
+    window.closePublicModal();
+    document.body.style.overflow = 'hidden';
+
+    const skills = (job.requirements || '').split(',').map(s => s.trim()).filter(Boolean);
+    const salary = job.salary_range ? job.salary_range : 'Best in Industry';
+    const jobType = job.job_type ? job.job_type : 'Full-time';
+    const location = job.location || 'Salem, Tamil Nadu';
+    const dept = job.department || 'General';
+
+    const modalHtml = `
+      <div id="public-modal-backdrop" onclick="if(event.target === this) closePublicModal()" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 border border-[#D3DDD7] dark:border-slate-800 w-full max-w-2xl rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 text-[#0F172A] dark:text-slate-100 max-h-[90vh] overflow-y-auto no-scrollbar">
+          
+          <!-- Header -->
+          <div class="flex items-start justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
+            <div class="space-y-2">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="px-3 py-1 bg-[#E8EFEB] dark:bg-emerald-950/70 text-[#123B32] dark:text-emerald-400 font-bold text-xs rounded-full uppercase tracking-wider">
+                  ${dept}
+                </span>
+                <span class="px-2.5 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs rounded-md">
+                  ${jobType}
+                </span>
+                <span class="px-2.5 py-0.5 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300 font-bold text-xs rounded-md">
+                  Open
+                </span>
+              </div>
+              <h2 class="text-xl sm:text-2xl font-black font-heading text-brand-darkText dark:text-white leading-tight">
+                ${job.title}
+              </h2>
+            </div>
+            <button onclick="closePublicModal()" class="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center transition-colors cursor-pointer shrink-0">
+              <i class="bi bi-x-lg text-sm pointer-events-none"></i>
+            </button>
+          </div>
+
+          <!-- Quick Spec Cards -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="p-3.5 bg-[#F8FAFC] dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 rounded-2xl">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Location</span>
+              <div class="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                <i class="bi bi-geo-alt-fill text-[#123B32] dark:text-emerald-400"></i>
+                <span>${location}</span>
+              </div>
+            </div>
+            <div class="p-3.5 bg-[#F8FAFC] dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 rounded-2xl">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Work Type & Hours</span>
+              <div class="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                <i class="bi bi-clock-fill text-[#C47D4C]"></i>
+                <span>${jobType}</span>
+              </div>
+            </div>
+            <div class="p-3.5 bg-[#F8FAFC] dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 rounded-2xl">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Compensation / Pay</span>
+              <div class="text-xs font-bold text-amber-700 dark:text-amber-400 font-mono flex items-center gap-1.5">
+                <i class="bi bi-cash-stack"></i>
+                <span>${salary}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Full Description & Requirements Body -->
+          <div class="space-y-3">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Role Details & Description</h4>
+            <div class="p-4 bg-[#F8FAFC] dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 rounded-2xl text-xs sm:text-sm text-slate-700 dark:text-slate-200 leading-relaxed whitespace-pre-line font-sans">
+${job.description || 'No description provided.'}
+            </div>
+          </div>
+
+          ${skills.length > 0 ? `
+            <div class="space-y-2">
+              <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Skills & Focus Areas</h4>
+              <div class="flex flex-wrap gap-1.5">
+                ${skills.map(s => `<span class="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-semibold">${s}</span>`).join('')}
+              </div>
+            </div>
+          ` : ''}
+
+          <!-- Footer Actions -->
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-slate-200 dark:border-slate-800">
+            <button type="button" onclick="closePublicModal()" class="w-full sm:w-auto px-5 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs rounded-xl transition-all cursor-pointer">
+              Close
+            </button>
+            <button type="button" onclick="closePublicModal(); openApplyModal('${job.id}', '${encodeURIComponent(job.title)}')" class="w-full sm:w-auto px-6 py-2.5 bg-[#123B32] hover:bg-[#C47D4C] text-white font-extrabold text-xs rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer">
+              <i class="bi bi-file-earmark-person"></i>
+              <span>Apply For Position</span>
+              <i class="bi bi-arrow-right text-xs"></i>
+            </button>
+          </div>
+
+        </div>
+      </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+  };
+
   window.openApplyModal = function (jobId, encodedTitle) {
     let title = 'Position';
     let id = jobId || '1';
