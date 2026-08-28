@@ -85,20 +85,11 @@
           </div>
         </a>
 
-        <!-- About Us Accordion -->
-        <div class="mobile-accordion space-y-1">
-          <button type="button" class="mobile-accordion-toggle flex items-center justify-between w-full px-3.5 py-2.5 rounded-lg font-bold text-xs text-[#123B32] bg-[#E8EFEB] border-l-3 border-[#123B32] transition-all cursor-pointer">
-            <div class="flex items-center gap-3">
-              <i class="uil uil-info-circle text-base text-[#123B32]"></i>
-              <span>About Us</span>
-            </div>
-            <i class="bi bi-chevron-down text-[10px] transition-transform duration-200 accordion-arrow rotate-180"></i>
-          </button>
-          <div class="mobile-accordion-menu pl-9 space-y-1.5 pt-1 border-l border-slate-100 dark:border-slate-800 ml-4">
-            <a href="about.html" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32]">About Company</a>
-            <a href="membership.html" class="block py-1 text-xs text-[#123B32] font-bold">Membership & Chapters</a>
-          </div>
-        </div>
+        <!-- About Us Direct Link -->
+        <a href="about.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg font-medium text-xs text-[#475569] dark:text-[#cbd5e1] hover:text-[#123B32] hover:bg-[#E8EFEB] dark:hover:bg-[#1e293b] transition-all">
+          <i class="uil uil-info-circle text-base text-[#123B32]"></i>
+          <span>About Us</span>
+        </a>
 
         <!-- Services Accordion -->
         <div class="mobile-accordion space-y-1">
@@ -126,10 +117,28 @@
             <i class="bi bi-chevron-down text-[10px] transition-transform duration-200 accordion-arrow"></i>
           </button>
           <div class="mobile-accordion-menu hidden pl-9 space-y-1.5 pt-1 border-l border-slate-100 dark:border-slate-800 ml-4">
-            <a href="events.html" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32]">Upcoming Events</a>
-            <a href="events.html#hackathons" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32]">Hackathons & Contests</a>
+            <a href="events.html?type=conference" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32] flex items-center gap-1.5">
+              <i class="bi bi-mortarboard-fill text-amber-500 text-[10px]"></i> Conferences & Symposia
+            </a>
+            <a href="events.html?type=hackathon" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32] flex items-center gap-1.5">
+              <i class="bi bi-trophy-fill text-emerald-500 text-[10px]"></i> Hackathons & Contests
+            </a>
+            <a href="events.html?type=fdp" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32] flex items-center gap-1.5">
+              <i class="bi bi-person-video3 text-blue-500 text-[10px]"></i> FDP & Workshops
+            </a>
+            <a href="events.html?type=courses" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32] flex items-center gap-1.5">
+              <i class="bi bi-journal-code text-purple-500 text-[10px]"></i> Professional Courses
+            </a>
           </div>
         </div>
+
+        <!-- Gallery Direct Link -->
+        <a href="gallery.html" class="flex items-center justify-between px-3.5 py-2.5 rounded-lg font-medium text-xs text-[#475569] dark:text-[#cbd5e1] hover:text-[#123B32] hover:bg-[#E8EFEB] dark:hover:bg-[#1e293b] transition-all">
+          <div class="flex items-center gap-3">
+            <i class="bi bi-images text-base text-[#123B32]"></i>
+            <span>Gallery</span>
+          </div>
+        </a>
 
         <a href="careers.html" class="flex items-center justify-between px-3.5 py-2.5 rounded-lg font-medium text-xs text-[#475569] hover:text-[#123B32] hover:bg-[#E8EFEB] transition-all">
           <div class="flex items-center gap-3">
@@ -174,24 +183,8 @@
       <nav class="hidden lg:flex items-center space-x-1 font-heading shrink-0">
         <a href="index.html" class="nav-link-pill"><i class="uil uil-estate text-[14px]"></i>Home</a>
 
-        <!-- About Us Dropdown -->
-        <div class="relative group">
-          <a href="about.html" class="nav-link-pill active flex items-center gap-1">
-            <i class="uil uil-info-circle text-[14px]"></i>
-            <span>About Us</span>
-            <i class="bi bi-chevron-down text-[10px] ml-0.5 transition-transform duration-200 group-hover:rotate-180"></i>
-          </a>
-          <div class="absolute left-0 top-full pt-2 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 z-50 min-w-[210px]">
-            <div class="nav-dropdown-menu p-1.5 space-y-0.5">
-              <a href="about.html" class="nav-dropdown-item block px-3.5 py-2">
-                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32]">About Company</span>
-              </a>
-              <a href="membership.html" class="nav-dropdown-item block px-3.5 py-2">
-                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32]">Membership & Chapters</span>
-              </a>
-            </div>
-          </div>
-        </div>
+        <!-- About Us Direct Link -->
+        <a href="about.html" class="nav-link-pill dark:text-[#E2E8F0] dark:hover:text-[#6EE7B7]"><i class="uil uil-info-circle text-[14px]"></i>About Us</a>
 
         <!-- Services Dropdown -->
         <div class="relative group">
@@ -220,28 +213,45 @@
 
         <!-- Events Dropdown -->
         <div class="relative group">
-          <a href="events.html" class="nav-link-pill flex items-center gap-1">
+          <a href="events.html" class="nav-link-pill flex items-center gap-1 dark:text-[#E2E8F0] dark:hover:text-[#6EE7B7]">
             <i class="uil uil-calendar-alt text-[14px]"></i>
             <span>Events</span>
             <i class="bi bi-chevron-down text-[10px] ml-0.5 transition-transform duration-200 group-hover:rotate-180"></i>
           </a>
-          <div class="absolute left-0 top-full pt-2 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 z-50 min-w-[210px]">
+          <div class="absolute left-0 top-full pt-2 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 z-50 min-w-[240px]">
             <div class="nav-dropdown-menu p-1.5 space-y-0.5">
-              <a href="events.html" class="nav-dropdown-item block px-3.5 py-2">
-                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32]">Upcoming Events</span>
+              <a href="events.html?type=conference" class="nav-dropdown-item block px-3.5 py-2">
+                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32] flex items-center gap-2">
+                  <i class="bi bi-mortarboard-fill text-amber-500"></i> Conferences & Symposia
+                </span>
               </a>
-              <a href="events.html#hackathons" class="nav-dropdown-item block px-3.5 py-2">
-                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32]">Hackathons & Contests</span>
+              <a href="events.html?type=hackathon" class="nav-dropdown-item block px-3.5 py-2">
+                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32] flex items-center gap-2">
+                  <i class="bi bi-trophy-fill text-emerald-500"></i> Hackathons & Contests
+                </span>
+              </a>
+              <a href="events.html?type=fdp" class="nav-dropdown-item block px-3.5 py-2">
+                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32] flex items-center gap-2">
+                  <i class="bi bi-person-video3 text-blue-500"></i> FDP & Workshops
+                </span>
+              </a>
+              <a href="events.html?type=courses" class="nav-dropdown-item block px-3.5 py-2">
+                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32] flex items-center gap-2">
+                  <i class="bi bi-journal-code text-purple-500"></i> Professional Courses
+                </span>
               </a>
             </div>
           </div>
         </div>
 
-        <a href="careers.html" class="nav-link-pill"><i class="uil uil-briefcase-alt text-[14px]"></i>Career</a>
+        <!-- Gallery Nav Pill -->
+        <a href="gallery.html" class="nav-link-pill dark:text-[#E2E8F0] dark:hover:text-[#6EE7B7]"><i class="bi bi-images text-[14px]"></i>Gallery</a>
+
+        <a href="careers.html" class="nav-link-pill dark:text-[#E2E8F0] dark:hover:text-[#6EE7B7]"><i class="uil uil-briefcase-alt text-[14px]"></i>Career</a>
 
         <!-- Contact Dropdown -->
         <div class="relative group">
-          <a href="contact.html" class="nav-link-pill flex items-center gap-1">
+          <a href="contact.html" class="nav-link-pill flex items-center gap-1 dark:text-[#E2E8F0] dark:hover:text-[#6EE7B7]">
             <i class="uil uil-envelope text-[14px]"></i>
             <span>Contact Us</span>
             <i class="bi bi-chevron-down text-[10px] ml-0.5 transition-transform duration-200 group-hover:rotate-180"></i>
@@ -362,29 +372,98 @@
     </section>
 
     <!-- Member Associations section -->
-    <section data-aos="fade-up" class="py-12 md:py-10 md:py-12 bg-white">
-      <div class="max-w-7xl mx-auto px-6">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          <div class="lg:col-span-7 space-y-6">
-            <h2 class="text-2xl md:text-3xl font-extrabold font-heading text-brand-darkText">Member Associations</h2>
-            <div class="w-12 h-1 bg-brand-green rounded"></div>
-            <p class="text-brand-secText text-sm leading-relaxed">
-              We connect members with international scientific divisions. Becoming a member establishes credentials in regional research, coordinates technical chapters, and gives continuous access to digital library resources.
-            </p>
-            <p class="text-brand-secText text-sm leading-relaxed">
-              Associations collaborate to host annual engineering forums, peer-review candidate journals, and verify laboratory practices for institutional accreditations.
-            </p>
-          </div>
-          <div class="lg:col-span-5">
-            <div class="p-5 border border-brand-border rounded-xl bg-brand-lightGreen/10 space-y-4">
-              <h4 class="font-heading font-bold text-sm text-brand-darkText">Associated Chapters</h4>
-              <ul class="space-y-3 text-xs text-brand-secText">
-                <li class="flex items-center gap-2"><i class="bi bi-link-45deg text-brand-green"></i> Scientific Computing Chapter</li>
-                <li class="flex items-center gap-2"><i class="bi bi-link-45deg text-brand-green"></i> Educational Pedagogy Chapter</li>
-                <li class="flex items-center gap-2"><i class="bi bi-link-45deg text-brand-green"></i> Applied Sciences Alliance</li>
-              </ul>
+    <section data-aos="fade-up" class="py-14 md:py-16 bg-white dark:bg-slate-900">
+      <div class="max-w-7xl mx-auto px-6 space-y-10">
+        <div class="max-w-3xl space-y-3">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-extrabold text-[11px] uppercase tracking-wider border border-emerald-300/50 dark:border-emerald-800">
+            <i class="bi bi-patch-check-fill"></i> Official Seal Charters
+          </span>
+          <h2 class="text-2xl md:text-3xl font-black font-heading text-brand-darkText dark:text-white tracking-tight">
+            Official Member Associations & Global Charters
+          </h2>
+          <p class="text-xs sm:text-sm text-brand-secText dark:text-slate-400 leading-relaxed">
+            Shazu Soft Technologies is officially affiliated with 4 specialized international bodies, connecting multidisciplinary researchers, scientists, and educators worldwide.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          
+          <!-- Association 1: ISEI -->
+          <div class="p-6 rounded-3xl border border-slate-200 dark:border-slate-800 bg-[#F8FAFC] dark:bg-slate-950/60 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 space-y-4 group flex flex-col justify-between">
+            <div class="space-y-4">
+              <div class="w-24 h-24 mx-auto rounded-full overflow-hidden p-1 bg-white dark:bg-slate-900 border border-emerald-300/40 dark:border-emerald-500/30 shadow-md group-hover:scale-105 transition-transform duration-300 flex items-center justify-center">
+                <img src="img/seal-science-engineering.png" alt="Institute of Science, Engineering and Innovation Official Charter Seal" loading="lazy" decoding="async" class="w-full h-full object-contain rounded-full">
+              </div>
+              <div class="text-center space-y-1">
+                <span class="inline-block px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 text-[10px] font-mono font-bold uppercase tracking-widest">ISEI</span>
+                <h3 class="text-sm font-bold font-heading text-slate-900 dark:text-white leading-snug">Institute of Science, Engineering and Innovation</h3>
+              </div>
+              <p class="text-slate-500 dark:text-slate-400 text-xs leading-relaxed text-center">
+                Dedicated to breakthrough technology patents, computational science, artificial intelligence, and applied engineering.
+              </p>
+            </div>
+            <div class="pt-3 border-t border-slate-200/70 dark:border-slate-800/80 text-center">
+              <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Global Affiliated Charter</span>
             </div>
           </div>
+
+          <!-- Association 2: ACAR -->
+          <div class="p-6 rounded-3xl border border-slate-200 dark:border-slate-800 bg-[#F8FAFC] dark:bg-slate-950/60 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 space-y-4 group flex flex-col justify-between">
+            <div class="space-y-4">
+              <div class="w-24 h-24 mx-auto rounded-full overflow-hidden p-1 bg-white dark:bg-slate-900 border border-amber-300/40 dark:border-amber-500/30 shadow-md group-hover:scale-105 transition-transform duration-300 flex items-center justify-center">
+                <img src="img/seal-arts-research.jpg" alt="Association Creative Arts and Research Official Charter Seal" loading="lazy" decoding="async" class="w-full h-full object-contain rounded-full">
+              </div>
+              <div class="text-center space-y-1">
+                <span class="inline-block px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/70 text-amber-700 dark:text-amber-300 text-[10px] font-mono font-bold uppercase tracking-widest">ACAR</span>
+                <h3 class="text-sm font-bold font-heading text-slate-900 dark:text-white leading-snug">Association Creative Arts and Research</h3>
+              </div>
+              <p class="text-slate-500 dark:text-slate-400 text-xs leading-relaxed text-center">
+                Fostering interdisciplinary research across design, media, creative computation, and digital pedagogy.
+              </p>
+            </div>
+            <div class="pt-3 border-t border-slate-200/70 dark:border-slate-800/80 text-center">
+              <span class="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">Global Affiliated Charter</span>
+            </div>
+          </div>
+
+          <!-- Association 3: WASP -->
+          <div class="p-6 rounded-3xl border border-slate-200 dark:border-slate-800 bg-[#F8FAFC] dark:bg-slate-950/60 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 space-y-4 group flex flex-col justify-between">
+            <div class="space-y-4">
+              <div class="w-24 h-24 mx-auto rounded-full overflow-hidden p-1 bg-white dark:bg-slate-900 border border-blue-300/40 dark:border-blue-500/30 shadow-md group-hover:scale-105 transition-transform duration-300 flex items-center justify-center">
+                <img src="img/seal-scholars-professionals.jpg" alt="World Association Scholars and Professionals Official Charter Seal" loading="lazy" decoding="async" class="w-full h-full object-contain rounded-full">
+              </div>
+              <div class="text-center space-y-1">
+                <span class="inline-block px-2.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 text-[10px] font-mono font-bold uppercase tracking-widest">WASP</span>
+                <h3 class="text-sm font-bold font-heading text-slate-900 dark:text-white leading-snug">World Association Scholars and Professionals</h3>
+              </div>
+              <p class="text-slate-500 dark:text-slate-400 text-xs leading-relaxed text-center">
+                Global coalition advancing academic excellence, international fellowships, and peer-reviewed symposium proceedings.
+              </p>
+            </div>
+            <div class="pt-3 border-t border-slate-200/70 dark:border-slate-800/80 text-center">
+              <span class="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Global Affiliated Charter</span>
+            </div>
+          </div>
+
+          <!-- Association 4: IAMHP -->
+          <div class="p-6 rounded-3xl border border-slate-200 dark:border-slate-800 bg-[#F8FAFC] dark:bg-slate-950/60 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 space-y-4 group flex flex-col justify-between">
+            <div class="space-y-4">
+              <div class="w-24 h-24 mx-auto rounded-full overflow-hidden p-1 bg-white dark:bg-slate-900 border border-rose-300/40 dark:border-rose-500/30 shadow-md group-hover:scale-105 transition-transform duration-300 flex items-center justify-center">
+                <img src="img/seal-medical-health.jpg" alt="International Association of Medical and Health Professionals Official Charter Seal" loading="lazy" decoding="async" class="w-full h-full object-contain rounded-full">
+              </div>
+              <div class="text-center space-y-1">
+                <span class="inline-block px-2.5 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950/70 text-rose-700 dark:text-rose-300 text-[10px] font-mono font-bold uppercase tracking-widest">IAMHP</span>
+                <h3 class="text-sm font-bold font-heading text-slate-900 dark:text-white leading-snug">International Association of Medical and Health Professionals</h3>
+              </div>
+              <p class="text-slate-500 dark:text-slate-400 text-xs leading-relaxed text-center">
+                Uniting medical practitioners, healthcare researchers, biomedical engineers, and public health innovators.
+              </p>
+            </div>
+            <div class="pt-3 border-t border-slate-200/70 dark:border-slate-800/80 text-center">
+              <span class="text-[10px] font-bold text-rose-600 dark:text-rose-400 uppercase tracking-wider">Global Affiliated Charter</span>
+            </div>
+          </div>
+
         </div>
       </div>
     </section>
@@ -503,9 +582,6 @@
           <div class="space-y-2">
             <h4 class="font-heading font-bold text-brand-green">Establish Campus Chapters</h4>
             <p class="text-brand-secText text-[11.5px] leading-relaxed">
-              Institutional members gain formal rights to charter local student chapters, inviting guest developers to give expert seminars right inside their premises.
-            </p>
-          </div>
         </div>
       </div>
     </section>
@@ -522,14 +598,18 @@
         </div>
 
         <form id="membership-form" onsubmit="window.submitMembershipApplication(event)" class="space-y-6 border border-slate-200 dark:border-slate-800 p-6 sm:p-8 rounded-3xl bg-[#F8FAFC] dark:bg-slate-950/70 shadow-xl backdrop-blur-md">
-          
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
             <!-- 1. Association Name -->
             <div>
               <label for="member-association" class="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1.5 flex items-center gap-1.5">
                 <i class="bi bi-building text-emerald-600 dark:text-emerald-400"></i> Association / Chapter Name *
               </label>
-              <input type="text" id="member-association" required placeholder="e.g. SST Academic & Research Network" value="SST Academic & Research Network" class="w-full border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 rounded-xl text-xs text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-[#123B32] dark:focus:border-emerald-500 font-sans transition-all">
+              <select id="member-association" required class="w-full border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#123B32] dark:focus:border-emerald-500 font-sans transition-all cursor-pointer">
+                <option value="Institute of Science, Engineering and Innovation">Institute of Science, Engineering and Innovation (ISEI)</option>
+                <option value="Association Creative Arts and Research">Association Creative Arts and Research (ACAR)</option>
+                <option value="World Association Scholars and Professionals">World Association Scholars and Professionals (WASP)</option>
+                <option value="International Association of Medical and Health Professionals">International Association of Medical and Health Professionals (IAMHP)</option>
+              </select>
             </div>
 
             <!-- 2. Membership Type (Professional, Institutional, Student) -->
@@ -538,7 +618,7 @@
                 <i class="bi bi-award text-emerald-600 dark:text-emerald-400"></i> Membership Type *
               </label>
               <select id="member-category" required class="w-full border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-[#123B32] dark:focus:border-emerald-500 font-sans transition-all cursor-pointer">
-                <option value="Professional Member">Professional Member (Engineers, Faculty & Scientists)</option>
+                <option value="Professional Member">Professional Member (Faculty & Scientists)</option>
                 <option value="Institutional Member">Institutional Member (Universities, Colleges & Corporates)</option>
                 <option value="Student Member">Student Member (UG/PG & Research Scholars)</option>
               </select>
@@ -573,7 +653,7 @@
               <label for="member-phone" class="block text-xs font-bold text-slate-800 dark:text-slate-200 mb-1.5 flex items-center gap-1.5">
                 <i class="bi bi-telephone text-emerald-600 dark:text-emerald-400"></i> Contact Number *
               </label>
-              <input type="tel" id="member-phone" required placeholder="+91 98765 43210" class="w-full border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 rounded-xl text-xs text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-[#123B32] dark:focus:border-emerald-500 font-sans transition-all">
+              <input type="tel" id="member-phone" required placeholder="e.g. +91 98765 43210" class="w-full border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 rounded-xl text-xs text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-[#123B32] dark:focus:border-emerald-500 font-sans transition-all">
             </div>
 
             <!-- 7. Email Address -->
@@ -651,17 +731,11 @@
           <a href="https://www.linkedin.com/company/shazu-soft-technologies" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-[#123B32] border border-white/10 hover:border-emerald-500/50 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-xs" title="LinkedIn" aria-label="LinkedIn">
             <i class="bi bi-linkedin text-xs"></i>
           </a>
-          <a href="https://x.com/shazusoft" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-[#123B32] border border-white/10 hover:border-emerald-500/50 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-xs" title="Twitter / X" aria-label="Twitter">
-            <i class="bi bi-twitter-x text-xs"></i>
-          </a>
           <a href="https://www.instagram.com/shazusofttechnologies" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-[#123B32] border border-white/10 hover:border-emerald-500/50 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-xs" title="Instagram" aria-label="Instagram">
             <i class="bi bi-instagram text-xs"></i>
           </a>
           <a href="https://www.facebook.com/shazusofttechnologies" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-[#123B32] border border-white/10 hover:border-emerald-500/50 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-xs" title="Facebook" aria-label="Facebook">
             <i class="bi bi-facebook text-xs"></i>
-          </a>
-          <a href="https://github.com/shazusoft" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-[#123B32] border border-white/10 hover:border-emerald-500/50 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-xs" title="GitHub" aria-label="GitHub">
-            <i class="bi bi-github text-xs"></i>
           </a>
           <a href="https://youtube.com/@shazusofttechnologies" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-[#123B32] border border-white/10 hover:border-emerald-500/50 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-xs" title="YouTube" aria-label="YouTube">
             <i class="bi bi-youtube text-xs"></i>

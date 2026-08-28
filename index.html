@@ -10,7 +10,7 @@
 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shazu Soft Technologies | Innovation, Research & Technology</title>
+  <title>Shazu Soft Technologies | Transforming Ideas into Digital Excellence</title>
   <meta name="description" content="Shazu Soft Technologies is a technology-driven organization integrating software solutions, education, research, professional development, and industry-academia collaboration.">
   <link rel="canonical" href="https://shazusofttechnologies.org/index.html">
   
@@ -56,13 +56,12 @@
 </head>
 <body class="bg-brand-white text-brand-darkText antialiased">
 
-  <!-- Mobile Off-Canvas Backdrop (Root Stacking Context z-index 99988) -->
+  <!-- Mobile Off-Canvas Backdrop -->
   <div id="mobile-backdrop" class="mobile-drawer-backdrop"></div>
 
-  <!-- Mobile Side Navigation Drawer (Root Stacking Context z-index 99999) -->
+  <!-- Mobile Side Navigation Drawer -->
   <aside id="mobile-menu" class="mobile-drawer-content font-heading text-[#0F172A]">
     <div class="flex-1 overflow-y-auto">
-      <!-- Drawer Header -->
       <div class="p-4 border-b border-[#E2E8F0] dark:border-slate-800 flex items-center justify-between bg-white dark:bg-slate-900">
         <a href="index.html" class="flex items-center space-x-2.5">
           <img loading="lazy" decoding="async" src="img/logo.png" alt="SST Logo" class="h-10 w-auto">
@@ -76,7 +75,6 @@
         </button>
       </div>
 
-      <!-- Drawer Nav Links -->
       <nav class="p-3 space-y-1.5">
         <a href="index.html" class="flex items-center justify-between px-3.5 py-2.5 rounded-lg font-bold text-xs text-[#123B32] bg-[#E8EFEB] border-l-3 border-[#123B32] transition-all">
           <div class="flex items-center gap-3">
@@ -85,23 +83,10 @@
           </div>
           <span class="w-1.5 h-1.5 rounded-full bg-[#123B32]"></span>
         </a>
-
-        <!-- About Us Accordion -->
-        <div class="mobile-accordion space-y-1">
-          <button type="button" class="mobile-accordion-toggle flex items-center justify-between w-full px-3.5 py-2.5 rounded-lg font-medium text-xs text-[#475569] dark:text-[#cbd5e1] hover:text-[#123B32] hover:bg-[#E8EFEB] dark:hover:bg-[#1e293b] transition-all cursor-pointer">
-            <div class="flex items-center gap-3">
-              <i class="uil uil-info-circle text-base text-[#123B32]"></i>
-              <span>About Us</span>
-            </div>
-            <i class="bi bi-chevron-down text-[10px] transition-transform duration-200 accordion-arrow"></i>
-          </button>
-          <div class="mobile-accordion-menu hidden pl-9 space-y-1.5 pt-1 border-l border-slate-100 dark:border-slate-800 ml-4">
-            <a href="about.html" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32]">About Company</a>
-            <a href="membership.html" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32]">Membership & Chapters</a>
-          </div>
-        </div>
-
-        <!-- Services Accordion -->
+        <a href="about.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg font-medium text-xs text-[#475569] dark:text-[#cbd5e1] hover:text-[#123B32] hover:bg-[#E8EFEB] dark:hover:bg-[#1e293b] transition-all">
+          <i class="uil uil-info-circle text-base text-[#123B32]"></i>
+          <span>About Us</span>
+        </a>
         <div class="mobile-accordion space-y-1">
           <button type="button" class="mobile-accordion-toggle flex items-center justify-between w-full px-3.5 py-2.5 rounded-lg font-medium text-xs text-[#475569] dark:text-[#cbd5e1] hover:text-[#123B32] hover:bg-[#E8EFEB] dark:hover:bg-[#1e293b] transition-all cursor-pointer">
             <div class="flex items-center gap-3">
@@ -127,40 +112,46 @@
             <i class="bi bi-chevron-down text-[10px] transition-transform duration-200 accordion-arrow"></i>
           </button>
           <div class="mobile-accordion-menu hidden pl-9 space-y-1.5 pt-1 border-l border-slate-100 dark:border-slate-800 ml-4">
-            <a href="events.html" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32]">Upcoming Events</a>
-            <a href="events.html#hackathons" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32]">Hackathons & Contests</a>
+            <a href="events.html?type=conference" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32] flex items-center gap-1.5">
+              <i class="bi bi-mortarboard-fill text-amber-500 text-[10px]"></i> Conferences & Symposia
+            </a>
+            <a href="events.html?type=hackathon" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32] flex items-center gap-1.5">
+              <i class="bi bi-trophy-fill text-emerald-500 text-[10px]"></i> Hackathons & Contests
+            </a>
+            <a href="events.html?type=fdp" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32] flex items-center gap-1.5">
+              <i class="bi bi-person-video3 text-blue-500 text-[10px]"></i> FDP & Workshops
+            </a>
+            <a href="events.html?type=courses" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32] flex items-center gap-1.5">
+              <i class="bi bi-journal-code text-purple-500 text-[10px]"></i> Professional Courses
+            </a>
           </div>
         </div>
 
-        <a href="careers.html" class="flex items-center justify-between px-3.5 py-2.5 rounded-lg font-medium text-xs text-[#475569] hover:text-[#123B32] hover:bg-[#E8EFEB] transition-all">
+        <!-- Gallery Direct Link -->
+        <a href="gallery.html" class="flex items-center justify-between px-3.5 py-2.5 rounded-lg font-medium text-xs text-[#475569] dark:text-[#cbd5e1] hover:text-[#123B32] hover:bg-[#E8EFEB] dark:hover:bg-[#1e293b] transition-all">
+          <div class="flex items-center gap-3">
+            <i class="bi bi-images text-base text-[#123B32]"></i>
+            <span>Gallery</span>
+          </div>
+        </a>
+
+        <a href="careers.html" class="flex items-center justify-between px-3.5 py-2.5 rounded-lg font-medium text-xs text-[#475569] dark:text-[#cbd5e1] hover:text-[#123B32] hover:bg-[#E8EFEB] dark:hover:bg-[#1e293b] transition-all">
           <div class="flex items-center gap-3">
             <i class="uil uil-briefcase-alt text-base text-[#123B32]"></i>
             <span>Career</span>
           </div>
         </a>
-        <a href="membership.html" class="flex items-center justify-between px-3.5 py-2.5 rounded-lg font-medium text-xs text-[#475569] hover:text-[#123B32] hover:bg-[#E8EFEB] transition-all">
-          <div class="flex items-center gap-3">
-            <i class="uil uil-award text-base text-[#123B32]"></i>
-            <span>Membership</span>
-          </div>
-        </a>
-        <a href="contact.html" class="flex items-center justify-between px-3.5 py-2.5 rounded-lg font-medium text-xs text-[#475569] hover:text-[#123B32] hover:bg-[#E8EFEB] transition-all">
+        <a href="contact.html" class="flex items-center justify-between px-3.5 py-2.5 rounded-lg font-medium text-xs text-[#475569] dark:text-[#cbd5e1] hover:text-[#123B32] hover:bg-[#E8EFEB] dark:hover:bg-[#1e293b] transition-all">
           <div class="flex items-center gap-3">
             <i class="uil uil-envelope text-base text-[#123B32]"></i>
             <span>Contact Us</span>
-          </div>
-        </a>
-        <a href="track.html" class="flex items-center justify-between px-3.5 py-2.5 rounded-lg font-bold text-xs text-[#123B32] bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 transition-all">
-          <div class="flex items-center gap-3">
-            <i class="uil uil-search text-base text-[#123B32]"></i>
-            <span>Track Reference Token</span>
           </div>
         </a>
       </nav>
     </div>
 
     <!-- Drawer Footer CTA -->
-    <div class="p-4 border-t border-[#E2E8F0] bg-[#E8EFEB]">
+    <div class="p-4 border-t border-[#E2E8F0] dark:border-slate-800 bg-[#E8EFEB] dark:bg-slate-900">
       <a href="membership.html" class="flex items-center justify-center gap-2 w-full py-2.5 bg-[#123B32] hover:bg-[#2F5B4E] text-white font-bold rounded-lg text-xs shadow-xs transition-all">
         <i class="uil uil-user-plus text-sm"></i> Join Us
       </a>
@@ -169,7 +160,6 @@
 
   <!-- Combined Sticky Top Header Section -->
   <div class="sticky top-0 z-40 w-full">
-    
     <header class="relative z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-[#E2E8F0] dark:border-slate-800 transition-all duration-200 shadow-xs">
       <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
         <!-- Brand Logo & Name -->
@@ -185,24 +175,8 @@
       <nav class="hidden lg:flex items-center space-x-1 font-heading text-[#26322E] dark:text-[#E2E8F0] shrink-0">
         <a href="index.html" class="nav-link-pill active"><i class="uil uil-estate text-[14px]"></i>Home</a>
 
-        <!-- About Us Dropdown -->
-        <div class="relative group">
-          <a href="about.html" class="nav-link-pill flex items-center gap-1 dark:text-[#E2E8F0] dark:hover:text-[#6EE7B7]">
-            <i class="uil uil-info-circle text-[14px]"></i>
-            <span>About Us</span>
-            <i class="bi bi-chevron-down text-[10px] ml-0.5 transition-transform duration-200 group-hover:rotate-180"></i>
-          </a>
-          <div class="absolute left-0 top-full pt-2 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 z-50 min-w-[210px]">
-            <div class="nav-dropdown-menu p-1.5 space-y-0.5">
-              <a href="about.html" class="nav-dropdown-item block px-3.5 py-2">
-                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32]">About Company</span>
-              </a>
-              <a href="membership.html" class="nav-dropdown-item block px-3.5 py-2">
-                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32]">Membership & Chapters</span>
-              </a>
-            </div>
-          </div>
-        </div>
+        <!-- About Us Direct Link -->
+        <a href="about.html" class="nav-link-pill dark:text-[#E2E8F0] dark:hover:text-[#6EE7B7]"><i class="uil uil-info-circle text-[14px]"></i>About Us</a>
 
         <!-- Services Dropdown -->
         <div class="relative group">
@@ -236,17 +210,34 @@
             <span>Events</span>
             <i class="bi bi-chevron-down text-[10px] ml-0.5 transition-transform duration-200 group-hover:rotate-180"></i>
           </a>
-          <div class="absolute left-0 top-full pt-2 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 z-50 min-w-[210px]">
+          <div class="absolute left-0 top-full pt-2 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 z-50 min-w-[240px]">
             <div class="nav-dropdown-menu p-1.5 space-y-0.5">
-              <a href="events.html" class="nav-dropdown-item block px-3.5 py-2">
-                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32]">Upcoming Events</span>
+              <a href="events.html?type=conference" class="nav-dropdown-item block px-3.5 py-2">
+                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32] flex items-center gap-2">
+                  <i class="bi bi-mortarboard-fill text-amber-500"></i> Conferences & Symposia
+                </span>
               </a>
-              <a href="events.html#hackathons" class="nav-dropdown-item block px-3.5 py-2">
-                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32]">Hackathons & Contests</span>
+              <a href="events.html?type=hackathon" class="nav-dropdown-item block px-3.5 py-2">
+                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32] flex items-center gap-2">
+                  <i class="bi bi-trophy-fill text-emerald-500"></i> Hackathons & Contests
+                </span>
+              </a>
+              <a href="events.html?type=fdp" class="nav-dropdown-item block px-3.5 py-2">
+                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32] flex items-center gap-2">
+                  <i class="bi bi-person-video3 text-blue-500"></i> FDP & Workshops
+                </span>
+              </a>
+              <a href="events.html?type=courses" class="nav-dropdown-item block px-3.5 py-2">
+                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32] flex items-center gap-2">
+                  <i class="bi bi-journal-code text-purple-500"></i> Professional Courses
+                </span>
               </a>
             </div>
           </div>
         </div>
+
+        <!-- Gallery Nav Pill -->
+        <a href="gallery.html" class="nav-link-pill dark:text-[#E2E8F0] dark:hover:text-[#6EE7B7]"><i class="bi bi-images text-[14px]"></i>Gallery</a>
 
         <a href="careers.html" class="nav-link-pill dark:text-[#E2E8F0] dark:hover:text-[#6EE7B7]"><i class="uil uil-briefcase-alt text-[14px]"></i>Career</a>
 
@@ -349,9 +340,8 @@
       </button>
     </div>
   </header>
-    <div id="dynamic-announcement-bar"></div>
+  <div id="dynamic-announcement-bar"></div>
 </div>
-
 
   <!-- Hero Section -->
   <main>
@@ -373,12 +363,8 @@
         <!-- Hero Text content -->
         <div class="lg:col-span-6 space-y-5" data-aos="fade-right">
           <div class="hero-pill-badge text-xs font-black tracking-wider uppercase px-4 py-1.5 rounded-full inline-flex items-center gap-2">
-            <i class="bi bi-stars text-sm"></i>
-            <span class="font-extrabold tracking-wider">INNOVATION</span>
-            <span class="font-black dot-separator">•</span>
-            <span class="font-extrabold tracking-wider">RESEARCH</span>
-            <span class="font-black dot-separator">•</span>
-            <span class="font-extrabold tracking-wider">TECHNOLOGY</span>
+            <i class="bi bi-stars text-sm text-amber-300"></i>
+            <span class="font-extrabold tracking-wider">Transforming Ideas into Digital Excellence</span>
           </div>
           <h1 class="text-3xl md:text-4xl lg:text-[42px] font-black text-brand-darkText dark:text-white tracking-tight leading-snug font-heading my-2">
             Bridging Ideas with <br>
@@ -435,9 +421,7 @@
           </div>
         </div>
       </div>
-      </div>
     </section>
-
 
     <!-- Milestone Announcement Section -->
     <section class="py-12 md:py-10 md:py-12 bg-white border-y border-brand-border overflow-hidden">
@@ -793,22 +777,6 @@
                 Technology
               </span>
               <h3 class="font-bold text-sm text-brand-darkText font-heading leading-snug">
-                Int. Conference on Advances in Computing & AI
-              </h3>
-              <p class="text-brand-secText text-xs">
-                Salem, Tamil Nadu
-              </p>
-            </div>
-            <div class="pt-4 border-t border-brand-border mt-4 flex items-center justify-between text-[11px] text-brand-secText">
-              <span>Nov 2026</span>
-              <a href="events.html" class="text-brand-green hover:underline font-bold">Details</a>
-            </div>
-          </div>
-
-          <!-- Event 2 -->
-          <div data-aos="fade-up" data-aos-delay="100" class="border border-brand-border rounded-xl p-5 bg-white h-full flex flex-col justify-between hover:border-brand-green/30 transition-all shadow-sm">
-            <div class="space-y-3">
-              <span class="text-[10px] font-bold tracking-wider text-brand-green uppercase bg-brand-softGreen px-2 py-0.5 rounded">
                 Engineering
               </span>
               <h3 class="font-bold text-sm text-brand-darkText font-heading leading-snug">
@@ -865,6 +833,48 @@
       </div>
     </section>
 
+    <!-- Photo Gallery Showcase Section -->
+    <section id="gallery-section" data-aos="fade-up" class="py-14 md:py-16 bg-[#F8FAFC] dark:bg-slate-950/80 border-t border-brand-border dark:border-slate-800">
+      <div class="max-w-7xl mx-auto px-6 space-y-8">
+        
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div class="space-y-2">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-extrabold text-[11px] uppercase tracking-wider border border-emerald-300/50 dark:border-emerald-800">
+              <i class="bi bi-camera-fill text-xs"></i> Official Media Gallery
+            </span>
+            <h2 class="text-2xl md:text-3xl font-black font-heading text-brand-darkText dark:text-white tracking-tight">
+              Moments of Excellence & Collaborations
+            </h2>
+            <p class="text-xs sm:text-sm text-brand-secText dark:text-slate-400 max-w-xl">
+              Capturing milestones across our international conferences, institutional MoU signings, tech hackathons, and academic delegations.
+            </p>
+          </div>
+
+          <!-- Category Filter Pills -->
+          <div class="flex flex-wrap items-center gap-1.5 pt-2">
+            <button type="button" onclick="window.filterGalleryCategory('all', this)" class="gallery-category-pill px-3.5 py-1.5 rounded-full text-xs font-bold bg-[#123B32] text-white dark:bg-emerald-600 shadow-sm cursor-pointer">
+              All Photos
+            </button>
+            <button type="button" onclick="window.filterGalleryCategory('Conferences', this)" class="gallery-category-pill px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-[#123B32] hover:text-white dark:hover:bg-emerald-600 transition-all cursor-pointer">
+              Conferences
+            </button>
+            <button type="button" onclick="window.filterGalleryCategory('MoUs', this)" class="gallery-category-pill px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-[#123B32] hover:text-white dark:hover:bg-emerald-600 transition-all cursor-pointer">
+              MoUs & Partnerships
+            </button>
+            <button type="button" onclick="window.filterGalleryCategory('Memberships', this)" class="gallery-category-pill px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-[#123B32] hover:text-white dark:hover:bg-emerald-600 transition-all cursor-pointer">
+              Memberships
+            </button>
+          </div>
+        </div>
+
+        <!-- Dynamic Gallery Grid Container -->
+        <div id="dynamic-gallery-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <!-- Populated dynamically by dynamic-content.js -->
+        </div>
+
+      </div>
+    </section>
+
     <!-- Final CTA Section with Glassmorphism green -->
     <section class="py-12 md:py-10 md:py-12 bg-brand-lightGreen dark:bg-[#0b0f19] overflow-hidden">
       <div class="max-w-4xl mx-auto px-6 text-center">
@@ -910,17 +920,11 @@
           <a href="https://www.linkedin.com/company/shazu-soft-technologies" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-[#123B32] border border-white/10 hover:border-emerald-500/50 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-xs" title="LinkedIn" aria-label="LinkedIn">
             <i class="bi bi-linkedin text-xs"></i>
           </a>
-          <a href="https://x.com/shazusoft" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-[#123B32] border border-white/10 hover:border-emerald-500/50 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-xs" title="Twitter / X" aria-label="Twitter">
-            <i class="bi bi-twitter-x text-xs"></i>
-          </a>
           <a href="https://www.instagram.com/shazusofttechnologies" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-[#123B32] border border-white/10 hover:border-emerald-500/50 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-xs" title="Instagram" aria-label="Instagram">
             <i class="bi bi-instagram text-xs"></i>
           </a>
           <a href="https://www.facebook.com/shazusofttechnologies" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-[#123B32] border border-white/10 hover:border-emerald-500/50 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-xs" title="Facebook" aria-label="Facebook">
             <i class="bi bi-facebook text-xs"></i>
-          </a>
-          <a href="https://github.com/shazusoft" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-[#123B32] border border-white/10 hover:border-emerald-500/50 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-xs" title="GitHub" aria-label="GitHub">
-            <i class="bi bi-github text-xs"></i>
           </a>
           <a href="https://www.youtube.com/@shazusofttechnologies" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-[#123B32] border border-white/10 hover:border-emerald-500/50 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-xs" title="YouTube" aria-label="YouTube">
             <i class="bi bi-youtube text-xs"></i>
@@ -936,6 +940,7 @@
           <li><a href="about.html" class="hover:text-white transition-colors duration-150 flex items-center gap-1.5"><i class="text-[15px] uil uil-info-circle"></i>About Us</a></li>
           <li><a href="services.html" class="hover:text-white transition-colors duration-150 flex items-center gap-1.5"><i class="text-[15px] uil uil-setting"></i>Services</a></li>
           <li><a href="events.html" class="hover:text-white transition-colors duration-150 flex items-center gap-1.5"><i class="text-[15px] uil uil-calendar-alt"></i>Events</a></li>
+          <li><a href="gallery.html" class="hover:text-white transition-colors duration-150 flex items-center gap-1.5"><i class="text-[15px] bi bi-images"></i>Gallery</a></li>
           <li><a href="careers.html" class="hover:text-white transition-colors duration-150 flex items-center gap-1.5"><i class="text-[15px] uil uil-briefcase-alt"></i>Career</a></li>
           <li><a href="membership.html" class="hover:text-white transition-colors duration-150">Membership</a></li>
           <li><a href="contact.html" class="hover:text-white transition-colors duration-150">Contact</a></li>

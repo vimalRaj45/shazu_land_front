@@ -86,20 +86,11 @@
           </div>
         </a>
 
-        <!-- About Us Accordion -->
-        <div class="mobile-accordion space-y-1">
-          <button type="button" class="mobile-accordion-toggle flex items-center justify-between w-full px-3.5 py-2.5 rounded-lg font-medium text-xs text-[#475569] dark:text-[#cbd5e1] hover:text-[#123B32] hover:bg-[#E8EFEB] dark:hover:bg-[#1e293b] transition-all cursor-pointer">
-            <div class="flex items-center gap-3">
-              <i class="uil uil-info-circle text-base text-[#123B32]"></i>
-              <span>About Us</span>
-            </div>
-            <i class="bi bi-chevron-down text-[10px] transition-transform duration-200 accordion-arrow"></i>
-          </button>
-          <div class="mobile-accordion-menu hidden pl-9 space-y-1.5 pt-1 border-l border-slate-100 dark:border-slate-800 ml-4">
-            <a href="about.html" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32]">About Company</a>
-            <a href="membership.html" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32]">Membership & Chapters</a>
-          </div>
-        </div>
+        <!-- About Us Direct Link -->
+        <a href="about.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg font-medium text-xs text-[#475569] dark:text-[#cbd5e1] hover:text-[#123B32] hover:bg-[#E8EFEB] dark:hover:bg-[#1e293b] transition-all">
+          <i class="uil uil-info-circle text-base text-[#123B32]"></i>
+          <span>About Us</span>
+        </a>
 
         <!-- Services Accordion -->
         <div class="mobile-accordion space-y-1">
@@ -127,10 +118,28 @@
             <i class="bi bi-chevron-down text-[10px] transition-transform duration-200 accordion-arrow"></i>
           </button>
           <div class="mobile-accordion-menu hidden pl-9 space-y-1.5 pt-1 border-l border-slate-100 dark:border-slate-800 ml-4">
-            <a href="events.html" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32]">Upcoming Events</a>
-            <a href="events.html#hackathons" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32]">Hackathons & Contests</a>
+            <a href="events.html?type=conference" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32] flex items-center gap-1.5">
+              <i class="bi bi-mortarboard-fill text-amber-500 text-[10px]"></i> Conferences & Symposia
+            </a>
+            <a href="events.html?type=hackathon" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32] flex items-center gap-1.5">
+              <i class="bi bi-trophy-fill text-emerald-500 text-[10px]"></i> Hackathons & Contests
+            </a>
+            <a href="events.html?type=fdp" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32] flex items-center gap-1.5">
+              <i class="bi bi-person-video3 text-blue-500 text-[10px]"></i> FDP & Workshops
+            </a>
+            <a href="events.html?type=courses" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32] flex items-center gap-1.5">
+              <i class="bi bi-journal-code text-purple-500 text-[10px]"></i> Professional Courses
+            </a>
           </div>
         </div>
+
+        <!-- Gallery Direct Link -->
+        <a href="gallery.html" class="flex items-center justify-between px-3.5 py-2.5 rounded-lg font-medium text-xs text-[#475569] dark:text-[#cbd5e1] hover:text-[#123B32] hover:bg-[#E8EFEB] dark:hover:bg-[#1e293b] transition-all">
+          <div class="flex items-center gap-3">
+            <i class="bi bi-images text-base text-[#123B32]"></i>
+            <span>Gallery</span>
+          </div>
+        </a>
 
         <a href="careers.html" class="flex items-center justify-between px-3.5 py-2.5 rounded-lg font-medium text-xs text-[#475569] hover:text-[#123B32] hover:bg-[#E8EFEB] transition-all">
           <div class="flex items-center gap-3">
@@ -175,24 +184,8 @@
       <nav class="hidden lg:flex items-center space-x-1 font-heading shrink-0">
         <a href="index.html" class="nav-link-pill"><i class="uil uil-estate text-[14px]"></i>Home</a>
 
-        <!-- About Us Dropdown -->
-        <div class="relative group">
-          <a href="about.html" class="nav-link-pill flex items-center gap-1">
-            <i class="uil uil-info-circle text-[14px]"></i>
-            <span>About Us</span>
-            <i class="bi bi-chevron-down text-[10px] ml-0.5 transition-transform duration-200 group-hover:rotate-180"></i>
-          </a>
-          <div class="absolute left-0 top-full pt-2 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 z-50 min-w-[210px]">
-            <div class="nav-dropdown-menu p-1.5 space-y-0.5">
-              <a href="about.html" class="nav-dropdown-item block px-3.5 py-2">
-                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32]">About Company</span>
-              </a>
-              <a href="membership.html" class="nav-dropdown-item block px-3.5 py-2">
-                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32]">Membership & Chapters</span>
-              </a>
-            </div>
-          </div>
-        </div>
+        <!-- About Us Direct Link -->
+        <a href="about.html" class="nav-link-pill dark:text-[#E2E8F0] dark:hover:text-[#6EE7B7]"><i class="uil uil-info-circle text-[14px]"></i>About Us</a>
 
         <!-- Services Dropdown -->
         <div class="relative group">
@@ -221,24 +214,41 @@
 
         <!-- Events Dropdown -->
         <div class="relative group">
-          <a href="events.html" class="nav-link-pill flex items-center gap-1">
+          <a href="events.html" class="nav-link-pill flex items-center gap-1 dark:text-[#E2E8F0] dark:hover:text-[#6EE7B7]">
             <i class="uil uil-calendar-alt text-[14px]"></i>
             <span>Events</span>
             <i class="bi bi-chevron-down text-[10px] ml-0.5 transition-transform duration-200 group-hover:rotate-180"></i>
           </a>
-          <div class="absolute left-0 top-full pt-2 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 z-50 min-w-[210px]">
+          <div class="absolute left-0 top-full pt-2 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 z-50 min-w-[240px]">
             <div class="nav-dropdown-menu p-1.5 space-y-0.5">
-              <a href="events.html" class="nav-dropdown-item block px-3.5 py-2">
-                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32]">Upcoming Events</span>
+              <a href="events.html?type=conference" class="nav-dropdown-item block px-3.5 py-2">
+                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32] flex items-center gap-2">
+                  <i class="bi bi-mortarboard-fill text-amber-500"></i> Conferences & Symposia
+                </span>
               </a>
-              <a href="events.html#hackathons" class="nav-dropdown-item block px-3.5 py-2">
-                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32]">Hackathons & Contests</span>
+              <a href="events.html?type=hackathon" class="nav-dropdown-item block px-3.5 py-2">
+                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32] flex items-center gap-2">
+                  <i class="bi bi-trophy-fill text-emerald-500"></i> Hackathons & Contests
+                </span>
+              </a>
+              <a href="events.html?type=fdp" class="nav-dropdown-item block px-3.5 py-2">
+                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32] flex items-center gap-2">
+                  <i class="bi bi-person-video3 text-blue-500"></i> FDP & Workshops
+                </span>
+              </a>
+              <a href="events.html?type=courses" class="nav-dropdown-item block px-3.5 py-2">
+                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32] flex items-center gap-2">
+                  <i class="bi bi-journal-code text-purple-500"></i> Professional Courses
+                </span>
               </a>
             </div>
           </div>
         </div>
 
-        <a href="careers.html" class="nav-link-pill"><i class="uil uil-briefcase-alt text-[14px]"></i>Career</a>
+        <!-- Gallery Nav Pill -->
+        <a href="gallery.html" class="nav-link-pill dark:text-[#E2E8F0] dark:hover:text-[#6EE7B7]"><i class="bi bi-images text-[14px]"></i>Gallery</a>
+
+        <a href="careers.html" class="nav-link-pill dark:text-[#E2E8F0] dark:hover:text-[#6EE7B7]"><i class="uil uil-briefcase-alt text-[14px]"></i>Career</a>
 
         <!-- Contact Dropdown -->
         <div class="relative group">
@@ -392,9 +402,12 @@
                 <i class="uil uil-phone"></i>
               </div>
               <div class="space-y-1">
-                <h4 class="font-heading font-bold text-xs text-brand-darkText uppercase tracking-wider">Call Centers</h4>
+                <h4 class="font-heading font-bold text-xs text-brand-darkText uppercase tracking-wider">For Enquiries</h4>
+                <p class="text-brand-secText text-xs font-semibold">
+                  General Enquiry: <a href="tel:+919080340803" class="hover:text-brand-green">+91 90803 40803</a>
+                </p>
                 <p class="text-brand-secText text-xs">
-                  HR Hotline: +91 93616 80077
+                  HR Hotline: <a href="tel:+919361680077" class="hover:text-brand-green">+91 93616 80077</a>
                 </p>
               </div>
             </div>
@@ -405,9 +418,9 @@
                 <i class="uil uil-users-alt"></i>
               </div>
               <div class="space-y-1">
-                <h4 class="font-heading font-bold text-xs text-brand-darkText uppercase tracking-wider">HR Division</h4>
+                <h4 class="font-heading font-bold text-xs text-brand-darkText uppercase tracking-wider">HR Division & Recruitment</h4>
                 <p class="text-brand-secText text-xs">
-                  Direct recruiter line: +91 93616 80077
+                  Direct Line: <a href="tel:+919361680077" class="hover:text-brand-green">+91 93616 80077</a>
                 </p>
               </div>
             </div>
@@ -420,7 +433,10 @@
               <div class="space-y-1">
                 <h4 class="font-heading font-bold text-xs text-brand-darkText uppercase tracking-wider">Electronic Mail</h4>
                 <p class="text-brand-secText text-xs font-semibold">
-                  info@shazusofttechnologies.org
+                  <a href="mailto:hr@shazusofttechnologies.org" class="hover:text-brand-green">hr@shazusofttechnologies.org</a>
+                </p>
+                <p class="text-brand-secText text-[11px] text-slate-500">
+                  <a href="mailto:info@shazusofttechnologies.org" class="hover:text-brand-green">info@shazusofttechnologies.org</a>
                 </p>
               </div>
             </div>
@@ -492,17 +508,11 @@
           <a href="https://www.linkedin.com/company/shazu-soft-technologies" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-[#123B32] border border-white/10 hover:border-emerald-500/50 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-xs" title="LinkedIn" aria-label="LinkedIn">
             <i class="bi bi-linkedin text-xs"></i>
           </a>
-          <a href="https://x.com/shazusoft" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-[#123B32] border border-white/10 hover:border-emerald-500/50 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-xs" title="Twitter / X" aria-label="Twitter">
-            <i class="bi bi-twitter-x text-xs"></i>
-          </a>
           <a href="https://www.instagram.com/shazusofttechnologies" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-[#123B32] border border-white/10 hover:border-emerald-500/50 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-xs" title="Instagram" aria-label="Instagram">
             <i class="bi bi-instagram text-xs"></i>
           </a>
           <a href="https://www.facebook.com/shazusofttechnologies" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-[#123B32] border border-white/10 hover:border-emerald-500/50 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-xs" title="Facebook" aria-label="Facebook">
             <i class="bi bi-facebook text-xs"></i>
-          </a>
-          <a href="https://github.com/shazusoft" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-[#123B32] border border-white/10 hover:border-emerald-500/50 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-xs" title="GitHub" aria-label="GitHub">
-            <i class="bi bi-github text-xs"></i>
           </a>
           <a href="https://youtube.com/@shazusofttechnologies" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-[#123B32] border border-white/10 hover:border-emerald-500/50 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-xs" title="YouTube" aria-label="YouTube">
             <i class="bi bi-youtube text-xs"></i>

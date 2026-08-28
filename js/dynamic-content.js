@@ -68,110 +68,100 @@
     }
   }
 
-  // 2. Load Dynamic Announcements Top Bar (Compact Responsive Toggle & Slide Tray)
+  // 2. Load Dynamic Announcements Top Bar (Continuous Smooth Moving Ticker / Marquee)
   window.allAnnouncementsList = [];
   async function loadAnnouncements() {
     const container = document.getElementById('dynamic-announcement-bar');
     if (!container) return;
 
-    // Clean up any old floating pill if present
+    // Clean up any old floating trigger if present
     const oldPill = document.getElementById('announcement-floating-trigger');
     if (oldPill) oldPill.remove();
 
+    let announcements = [];
+
     try {
       const res = await fetch(`${API_BASE}/api/public/announcements`);
-      const data = await res.json();
-
-      if (!data.announcements || data.announcements.length === 0) {
-        container.innerHTML = '';
-        container.style.display = 'none';
-        return;
-      }
-
-      window.allAnnouncementsList = data.announcements;
-
-      // Build announcement ticker items with standardized badges and inline Learn More links
-      const itemsHtml = data.announcements.map(ann => {
-        const badgeLabel = (ann.badge_type || 'ANNOUNCEMENT').toUpperCase().trim();
-        const badgeClass = getAnnouncementBadgeClass(badgeLabel);
-        return `
-          <div class="inline-flex items-center gap-2.5 px-4 py-0.5 shrink-0 max-w-full">
-            <span class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider shadow-2xs ${badgeClass} shrink-0">${badgeLabel}</span>
-            <span class="font-bold text-white text-xs whitespace-nowrap">${ann.title}:</span>
-            <span class="text-emerald-100 text-xs truncate max-w-[240px] sm:max-w-md">${ann.content}</span>
-            ${ann.link_url ? `<a href="${ann.link_url}" class="text-[11px] font-bold text-amber-300 hover:text-white underline transition-colors flex items-center gap-1 shrink-0"><span>Learn More</span> <i class="bi bi-arrow-right text-[10px]"></i></a>` : ''}
-            <span class="text-emerald-700/60 font-mono text-xs mx-2 shrink-0">•</span>
-          </div>
-        `;
-      }).join('');
-
-      container.className = 'w-full relative z-30 transition-all duration-200';
-      container.innerHTML = `
-        <div class="w-full relative">
-          <!-- Compact Responsive Toggle Bar -->
-          <div class="px-3 sm:px-6 py-1 flex items-center justify-between bg-transparent pointer-events-none">
-            <button id="announcement-toggle-btn" type="button" class="pointer-events-auto bg-[#123B32] hover:bg-[#1a4a40] text-white border border-[#527A68]/60 text-[10px] sm:text-[11px] font-bold px-2.5 py-0.5 rounded-full shadow-xs flex items-center gap-1.5 cursor-pointer transition-all duration-200 group" aria-label="Toggle Announcement Bar">
-              <span class="relative flex h-1.5 w-1.5 shrink-0">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-500"></span>
-              </span>
-              <i class="bi bi-megaphone-fill text-[9px] sm:text-[10px] text-amber-300"></i>
-              <span class="hidden xs:inline">Announcements</span>
-              <span class="bg-amber-500/20 text-amber-300 border border-amber-500/40 px-1.5 py-0.1 rounded-full text-[8px] sm:text-[9px] font-mono font-bold">${data.announcements.length}</span>
-              <i id="announcement-toggle-chevron" class="bi bi-chevron-down text-[9px] text-emerald-300 transition-transform duration-300"></i>
-            </button>
-          </div>
-
-          <!-- Slide-Out Announcement Tray with Train Arrival Animation -->
-          <div id="announcement-tray" class="announcement-bar-tray w-full bg-[#123B32] text-white border-b border-[#527A68]/40 shadow-md">
-            <div class="py-1 px-3 sm:px-6 flex items-center justify-between gap-2.5">
-              <div class="flex-1 overflow-hidden train-carriage announcement-ticker-wrap">
-                <div class="animate-marquee-track">
-                  ${itemsHtml}
-                  ${itemsHtml}
-                </div>
-              </div>
-              <button id="announcement-close-tray-btn" type="button" class="shrink-0 text-emerald-200/80 hover:text-white hover:bg-white/10 w-5 h-5 rounded-full flex items-center justify-center transition-colors cursor-pointer text-xs focus:outline-none" aria-label="Hide Announcements" title="Hide">
-                <i class="bi bi-x-lg text-[9px] pointer-events-none"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-      `;
-
-      // Interactive Toggle Handlers
-      const toggleBtn = document.getElementById('announcement-toggle-btn');
-      const tray = document.getElementById('announcement-tray');
-      const chevron = document.getElementById('announcement-toggle-chevron');
-      const closeTrayBtn = document.getElementById('announcement-close-tray-btn');
-
-      function setTrayState(isOpen) {
-        if (isOpen) {
-          tray.classList.add('is-open');
-          if (chevron) chevron.style.transform = 'rotate(180deg)';
-        } else {
-          tray.classList.remove('is-open');
-          if (chevron) chevron.style.transform = 'rotate(0deg)';
+      if (res.ok) {
+        const data = await res.json();
+        if (data.announcements && data.announcements.length > 0) {
+          announcements = data.announcements;
         }
-      }
-
-      if (toggleBtn && tray) {
-        toggleBtn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          const willOpen = !tray.classList.contains('is-open');
-          setTrayState(willOpen);
-        });
-      }
-
-      if (closeTrayBtn) {
-        closeTrayBtn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          setTrayState(false);
-        });
       }
     } catch (err) {
       console.warn('Could not fetch dynamic announcements:', err);
     }
+
+    if (!announcements || announcements.length === 0) {
+      window.allAnnouncementsList = [];
+      container.style.display = 'none';
+      container.innerHTML = '';
+      return;
+    }
+
+    window.allAnnouncementsList = announcements;
+
+    container.className = 'w-full relative z-30 bg-[#123B32] text-white border-b border-[#527A68]/40 py-1.5 sm:py-2 px-2 sm:px-6 shadow-xs transition-all overflow-hidden';
+    container.style.display = 'block';
+
+    const buildItemsHtml = (list) => list.map(ann => {
+      const badgeLabel = (ann.badge_type || 'ANNOUNCEMENT').toUpperCase().trim();
+      const badgeClass = getAnnouncementBadgeClass(badgeLabel);
+      return `
+        <div class="inline-flex items-center gap-2 text-xs font-medium text-white shrink-0">
+          <span class="px-2.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider ${badgeClass} shrink-0 flex items-center gap-1 shadow-xs">
+            <i class="bi bi-megaphone-fill text-[8px]"></i> ${badgeLabel}
+          </span>
+          <span class="font-bold text-white whitespace-nowrap text-xs">${ann.title}:</span>
+          <span class="text-emerald-100 text-xs whitespace-nowrap">${ann.content}</span>
+          ${ann.link_url ? `
+            <a href="${ann.link_url}" class="text-[11px] font-bold text-amber-300 hover:text-white underline transition-colors flex items-center gap-0.5 ml-1">
+              <span>Learn More</span>
+              <i class="bi bi-arrow-right text-[10px]"></i>
+            </a>
+          ` : ''}
+          <span class="text-emerald-400/50 select-none px-3">•</span>
+        </div>
+      `;
+    }).join('');
+
+    const trackContent = buildItemsHtml(announcements);
+
+    container.innerHTML = `
+      <div class="max-w-7xl mx-auto flex items-center justify-between gap-1.5 sm:gap-3 text-xs">
+        <!-- Live Indicator Badge (Pinned Left) -->
+        <div class="flex items-center gap-1.5 sm:gap-2 shrink-0 bg-[#0d2a24] py-1 px-2 sm:px-2.5 rounded-lg border border-[#527A68]/50 shadow-xs z-10">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+          </span>
+          <span class="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-emerald-300 flex items-center gap-1 select-none whitespace-nowrap">
+            <span>Live</span><span class="hidden xs:inline">Updates</span>
+          </span>
+        </div>
+
+        <!-- Continuous Moving Marquee Scroller -->
+        <div class="flex-1 min-w-0 overflow-hidden relative cursor-pointer py-0.5 marquee-mask" title="Hover / tap to pause ticker">
+          <div class="animate-marquee-track flex items-center whitespace-nowrap">
+            <div class="flex items-center shrink-0">
+              ${trackContent}
+            </div>
+            <div class="flex items-center shrink-0" aria-hidden="true">
+              ${trackContent}
+            </div>
+          </div>
+        </div>
+
+        <!-- All Announcements Link (Pinned Right - Visible on Mobile & Desktop) -->
+        <div class="flex items-center gap-1 sm:gap-2 shrink-0 z-10 pl-1 sm:pl-2">
+          <a href="announcements.html" class="text-[10px] sm:text-[11px] font-semibold text-emerald-200 hover:text-white transition-colors bg-[#0d2a24]/90 hover:bg-[#0d2a24] px-2 sm:px-2.5 py-1 rounded-lg border border-[#527A68]/40 flex items-center gap-1 shadow-xs whitespace-nowrap" title="View all announcements">
+            <span class="hidden sm:inline">All Notices (${announcements.length})</span>
+            <span class="sm:hidden flex items-center gap-0.5 font-bold">View All <i class="bi bi-arrow-right text-[9px]"></i></span>
+            <i class="hidden sm:inline-block bi bi-arrow-right text-[10px]"></i>
+          </a>
+        </div>
+      </div>
+    `;
   }
 
   function renderAnnouncementsPageSkeleton(container) {
@@ -405,13 +395,7 @@
     }
   }
 
-  window.eventFilterState = {
-    type: 'all',
-    search: '',
-    status: 'all',
-    field: 'all'
-  };
-
+  // 4. Load Dynamic Events & Courses Listing
   function renderEventsSkeleton(container) {
     if (!container) return;
     container.innerHTML = Array.from({ length: 3 }).map(() => `
@@ -439,7 +423,6 @@
     `).join('');
   }
 
-  // 4. Load Dynamic Events & Courses Listing
   async function loadEvents() {
     const container = document.getElementById('dynamic-events-container');
     if (!container) return;
@@ -449,10 +432,11 @@
     try {
       const [evRes, courseRes] = await Promise.all([
         fetch(`${API_BASE}/api/public/events`).then(r => r.json()).catch(() => ({ events: [] })),
-        fetch(`${API_BASE}/api/public/courses-services`).then(r => r.json()).catch(() => ({ courses: [] }))
+        fetch(`${API_BASE}/api/public/courses-services`).then(r => r.json()).catch(() => ({ offerings: [], courses: [] }))
       ]);
 
-      const coursesAsEvents = (courseRes.courses || []).map(c => ({
+      const courseList = (courseRes && (courseRes.courses || courseRes.offerings)) || [];
+      const coursesAsEvents = courseList.map(c => ({
         id: `course-${c.id}`,
         is_course: true,
         title: c.title,
@@ -465,17 +449,126 @@
         status: c.status || 'Upcoming'
       }));
 
-      window.allEventsData = [...(evRes.events || []), ...coursesAsEvents];
+      const rawEvents = (evRes && evRes.events) || [];
+      window.allEventsData = [...rawEvents, ...coursesAsEvents];
+      if (typeof window.handleEventTypeUrlParam === 'function') window.handleEventTypeUrlParam();
       window.applyEventFilters();
       if (typeof window.handleSharedEventParam === 'function') window.handleSharedEventParam();
     } catch (err) {
       console.warn('Could not fetch events/courses from DB:', err);
       window.allEventsData = [];
+      if (typeof window.handleEventTypeUrlParam === 'function') window.handleEventTypeUrlParam();
       window.applyEventFilters();
     }
   }
 
   window.eventFilterState = window.eventFilterState || { type: 'all', search: '', status: 'all', field: 'all' };
+
+  window.handleEventTypeUrlParam = function() {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const rawType = urlParams.get('type') || urlParams.get('category');
+      if (!rawType) return;
+
+      const t = rawType.toLowerCase().trim();
+      let targetType = 'all';
+      if (t.includes('conf') || t.includes('sympos')) targetType = 'Upcoming Conference';
+      else if (t.includes('hack') || t.includes('contest')) targetType = 'Hackathon';
+      else if (t.includes('fdp') || t.includes('faculty') || t.includes('seminar')) targetType = 'Faculty Development Program';
+      else if (t.includes('course') || t.includes('train')) targetType = 'Courses & Training';
+      else if (t.includes('intern')) targetType = 'Internship';
+      else if (t.includes('webinar')) targetType = 'Webinar';
+      else targetType = rawType;
+
+      window.eventFilterState = window.eventFilterState || { type: 'all', search: '', status: 'all', field: 'all' };
+      window.eventFilterState.type = targetType;
+
+      const select = document.getElementById('event-type-select');
+      if (select) select.value = targetType;
+
+      const tabs = document.querySelectorAll('.event-quick-tab');
+      tabs.forEach(b => {
+        const onclickAttr = b.getAttribute('onclick') || '';
+        if (
+          onclickAttr.toLowerCase().includes(targetType.toLowerCase()) || 
+          (targetType === 'Upcoming Conference' && onclickAttr.toLowerCase().includes('upcoming conference')) ||
+          (targetType === 'Hackathon' && onclickAttr.toLowerCase().includes('hackathon')) ||
+          (targetType === 'Faculty Development Program' && onclickAttr.toLowerCase().includes('faculty')) ||
+          (targetType === 'Courses & Training' && onclickAttr.toLowerCase().includes('courses'))
+        ) {
+          b.className = 'event-quick-tab shrink-0 px-4 py-2 rounded-xl text-xs font-bold bg-[#123B32] text-white dark:bg-emerald-600 shadow-xs cursor-pointer transition-all flex items-center gap-1.5';
+        } else {
+          b.className = 'event-quick-tab shrink-0 px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-[#123B32] hover:text-white dark:hover:bg-emerald-600 transition-all cursor-pointer flex items-center gap-1.5';
+        }
+      });
+    } catch (e) {
+      console.warn('Type parameter handler note:', e);
+    }
+  };
+
+  window.selectEventCategoryQuick = function(type, btnEl) {
+    window.eventFilterState = window.eventFilterState || { type: 'all', search: '', status: 'all', field: 'all' };
+    window.eventFilterState.type = type;
+    const select = document.getElementById('event-type-select');
+    if (select) select.value = type;
+
+    document.querySelectorAll('.event-quick-tab').forEach(b => {
+      b.className = 'event-quick-tab shrink-0 px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-[#123B32] hover:text-white dark:hover:bg-emerald-600 transition-all cursor-pointer flex items-center gap-1.5';
+    });
+    if (btnEl) {
+      btnEl.className = 'event-quick-tab shrink-0 px-4 py-2 rounded-xl text-xs font-bold bg-[#123B32] text-white dark:bg-emerald-600 shadow-xs cursor-pointer transition-all flex items-center gap-1.5';
+    }
+
+    // Update URL query string without reloading page
+    try {
+      const url = new URL(window.location);
+      if (type === 'all') {
+        url.searchParams.delete('type');
+        url.searchParams.delete('category');
+      } else {
+        let typeSlug = 'all';
+        if (type.includes('Conference')) typeSlug = 'conference';
+        else if (type.includes('Hackathon')) typeSlug = 'hackathon';
+        else if (type.includes('Faculty')) typeSlug = 'fdp';
+        else if (type.includes('Course')) typeSlug = 'courses';
+        else typeSlug = type.toLowerCase();
+        url.searchParams.set('type', typeSlug);
+      }
+      window.history.pushState({}, '', url);
+    } catch (err) {}
+
+    window.applyEventFilters();
+  };
+
+  // Listen for SPA navigation or in-page dropdown clicks
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest('a');
+    if (!a) return;
+    const href = a.getAttribute('href') || '';
+    if ((href.includes('events.html?') || href.includes('events?')) && document.getElementById('dynamic-events-container')) {
+      try {
+        const targetUrl = new URL(a.href, window.location.origin);
+        const typeParam = targetUrl.searchParams.get('type') || targetUrl.searchParams.get('category');
+        if (typeParam) {
+          e.preventDefault();
+          window.history.pushState({}, '', a.href);
+          window.handleEventTypeUrlParam();
+          window.applyEventFilters();
+          const filterHeader = document.getElementById('event-type-select');
+          if (filterHeader) {
+            filterHeader.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }
+      } catch (err) {}
+    }
+  });
+
+  window.addEventListener('popstate', () => {
+    if (document.getElementById('dynamic-events-container')) {
+      window.handleEventTypeUrlParam();
+      window.applyEventFilters();
+    }
+  });
 
   window.applyEventFilters = function () {
     if (!window.allEventsData) return;
@@ -724,7 +817,194 @@
     }
   };
 
-  // 5. Global Modal Helpers for Job Details, Apply & Event Register
+  // ==========================================
+  // 5. PUBLIC PHOTO GALLERY SHOWCASE & LIGHTBOX
+  // ==========================================
+  window.allGalleryData = [];
+  window.activeGalleryCategory = 'all';
+
+  async function loadGalleryShowcase() {
+    const container = document.getElementById('dynamic-gallery-container');
+    if (!container) return;
+
+    try {
+      const res = await fetch(`${API_BASE}/api/public/gallery`).then(r => r.json()).catch(() => ({ gallery: [] }));
+      window.allGalleryData = res.gallery || [];
+      renderGalleryShowcase();
+    } catch (err) {
+      console.warn('Could not load public gallery:', err);
+    }
+  }
+
+  window.filterGalleryCategory = function(cat, btnElement) {
+    window.activeGalleryCategory = cat;
+    document.querySelectorAll('.gallery-category-pill').forEach(btn => {
+      btn.className = 'gallery-category-pill px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-[#123B32] hover:text-white dark:hover:bg-emerald-600 transition-all cursor-pointer';
+    });
+    if (btnElement) {
+      btnElement.className = 'gallery-category-pill px-3.5 py-1.5 rounded-full text-xs font-bold bg-[#123B32] text-white dark:bg-emerald-600 shadow-sm cursor-pointer';
+    }
+    renderGalleryShowcase();
+  };
+
+  window.scrollGalleryReel = function(delta) {
+    const reel = document.getElementById('dynamic-gallery-reel');
+    if (reel) {
+      reel.scrollBy({ left: delta, behavior: 'smooth' });
+    }
+  };
+
+  function renderGalleryShowcase() {
+    const container = document.getElementById('dynamic-gallery-container');
+    const reel = document.getElementById('dynamic-gallery-reel');
+    if (!container && !reel) return;
+
+    const allItems = window.allGalleryData || [];
+
+    // 1. Populate Horizontal Highlights Reel Slider
+    if (reel) {
+      if (allItems.length === 0) {
+        reel.innerHTML = `
+          <div class="w-full py-8 text-center text-slate-400 bg-slate-50 dark:bg-slate-900/40 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800">
+            <i class="bi bi-images text-2xl mb-1 block"></i>
+            <p class="text-xs font-semibold">No highlights uploaded yet.</p>
+          </div>
+        `;
+      } else {
+        reel.innerHTML = allItems.map(item => `
+          <div onclick="window.openGalleryLightbox('${encodeURIComponent(item.image_blob)}', '${encodeURIComponent(item.title)}', '${encodeURIComponent(item.category || '')}', '${encodeURIComponent(item.description || '')}')" class="shrink-0 w-72 sm:w-84 bg-white dark:bg-slate-900 rounded-3xl overflow-hidden border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 snap-start cursor-pointer flex flex-col justify-between group">
+            <!-- Top Image -->
+            <div class="relative w-full aspect-16/10 overflow-hidden bg-slate-950">
+              <img src="${item.image_blob}" alt="${item.title}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-106 transition-transform duration-500" onerror="this.src='images/software.png'">
+              <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+              <div class="absolute top-3 left-3">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-[#123B32] text-white dark:bg-emerald-600 font-extrabold text-[9px] uppercase tracking-wider shadow-md">
+                  ${item.category || 'HIGHLIGHT'}
+                </span>
+              </div>
+              <div class="absolute top-3 right-3 w-7 h-7 rounded-full bg-black/60 backdrop-blur-md text-white flex items-center justify-center text-[11px] opacity-0 group-hover:opacity-100 transition-opacity">
+                <i class="bi bi-arrows-fullscreen"></i>
+              </div>
+            </div>
+
+            <!-- Bottom Text Container (100% Readable) -->
+            <div class="p-4 sm:p-5 flex flex-col justify-between grow space-y-2">
+              <div>
+                <h3 class="text-sm font-bold font-heading text-slate-900 dark:text-white group-hover:text-[#123B32] dark:group-hover:text-emerald-400 transition-colors line-clamp-1 leading-snug">
+                  ${item.title}
+                </h3>
+                ${item.description ? `<p class="text-[11px] text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed mt-1">${item.description}</p>` : ''}
+              </div>
+              <div class="pt-2.5 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-[11px] font-bold text-[#123B32] dark:text-emerald-400">
+                <span class="inline-flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                  <span>View Full Size</span>
+                  <i class="bi bi-arrow-right"></i>
+                </span>
+                <span class="text-[10px] font-mono text-slate-400">HD Photo</span>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+
+    // 2. Populate Grid
+    if (!container) return;
+
+    const cat = (window.activeGalleryCategory || 'all').toLowerCase();
+    const items = allItems.filter(item => {
+      if (cat === 'all') return true;
+      const c = (item.category || '').toLowerCase();
+      return c.includes(cat) || cat.includes(c);
+    });
+
+    if (items.length === 0) {
+      container.innerHTML = `
+        <div class="col-span-full text-center p-12 bg-white dark:bg-slate-900 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800 text-slate-500 text-xs">
+          <i class="bi bi-images text-3xl block mb-2 text-slate-400"></i>
+          No media found in this category.
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = items.map(item => `
+      <div onclick="window.openGalleryLightbox('${encodeURIComponent(item.image_blob)}', '${encodeURIComponent(item.title)}', '${encodeURIComponent(item.category || '')}', '${encodeURIComponent(item.description || '')}')" class="group bg-white dark:bg-slate-900 rounded-3xl overflow-hidden border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col justify-between">
+        <!-- Top Image -->
+        <div class="relative w-full aspect-16/10 overflow-hidden bg-slate-950">
+          <img src="${item.image_blob}" alt="${item.title}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-106 transition-transform duration-500" onerror="this.src='images/software.png'">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+          <div class="absolute top-3 left-3">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-[#123B32] text-white dark:bg-emerald-600 font-extrabold text-[9px] uppercase tracking-wider shadow-md">
+              ${item.category || 'EVENT'}
+            </span>
+          </div>
+          <div class="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/60 backdrop-blur-md text-white flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity">
+            <i class="bi bi-arrows-fullscreen"></i>
+          </div>
+        </div>
+
+        <!-- Bottom Content Box with Ultra Clean Visible Typography -->
+        <div class="p-4 sm:p-5 flex flex-col justify-between grow space-y-2.5 bg-white dark:bg-slate-900">
+          <div>
+            <h3 class="text-sm sm:text-base font-extrabold font-heading text-slate-900 dark:text-white group-hover:text-[#123B32] dark:group-hover:text-emerald-400 transition-colors line-clamp-2 leading-snug">
+              ${item.title}
+            </h3>
+            ${item.description ? `<p class="text-xs text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed mt-1.5">${item.description}</p>` : ''}
+          </div>
+
+          <div class="pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs font-bold text-[#123B32] dark:text-emerald-400">
+            <span class="inline-flex items-center gap-1 text-[11px] group-hover:translate-x-0.5 transition-transform">
+              <span>View High-Res Photo</span>
+              <i class="bi bi-arrow-right"></i>
+            </span>
+            <span class="text-[10px] font-mono text-slate-400 uppercase">Gallery</span>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  };
+
+  window.openGalleryLightbox = function(encodedImg, encodedTitle, encodedCat, encodedDesc) {
+    const img = decodeURIComponent(encodedImg);
+    const title = decodeURIComponent(encodedTitle);
+    const cat = decodeURIComponent(encodedCat);
+    const desc = decodeURIComponent(encodedDesc);
+
+    const oldModal = document.getElementById('gallery-lightbox-modal');
+    if (oldModal) oldModal.remove();
+
+    const modalHtml = `
+      <div id="gallery-lightbox-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in" onclick="if(event.target === this) window.closeGalleryLightbox()">
+        <div class="relative max-w-4xl w-full bg-slate-950 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl space-y-0 text-white">
+          
+          <button onclick="window.closeGalleryLightbox()" class="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-black/60 hover:bg-white/20 text-white flex items-center justify-center text-lg transition-colors cursor-pointer" aria-label="Close Preview">
+            <i class="bi bi-x-lg"></i>
+          </button>
+
+          <div class="w-full max-h-[70vh] bg-black flex items-center justify-center overflow-hidden">
+            <img src="${img}" alt="${title}" class="max-w-full max-h-[70vh] object-contain">
+          </div>
+
+          <div class="p-6 bg-slate-900 border-t border-slate-800 space-y-2">
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded-full bg-emerald-600 text-white font-mono font-bold text-[10px] uppercase">${cat || 'EVENT'}</span>
+            </div>
+            <h2 class="text-lg font-bold font-heading text-white">${title}</h2>
+            ${desc ? `<p class="text-xs text-slate-300 leading-relaxed">${desc}</p>` : ''}
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+  };
+
+  window.closeGalleryLightbox = function() {
+    const modal = document.getElementById('gallery-lightbox-modal');
+    if (modal) modal.remove();
+  };
+
+  // 6. Global Modal Helpers for Job Details, Apply & Event Register
   window.openJobDetailsModal = async function(jobId) {
     let job = (window.allCareersData || []).find(j => String(j.id) === String(jobId));
     if (!job) {
@@ -1934,6 +2214,7 @@ ${job.description || 'No description provided.'}
     loadAnnouncementsPage();
     loadCareers();
     loadEvents();
+    loadGalleryShowcase();
 
     // 3-Tier Multi-Filter Listeners
     // Tier 1: Event Type Cards

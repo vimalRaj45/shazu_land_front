@@ -316,6 +316,13 @@
           <span id="badge-slider-count" class="px-1.5 py-0.5 bg-emerald-100 text-emerald-700 text-[10px] font-mono font-bold rounded-md leading-none">0</span>
         </button>
 
+        <!-- PHOTO GALLERY (BLOB STORAGE) TAB -->
+        <button onclick="switchTab('gallery')" id="nav-gallery" class="nav-tab-pill flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 cursor-pointer">
+          <i class="bi bi-camera-fill text-indigo-600"></i>
+          <span>Gallery</span>
+          <span id="badge-gallery-count" class="px-1.5 py-0.5 bg-indigo-100 text-indigo-700 text-[10px] font-mono font-bold rounded-md leading-none">0</span>
+        </button>
+
         <!-- ACCESS MANAGEMENT TAB (Visible to Super Admin) -->
         <button onclick="switchTab('users')" id="nav-users" class="nav-tab-pill flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 cursor-pointer">
           <i class="bi bi-shield-lock-fill text-rose-600"></i>
@@ -994,6 +1001,41 @@
       </div>
 
       <!-- ========================================== -->
+      <!-- TAB: PHOTO GALLERY (BLOB STORAGE) -->
+      <!-- ========================================== -->
+      <div id="tab-gallery" class="hidden space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h2 class="text-lg font-bold font-heading text-slate-900 flex items-center gap-2">
+              <i class="bi bi-camera-fill text-indigo-600"></i>
+              <span>Official Photo Gallery & Events Media</span>
+            </h2>
+            <p class="text-xs text-slate-500">Upload high-resolution event photographs stored directly in database as Base64/BLOB</p>
+          </div>
+          <button id="btn-create-gallery" onclick="openGalleryModal()" class="px-4 py-2 bg-[#123B32] hover:bg-[#2F5B4E] text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-xs">
+            <i class="bi bi-cloud-upload-fill"></i> Upload New Photo
+          </button>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full min-w-[850px] text-left text-xs">
+              <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase font-semibold text-[10px]">
+                <tr>
+                  <th class="p-3">Photo Preview</th>
+                  <th class="p-3">Title & Category</th>
+                  <th class="p-3">Description</th>
+                  <th class="p-3">Status</th>
+                  <th class="p-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="gallery-table-body" class="divide-y divide-slate-100"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================== -->
       <!-- TAB 10: ACCESS MANAGEMENT (SUPER ADMIN) -->
       <!-- ========================================== -->
       <div id="tab-users" class="hidden space-y-4">
@@ -1164,6 +1206,7 @@
       announcements: [],
       offerings: [],
       slides: [],
+      gallery: [],
       users: [],
       audit: []
     };
@@ -1930,6 +1973,7 @@
       else if (tabId === 'announcements') loadAnnouncements();
       else if (tabId === 'offerings') loadOfferings();
       else if (tabId === 'slider') loadSlider();
+      else if (tabId === 'gallery') loadGallery();
       else if (tabId === 'users') loadUsers();
       else if (tabId === 'audit') loadAuditLogs();
     }
@@ -1944,7 +1988,22 @@
       statusSelect.innerHTML = '<option value="all">All Statuses</option>';
       categorySelect.innerHTML = '<option value="all">All Categories</option>';
 
-      if (tab === 'leads') {
+      if (tab === 'gallery') {
+        statusSelect.innerHTML += `
+          <option value="active">Active Photos</option>
+          <option value="inactive">Hidden Photos</option>
+        `;
+        categorySelect.innerHTML += `
+          <option value="Conferences & MoUs">Conferences & MoUs</option>
+          <option value="Conferences">Conferences</option>
+          <option value="MoUs & Delegations">MoUs & Delegations</option>
+          <option value="Memberships">Memberships</option>
+          <option value="Hackathons">Hackathons</option>
+          <option value="Workshops">Workshops</option>
+          <option value="Celebrations">Celebrations</option>
+          <option value="General">General</option>
+        `;
+      } else if (tab === 'leads') {
         statusSelect.innerHTML += `
           <option value="New Lead">New Lead</option>
           <option value="Contacted">Contacted</option>
@@ -3570,6 +3629,7 @@
       else if (currentTab === 'offerings') dataToExport = tableData.offerings;
       else if (currentTab === 'users') dataToExport = tableData.users;
       else if (currentTab === 'slider') dataToExport = tableData.slides;
+      else if (currentTab === 'gallery') dataToExport = tableData.gallery;
       else if (currentTab === 'audit') dataToExport = tableData.audit;
       else if (currentTab === 'analytics') dataToExport = (tableData.analytics && tableData.analytics.recentTransactions) ? tableData.analytics.recentTransactions : [];
 
@@ -4121,6 +4181,7 @@
       else if (currentTab === 'offerings') renderOfferingsTable();
       else if (currentTab === 'users') renderUsersTable();
       else if (currentTab === 'slider') renderSliderTable();
+      else if (currentTab === 'gallery') renderGalleryTable();
       else if (currentTab === 'audit') renderAuditTable();
       else if (currentTab === 'analytics') loadAnalytics();
     }
@@ -4340,6 +4401,215 @@
           loadSlider();
         } catch (err) {
           showToast('Error deleting slide', 'error');
+        }
+      });
+    }
+
+    // ==========================================
+    // PHOTO GALLERY (BLOB STORAGE) CRUD
+    // ==========================================
+    async function loadGallery() {
+      try {
+        renderTableLoadingSkeleton('gallery-table-body', 5);
+        const { ok, data } = await safeFetchJson(`${API_BASE}/api/admin/gallery`, { headers: getAuthHeaders() });
+        tableData.gallery = data.gallery || [];
+        const badgeCount = document.getElementById('badge-gallery-count');
+        if (badgeCount) badgeCount.textContent = tableData.gallery.length;
+        renderGalleryTable();
+      } catch (err) {
+        showToast('Error loading gallery photos', 'error');
+      }
+    }
+
+    function renderGalleryTable() {
+      const tbody = document.getElementById('gallery-table-body');
+      if (!tbody) return;
+
+      const items = filterAndSortArray(tableData.gallery, 'created_at', 'title', 'is_active', 'category');
+
+      tbody.innerHTML = items.map(item => `
+        <tr class="hover:bg-indigo-50/30 cursor-pointer transition-colors" onclick="openGalleryModal(${item.id})">
+          <td class="p-3">
+            <div class="relative w-24 h-16 rounded-xl overflow-hidden border border-slate-200 bg-slate-900 shadow-2xs group">
+              <img src="${item.image_blob}" alt="${item.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform" onerror="this.src='images/software.png'">
+            </div>
+          </td>
+          <td class="p-3">
+            <span class="inline-block px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-indigo-100 text-indigo-800 border border-indigo-300/60 mb-1">${item.category || 'General'}</span>
+            <span class="block font-bold text-slate-900 text-xs leading-snug">${item.title}</span>
+          </td>
+          <td class="p-3 text-slate-500 text-xs max-w-sm leading-relaxed">${item.description || '—'}</td>
+          <td class="p-3">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase ${item.is_active !== false ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-500'}">
+              ${item.is_active !== false ? 'Active' : 'Hidden'}
+            </span>
+          </td>
+          <td class="p-3 text-right space-x-1.5 whitespace-nowrap" onclick="event.stopPropagation()">
+            <button onclick="openGalleryModal(${item.id})" title="Edit Photo" class="p-1.5 bg-slate-100 hover:bg-amber-600 hover:text-white text-slate-700 rounded-lg text-xs font-semibold transition-colors shadow-2xs cursor-pointer"><i class="bi bi-pencil"></i></button>
+            <button onclick="confirmDeleteGallery(${item.id})" title="Delete Photo" class="p-1.5 bg-slate-100 hover:bg-red-600 hover:text-white text-red-600 rounded-lg text-xs font-semibold transition-colors shadow-2xs cursor-pointer"><i class="bi bi-trash"></i></button>
+          </td>
+        </tr>
+      `).join('') || '<tr><td colspan="5" class="p-8 text-center text-slate-400">No gallery photos uploaded yet. Click "Upload New Photo" to add one.</td></tr>';
+    }
+
+    function openGalleryModal(id = null) {
+      if (!hasPermission('create') && !id) {
+        showToast('Creation is disabled for your access role', 'error');
+        return;
+      }
+      const isEdit = !!id;
+      const item = isEdit ? tableData.gallery.find(g => g.id === id) : {};
+
+      showModal(`
+        <h3 class="text-base font-bold font-heading text-slate-900">${isEdit ? 'Edit Gallery Photo' : 'Upload Gallery Photo (Direct DB BLOB)'}</h3>
+        <form onsubmit="saveGallery(event, ${id || 'null'})" class="space-y-3.5 text-xs">
+          <div>
+            <label class="block text-slate-700 font-bold mb-1">Select Photo File (Converted & Saved as Base64/BLOB in Database) *</label>
+            
+            <label for="gallery-file-input" class="border-2 border-dashed border-indigo-200 hover:border-[#123B32] rounded-2xl p-5 text-center bg-slate-50 hover:bg-indigo-50/30 transition-colors cursor-pointer block">
+              <input type="file" id="gallery-file-input" accept="image/*" onchange="previewUploadedGallery(event)" class="hidden">
+              <div class="space-y-1.5">
+                <i class="bi bi-cloud-arrow-up-fill text-3xl text-[#123B32]"></i>
+                <div class="font-bold text-slate-800">Click to choose image file from device</div>
+                <div class="text-[10px] text-slate-500">Supports JPG, PNG, WEBP, SVG • Stored directly as BLOB payload in database</div>
+              </div>
+            </label>
+
+            <!-- Image Preview Box -->
+            <div id="gallery-preview-box" class="${item.image_blob ? '' : 'hidden'} mt-3 space-y-1.5">
+              <div class="flex items-center justify-between text-[11px]">
+                <span class="font-semibold text-slate-600">Selected Photo Preview:</span>
+                <span id="gallery-file-meta" class="text-slate-400 font-mono text-[10px]"></span>
+              </div>
+              <div class="h-40 w-full rounded-2xl overflow-hidden border border-slate-200 bg-slate-950 flex items-center justify-center shadow-inner">
+                <img id="gallery-img-preview" src="${item.image_blob || ''}" class="w-full h-full object-contain">
+              </div>
+            </div>
+
+            <!-- Hidden input holding the base64 BLOB -->
+            <input type="hidden" id="gallery-image-blob" value="${item.image_blob || ''}">
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-slate-700 font-bold mb-1">Photo Title / Event Name *</label>
+              <input type="text" id="gallery-title" required value="${item.title || ''}" placeholder="e.g. National Hackathon Award Ceremony" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32]">
+            </div>
+            <div>
+              <label class="block text-slate-700 font-bold mb-1">Category *</label>
+              <select id="gallery-category" required class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32] cursor-pointer">
+                <option value="Conferences & MoUs" ${item.category === 'Conferences & MoUs' ? 'selected' : ''}>Conferences & MoUs</option>
+                <option value="Conferences" ${item.category === 'Conferences' ? 'selected' : ''}>Conferences</option>
+                <option value="MoUs & Delegations" ${item.category === 'MoUs & Delegations' ? 'selected' : ''}>MoUs & Delegations</option>
+                <option value="Memberships" ${item.category === 'Memberships' ? 'selected' : ''}>Memberships</option>
+                <option value="Hackathons" ${item.category === 'Hackathons' ? 'selected' : ''}>Hackathons</option>
+                <option value="Workshops" ${item.category === 'Workshops' ? 'selected' : ''}>Workshops</option>
+                <option value="Celebrations" ${item.category === 'Celebrations' ? 'selected' : ''}>Celebrations</option>
+                <option value="General" ${item.category === 'General' ? 'selected' : ''}>General</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-slate-700 font-bold mb-1">Description / Event Context</label>
+            <textarea id="gallery-description" rows="2" placeholder="Describe the occasion, guests, or milestone..." class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-[#123B32]">${item.description || ''}</textarea>
+          </div>
+
+          <div class="flex items-center gap-2 pt-1">
+            <input type="checkbox" id="gallery-is-active" ${item.is_active !== false ? 'checked' : ''} class="w-4 h-4 text-emerald-600 rounded">
+            <label for="gallery-is-active" class="text-xs font-semibold text-slate-700">Display in Active Homepage Photo Gallery</label>
+          </div>
+
+          <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+            <button type="button" onclick="closeModal()" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl text-xs font-semibold">Cancel</button>
+            <button type="submit" class="px-5 py-2 bg-[#123B32] hover:bg-[#2F5B4E] text-white rounded-xl text-xs font-semibold shadow-sm">${isEdit ? 'Update Photo' : 'Save & Store in Database'}</button>
+          </div>
+        </form>
+      `);
+    }
+
+    function previewUploadedGallery(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      if (file.size > 12 * 1024 * 1024) {
+        showToast('Image size exceeds 12MB limit', 'error');
+        return;
+      }
+
+      const metaEl = document.getElementById('gallery-file-meta');
+      if (metaEl) {
+        metaEl.textContent = `${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const dataUrl = event.target.result;
+        const blobInput = document.getElementById('gallery-image-blob');
+        const previewBox = document.getElementById('gallery-preview-box');
+        const imgPreview = document.getElementById('gallery-img-preview');
+        if (blobInput) blobInput.value = dataUrl;
+        if (imgPreview) imgPreview.src = dataUrl;
+        if (previewBox) previewBox.classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function saveGallery(e, id) {
+      e.preventDefault();
+      const title = document.getElementById('gallery-title').value.trim();
+      const category = document.getElementById('gallery-category').value.trim();
+      const description = document.getElementById('gallery-description').value.trim();
+      const image_blob = document.getElementById('gallery-image-blob').value.trim();
+      const is_active = document.getElementById('gallery-is-active').checked;
+
+      if (!image_blob) {
+        showToast('Please select and upload an image file', 'error');
+        return;
+      }
+
+      const payload = { title, category, description, image_blob, is_active };
+
+      try {
+        if (id) {
+          const res = await safeFetchJson(`${API_BASE}/api/admin/gallery/${id}`, {
+            method: 'PUT',
+            headers: getAuthHeaders(),
+            body: JSON.stringify(payload)
+          });
+          if (!res.ok) throw new Error(res.data?.error || 'Failed to update gallery photo');
+          showToast('Gallery photo updated');
+        } else {
+          const res = await safeFetchJson(`${API_BASE}/api/admin/gallery`, {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify(payload)
+          });
+          if (!res.ok) throw new Error(res.data?.error || 'Failed to save photo');
+          showToast('Photo uploaded and stored in database as BLOB');
+        }
+        closeModal();
+        loadGallery();
+      } catch (err) {
+        showToast(err.message || 'Error saving gallery photo', 'error');
+      }
+    }
+
+    function confirmDeleteGallery(id) {
+      if (!hasPermission('delete')) {
+        showToast('Deletion disabled for your role', 'error');
+        return;
+      }
+      showConfirmModal('Delete Gallery Photo', 'Are you sure you want to permanently delete this photo from the database gallery?', 'Delete Photo', async () => {
+        try {
+          await safeFetchJson(`${API_BASE}/api/admin/gallery/${id}`, {
+            method: 'DELETE',
+            headers: getAuthHeaders()
+          });
+          showToast('Gallery photo deleted');
+          loadGallery();
+        } catch (err) {
+          showToast('Error deleting photo', 'error');
         }
       });
     }

@@ -85,20 +85,11 @@
           </div>
         </a>
 
-        <!-- About Us Accordion -->
-        <div class="mobile-accordion space-y-1">
-          <button type="button" class="mobile-accordion-toggle flex items-center justify-between w-full px-3.5 py-2.5 rounded-lg font-medium text-xs text-[#475569] dark:text-[#cbd5e1] hover:text-[#123B32] hover:bg-[#E8EFEB] dark:hover:bg-[#1e293b] transition-all cursor-pointer">
-            <div class="flex items-center gap-3">
-              <i class="uil uil-info-circle text-base text-[#123B32]"></i>
-              <span>About Us</span>
-            </div>
-            <i class="bi bi-chevron-down text-[10px] transition-transform duration-200 accordion-arrow"></i>
-          </button>
-          <div class="mobile-accordion-menu hidden pl-9 space-y-1.5 pt-1 border-l border-slate-100 dark:border-slate-800 ml-4">
-            <a href="about.html" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32]">About Company</a>
-            <a href="membership.html" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32]">Membership & Chapters</a>
-          </div>
-        </div>
+        <!-- About Us Direct Link -->
+        <a href="about.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-lg font-medium text-xs text-[#475569] dark:text-[#cbd5e1] hover:text-[#123B32] hover:bg-[#E8EFEB] dark:hover:bg-[#1e293b] transition-all">
+          <i class="uil uil-info-circle text-base text-[#123B32]"></i>
+          <span>About Us</span>
+        </a>
 
         <!-- Services Accordion -->
         <div class="mobile-accordion space-y-1">
@@ -126,10 +117,28 @@
             <i class="bi bi-chevron-down text-[10px] transition-transform duration-200 accordion-arrow"></i>
           </button>
           <div class="mobile-accordion-menu hidden pl-9 space-y-1.5 pt-1 border-l border-slate-100 dark:border-slate-800 ml-4">
-            <a href="events.html" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32]">Upcoming Events</a>
-            <a href="events.html#hackathons" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32]">Hackathons & Contests</a>
+            <a href="events.html?type=conference" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32] flex items-center gap-1.5">
+              <i class="bi bi-mortarboard-fill text-amber-500 text-[10px]"></i> Conferences & Symposia
+            </a>
+            <a href="events.html?type=hackathon" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32] flex items-center gap-1.5">
+              <i class="bi bi-trophy-fill text-emerald-500 text-[10px]"></i> Hackathons & Contests
+            </a>
+            <a href="events.html?type=fdp" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32] flex items-center gap-1.5">
+              <i class="bi bi-person-video3 text-blue-500 text-[10px]"></i> FDP & Workshops
+            </a>
+            <a href="events.html?type=courses" class="block py-1 text-xs text-[#64748B] dark:text-[#cbd5e1] hover:text-[#123B32] flex items-center gap-1.5">
+              <i class="bi bi-journal-code text-purple-500 text-[10px]"></i> Professional Courses
+            </a>
           </div>
         </div>
+
+        <!-- Gallery Direct Link -->
+        <a href="gallery.html" class="flex items-center justify-between px-3.5 py-2.5 rounded-lg font-medium text-xs text-[#475569] dark:text-[#cbd5e1] hover:text-[#123B32] hover:bg-[#E8EFEB] dark:hover:bg-[#1e293b] transition-all">
+          <div class="flex items-center gap-3">
+            <i class="bi bi-images text-base text-[#123B32]"></i>
+            <span>Gallery</span>
+          </div>
+        </a>
 
         <a href="careers.html" class="flex items-center justify-between px-3.5 py-2.5 rounded-lg font-medium text-xs text-[#475569] hover:text-[#123B32] hover:bg-[#E8EFEB] transition-all">
           <div class="flex items-center gap-3">
@@ -173,24 +182,8 @@
       <nav class="hidden lg:flex items-center space-x-1 font-heading shrink-0">
         <a href="index.html" class="nav-link-pill"><i class="uil uil-estate text-[14px]"></i>Home</a>
 
-        <!-- About Us Dropdown -->
-        <div class="relative group">
-          <a href="about.html" class="nav-link-pill flex items-center gap-1">
-            <i class="uil uil-info-circle text-[14px]"></i>
-            <span>About Us</span>
-            <i class="bi bi-chevron-down text-[10px] ml-0.5 transition-transform duration-200 group-hover:rotate-180"></i>
-          </a>
-          <div class="absolute left-0 top-full pt-2 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 z-50 min-w-[210px]">
-            <div class="nav-dropdown-menu p-1.5 space-y-0.5">
-              <a href="about.html" class="nav-dropdown-item block px-3.5 py-2">
-                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32]">About Company</span>
-              </a>
-              <a href="membership.html" class="nav-dropdown-item block px-3.5 py-2">
-                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32]">Membership & Chapters</span>
-              </a>
-            </div>
-          </div>
-        </div>
+        <!-- About Us Direct Link -->
+        <a href="about.html" class="nav-link-pill dark:text-[#E2E8F0] dark:hover:text-[#6EE7B7]"><i class="uil uil-info-circle text-[14px]"></i>About Us</a>
 
         <!-- Services Dropdown -->
         <div class="relative group">
@@ -219,28 +212,45 @@
 
         <!-- Events Dropdown -->
         <div class="relative group">
-          <a href="events.html" class="nav-link-pill flex items-center gap-1">
+          <a href="events.html" class="nav-link-pill flex items-center gap-1 dark:text-[#E2E8F0] dark:hover:text-[#6EE7B7]">
             <i class="uil uil-calendar-alt text-[14px]"></i>
             <span>Events</span>
             <i class="bi bi-chevron-down text-[10px] ml-0.5 transition-transform duration-200 group-hover:rotate-180"></i>
           </a>
-          <div class="absolute left-0 top-full pt-2 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 z-50 min-w-[210px]">
+          <div class="absolute left-0 top-full pt-2 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-200 z-50 min-w-[240px]">
             <div class="nav-dropdown-menu p-1.5 space-y-0.5">
-              <a href="events.html" class="nav-dropdown-item block px-3.5 py-2">
-                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32]">Upcoming Events</span>
+              <a href="events.html?type=conference" class="nav-dropdown-item block px-3.5 py-2">
+                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32] flex items-center gap-2">
+                  <i class="bi bi-mortarboard-fill text-amber-500"></i> Conferences & Symposia
+                </span>
               </a>
-              <a href="events.html#hackathons" class="nav-dropdown-item block px-3.5 py-2">
-                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32]">Hackathons & Contests</span>
+              <a href="events.html?type=hackathon" class="nav-dropdown-item block px-3.5 py-2">
+                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32] flex items-center gap-2">
+                  <i class="bi bi-trophy-fill text-emerald-500"></i> Hackathons & Contests
+                </span>
+              </a>
+              <a href="events.html?type=fdp" class="nav-dropdown-item block px-3.5 py-2">
+                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32] flex items-center gap-2">
+                  <i class="bi bi-person-video3 text-blue-500"></i> FDP & Workshops
+                </span>
+              </a>
+              <a href="events.html?type=courses" class="nav-dropdown-item block px-3.5 py-2">
+                <span class="block text-xs font-bold text-[#0F172A] dark:text-[#f8fafc] hover:text-[#123B32] flex items-center gap-2">
+                  <i class="bi bi-journal-code text-purple-500"></i> Professional Courses
+                </span>
               </a>
             </div>
           </div>
         </div>
 
-        <a href="careers.html" class="nav-link-pill"><i class="uil uil-briefcase-alt text-[14px]"></i>Career</a>
+        <!-- Gallery Nav Pill -->
+        <a href="gallery.html" class="nav-link-pill dark:text-[#E2E8F0] dark:hover:text-[#6EE7B7]"><i class="bi bi-images text-[14px]"></i>Gallery</a>
+
+        <a href="careers.html" class="nav-link-pill dark:text-[#E2E8F0] dark:hover:text-[#6EE7B7]"><i class="uil uil-briefcase-alt text-[14px]"></i>Career</a>
 
         <!-- Contact Dropdown -->
         <div class="relative group">
-          <a href="contact.html" class="nav-link-pill flex items-center gap-1">
+          <a href="contact.html" class="nav-link-pill flex items-center gap-1 dark:text-[#E2E8F0] dark:hover:text-[#6EE7B7]">
             <i class="uil uil-envelope text-[14px]"></i>
             <span>Contact Us</span>
             <i class="bi bi-chevron-down text-[10px] ml-0.5 transition-transform duration-200 group-hover:rotate-180"></i>
@@ -335,9 +345,80 @@
         <span class="w-6 h-0.5 bg-[#0F172A] rounded-full pointer-events-none"></span>
         <span class="w-6 h-0.5 bg-[#0F172A] rounded-full pointer-events-none"></span>
       </button>
+        <label class="switch" title="Toggle Theme">
+          <input class="theme-toggle-input" type="checkbox" />
+          <div class="slider round">
+            <div class="sun-moon">
+              <svg id="moon-dot-1" class="moon-dot" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50"></circle>
+              </svg>
+              <svg id="moon-dot-2" class="moon-dot" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50"></circle>
+              </svg>
+              <svg id="moon-dot-3" class="moon-dot" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50"></circle>
+              </svg>
+              <svg id="light-ray-1" class="light-ray" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50"></circle>
+              </svg>
+              <svg id="light-ray-2" class="light-ray" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50"></circle>
+              </svg>
+              <svg id="light-ray-3" class="light-ray" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50"></circle>
+              </svg>
+
+              <svg id="cloud-1" class="cloud-dark" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50"></circle>
+              </svg>
+              <svg id="cloud-2" class="cloud-dark" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50"></circle>
+              </svg>
+              <svg id="cloud-3" class="cloud-dark" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50"></circle>
+              </svg>
+              <svg id="cloud-4" class="cloud-light" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50"></circle>
+              </svg>
+              <svg id="cloud-5" class="cloud-light" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50"></circle>
+              </svg>
+              <svg id="cloud-6" class="cloud-light" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50"></circle>
+              </svg>
+            </div>
+            <div class="stars">
+              <svg id="star-1" class="star" viewBox="0 0 20 20">
+                <path d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"></path>
+              </svg>
+              <svg id="star-2" class="star" viewBox="0 0 20 20">
+                <path d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"></path>
+              </svg>
+              <svg id="star-3" class="star" viewBox="0 0 20 20">
+                <path d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"></path>
+              </svg>
+              <svg id="star-4" class="star" viewBox="0 0 20 20">
+                <path d="M 0 10 C 10 10,10 10 ,0 10 C 10 10 , 10 10 , 10 20 C 10 10 , 10 10 , 20 10 C 10 10 , 10 10 , 10 0 C 10 10,10 10 ,0 10 Z"></path>
+              </svg>
+            </div>
+          </div>
+        </label>
+
+        <div class="hidden lg:block">
+          <a href="membership.html" class="inline-flex items-center justify-center px-5 py-2.5 rounded-lg bg-[#123B32] hover:bg-[#2F5B4E] text-white text-xs font-bold transition-all duration-150 shadow-xs">
+            Join Us
+          </a>
+        </div>
+      </div>
+
+      <!-- Pure Tailwind Animated Hamburger Bars -->
+      <button id="mobile-menu-btn" class="lg:hidden p-2 text-[#0F172A] hover:text-[#123B32] focus:outline-none cursor-pointer relative z-40 flex flex-col justify-center items-center w-10 h-10 space-y-1.5" aria-label="Toggle Navigation Menu">
+        <span class="w-6 h-0.5 bg-[#0F172A] rounded-full pointer-events-none"></span>
+        <span class="w-6 h-0.5 bg-[#0F172A] rounded-full pointer-events-none"></span>
+      </button>
     </div>
   </header>
-    <div id="dynamic-announcement-bar"></div>
+  <div id="dynamic-announcement-bar"></div>
 </div>
 
   <!-- Main Content -->
@@ -399,24 +480,48 @@
 
         </div>
 
+        <!-- Hero Right Column: Illustration + 3 Core Value Promises -->
         <div class="lg:col-span-5 flex flex-col justify-center space-y-4">
           <div class="p-4 bg-white dark:bg-[#1e293b] border border-brand-border dark:border-[#334155] rounded-3xl shadow-2xl hover-lift relative overflow-hidden">
             <img loading="lazy" decoding="async" src="images/education.png" alt="Education Services Illustration" class="w-full max-h-72 object-contain img-interactive img-float mx-auto">
           </div>
 
-          <!-- Impact Metrics Grid -->
-          <div class="grid grid-cols-3 gap-2.5 text-center">
-            <div class="p-3 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs">
-              <span class="block text-lg sm:text-xl font-extrabold font-mono text-[#123B32] dark:text-emerald-400">50+</span>
-              <span class="block text-[10px] text-slate-500 dark:text-slate-400 uppercase font-semibold">Institutions</span>
+          <!-- Core Value Commitments & Promises Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-left">
+            <div class="p-3 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs hover:border-[#123B32] transition-all">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="w-6 h-6 rounded-lg bg-emerald-100 dark:bg-emerald-950 text-[#123B32] dark:text-emerald-400 flex items-center justify-center text-xs font-bold shrink-0">
+                  <i class="bi bi-shield-check"></i>
+                </span>
+                <span class="text-xs font-bold font-heading text-slate-900 dark:text-white leading-tight">Industry Ready</span>
+              </div>
+              <p class="text-[10px] text-slate-500 dark:text-slate-400 leading-snug font-normal">
+                Curriculum tailored to real-world tech stacks & tools.
+              </p>
             </div>
-            <div class="p-3 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs">
-              <span class="block text-lg sm:text-xl font-extrabold font-mono text-[#123B32] dark:text-emerald-400">15,000+</span>
-              <span class="block text-[10px] text-slate-500 dark:text-slate-400 uppercase font-semibold">Students</span>
+            
+            <div class="p-3 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs hover:border-[#123B32] transition-all">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="w-6 h-6 rounded-lg bg-emerald-100 dark:bg-emerald-950 text-[#123B32] dark:text-emerald-400 flex items-center justify-center text-xs font-bold shrink-0">
+                  <i class="bi bi-person-workspace"></i>
+                </span>
+                <span class="text-xs font-bold font-heading text-slate-900 dark:text-white leading-tight">Live Mentors</span>
+              </div>
+              <p class="text-[10px] text-slate-500 dark:text-slate-400 leading-snug font-normal">
+                Direct guidance from practicing developers & leads.
+              </p>
             </div>
-            <div class="p-3 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs">
-              <span class="block text-lg sm:text-xl font-extrabold font-mono text-[#123B32] dark:text-emerald-400">100%</span>
-              <span class="block text-[10px] text-slate-500 dark:text-slate-400 uppercase font-semibold">Hands-on</span>
+
+            <div class="p-3 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xs hover:border-[#123B32] transition-all">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="w-6 h-6 rounded-lg bg-emerald-100 dark:bg-emerald-950 text-[#123B32] dark:text-emerald-400 flex items-center justify-center text-xs font-bold shrink-0">
+                  <i class="bi bi-code-slash"></i>
+                </span>
+                <span class="text-xs font-bold font-heading text-slate-900 dark:text-white leading-tight">Pure Hands-on</span>
+              </div>
+              <p class="text-[10px] text-slate-500 dark:text-slate-400 leading-snug font-normal">
+                Live build sprints, practical labs & certified outcomes.
+              </p>
             </div>
           </div>
 
@@ -510,23 +615,6 @@
         </div>
       </div>
     </section>
-
-    <!-- Accreditation Advisory Banner with glassmorphism-blue -->
-    <section data-aos="fade-up" class="py-12 md:py-10 md:py-12 bg-brand-lightGreen">
-      <div class="max-w-4xl mx-auto px-6 text-center">
-        <div class="glassmorphism-blue p-6 md:p-12 rounded-2xl border border-brand-green/20 space-y-6">
-          <h3 class="text-2xl font-extrabold font-heading text-brand-darkText">Collaborating with Mahendra Engineering College</h3>
-          <p class="text-brand-secText text-xs md:text-sm max-w-2xl mx-auto leading-relaxed">
-            Our MoU agreements deliver continuous industrial exposure workshops, certified technical modules, and project support frameworks directly to academic divisions in Salem & Namakkal region.
-          </p>
-          <div class="pt-2">
-            <a href="contact.html" class="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-brand-green hover:bg-brand-hoverGreen text-white font-semibold text-xs transition-all shadow-sm">
-              Schedule Campus Seminar
-            </a>
-          </div>
-        </div>
-      </div>
-    </section>
   </main>
 
   <!-- Footer Section -->
@@ -550,17 +638,11 @@
           <a href="https://www.linkedin.com/company/shazu-soft-technologies" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-[#123B32] border border-white/10 hover:border-emerald-500/50 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-xs" title="LinkedIn" aria-label="LinkedIn">
             <i class="bi bi-linkedin text-xs"></i>
           </a>
-          <a href="https://x.com/shazusoft" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-[#123B32] border border-white/10 hover:border-emerald-500/50 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-xs" title="Twitter / X" aria-label="Twitter">
-            <i class="bi bi-twitter-x text-xs"></i>
-          </a>
           <a href="https://www.instagram.com/shazusofttechnologies" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-[#123B32] border border-white/10 hover:border-emerald-500/50 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-xs" title="Instagram" aria-label="Instagram">
             <i class="bi bi-instagram text-xs"></i>
           </a>
           <a href="https://www.facebook.com/shazusofttechnologies" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-[#123B32] border border-white/10 hover:border-emerald-500/50 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-xs" title="Facebook" aria-label="Facebook">
             <i class="bi bi-facebook text-xs"></i>
-          </a>
-          <a href="https://github.com/shazusoft" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-[#123B32] border border-white/10 hover:border-emerald-500/50 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-xs" title="GitHub" aria-label="GitHub">
-            <i class="bi bi-github text-xs"></i>
           </a>
           <a href="https://youtube.com/@shazusofttechnologies" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-xl bg-white/5 hover:bg-[#123B32] border border-white/10 hover:border-emerald-500/50 text-slate-300 hover:text-white flex items-center justify-center transition-all duration-200 hover:scale-110 shadow-xs" title="YouTube" aria-label="YouTube">
             <i class="bi bi-youtube text-xs"></i>
