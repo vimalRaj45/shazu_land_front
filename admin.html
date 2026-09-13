@@ -2480,6 +2480,13 @@
           </td>
           <td class="p-3 font-mono text-slate-700">
             ${r.transaction_id ? `<span class="px-2 py-1 bg-slate-100 border border-slate-200 rounded text-xs font-bold text-[#123B32]">${r.transaction_id}</span>` : '<span class="text-slate-400 text-xs">N/A (Free)</span>'}
+            ${r.payment_screenshot ? `
+              <div class="pt-1">
+                <button type="button" onclick="event.stopPropagation(); window.open('${r.payment_screenshot}', '_blank')" class="px-2 py-0.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 rounded text-[10px] font-bold inline-flex items-center gap-1 shadow-2xs cursor-pointer" title="View Uploaded Payment Receipt Screenshot">
+                  <i class="bi bi-receipt text-xs"></i> <span>Receipt Attached</span>
+                </button>
+              </div>
+            ` : ''}
           </td>
           <td class="p-3" onclick="event.stopPropagation()">
             <select onchange="updateRegistrationPaymentStatus(${r.id}, this.value)" class="bg-white text-slate-800 border border-slate-200 rounded-lg px-2 py-1 text-[11px] font-semibold cursor-pointer shadow-2xs">
@@ -3784,9 +3791,26 @@
             </div>
           </div>
 
-          <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs">
-            <span class="block text-slate-500 font-bold mb-1">Transaction ID / Payment UTR:</span>
-            <span class="font-mono font-bold text-sm text-[#123B32]">${item.transaction_id || 'N/A (Free Event / Walk-in)'}</span>
+          <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-slate-500 font-bold">Transaction ID / Payment UTR:</span>
+              <span class="font-mono font-bold text-sm text-[#123B32]">${item.transaction_id || 'N/A (Free Event / Walk-in)'}</span>
+            </div>
+            ${item.payment_screenshot ? `
+              <div class="pt-2 border-t border-slate-200 space-y-1.5">
+                <span class="font-bold text-slate-700 flex items-center gap-1.5"><i class="bi bi-receipt text-[#123B32]"></i> Payment Screenshot / Receipt:</span>
+                <div class="flex items-start gap-3 bg-white p-2.5 rounded-xl border border-slate-200">
+                  <img src="${item.payment_screenshot}" alt="Payment Proof" class="max-h-48 max-w-[200px] w-auto h-auto object-contain bg-slate-950 rounded-lg border border-slate-300 shadow-sm p-1 cursor-pointer" onclick="window.open('${item.payment_screenshot}', '_blank')" title="Click to open in new tab">
+                  <div class="space-y-1 text-slate-500 text-[11px] flex-1">
+                    <span class="font-bold text-emerald-700 block"><i class="bi bi-check-circle-fill"></i> Uploaded by Attendee</span>
+                    <span class="block text-slate-400 text-[10px]">Click image to inspect full high-resolution receipt.</span>
+                    <a href="${item.payment_screenshot}" target="_blank" class="inline-flex items-center gap-1 text-[#123B32] font-bold hover:underline mt-1"><i class="bi bi-box-arrow-up-right text-[10px]"></i> Open in New Tab</a>
+                  </div>
+                </div>
+              </div>
+            ` : `
+              <div class="pt-1 border-t border-slate-200 text-[11px] text-slate-400 italic">No payment screenshot attached by attendee.</div>
+            `}
           </div>
 
           <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2">
