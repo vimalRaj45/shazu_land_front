@@ -661,6 +661,56 @@
     }
   };
 
+  // Helper: Determine if an event is concluded by status OR if its scheduled date has passed
+  window.isEventPassed = function(ev) {
+    if (!ev) return false;
+    const statusLower = (ev.status || '').toLowerCase().trim();
+    if (statusLower === 'past' || statusLower === 'completed' || statusLower === 'closed' || statusLower === 'concluded') {
+      return true;
+    }
+
+    const rawDate = (ev.event_date || '').trim();
+    if (!rawDate) return false;
+
+    try {
+      // 1. Match YYYY-MM-DD or YYYY/MM/DD
+      const isoMatch = rawDate.match(/(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
+      if (isoMatch) {
+        const year = parseInt(isoMatch[1], 10);
+        const month = parseInt(isoMatch[2], 10) - 1;
+        const day = parseInt(isoMatch[3], 10);
+        const eventEnd = new Date(year, month, day, 23, 59, 59, 999);
+        if (!isNaN(eventEnd.getTime()) && eventEnd.getTime() < Date.now()) {
+          return true;
+        }
+      }
+
+      // 2. Match DD-MM-YYYY or DD/MM/YYYY
+      const dmyMatch = rawDate.match(/(\d{1,2})[-/](\d{1,2})[-/](\d{4})/);
+      if (dmyMatch) {
+        const day = parseInt(dmyMatch[1], 10);
+        const month = parseInt(dmyMatch[2], 10) - 1;
+        const year = parseInt(dmyMatch[3], 10);
+        const eventEnd = new Date(year, month, day, 23, 59, 59, 999);
+        if (!isNaN(eventEnd.getTime()) && eventEnd.getTime() < Date.now()) {
+          return true;
+        }
+      }
+
+      // 3. Fallback Date.parse for strings like "29 August, 2026", "August 31, 2026"
+      const parsed = Date.parse(rawDate);
+      if (!isNaN(parsed)) {
+        const eventEnd = new Date(parsed);
+        eventEnd.setHours(23, 59, 59, 999);
+        if (eventEnd.getTime() < Date.now()) {
+          return true;
+        }
+      }
+    } catch (_) {}
+
+    return false;
+  };
+
   window.renderEventsList = function (eventsList) {
     const container = document.getElementById('dynamic-events-container');
     if (!container) return;
@@ -689,50 +739,66 @@
       const eventImg = ev.image_url || defaultImg;
       const categoryLabel = ev.category ? ev.category.split('|')[0].trim().toUpperCase() : 'EVENT';
       const hasLongDesc = ev.description && ev.description.length > 110;
+      const isPast = window.isEventPassed(ev);
 
       return `
         <div id="event-card-${ev.id}" data-event-id="${ev.id}" class="event-carousel-card bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden flex flex-col justify-between group">
           
-          <!-- Event Cover Image with Top Badges & Bottom-Left Date Badge -->
-          <div class="h-44 w-full relative overflow-hidden bg-slate-100 dark:bg-slate-800">
-            <img src="${eventImg}" alt="${ev.title}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-            
-            <!-- Top Badges: Aligned Category & Price Badges (Single Share Icon kept at CTA) -->
-            <div class="absolute top-3 left-3 right-3 flex items-center justify-between gap-2 z-10">
-              <span class="h-7 px-3 inline-flex items-center gap-1.5 bg-black/70 backdrop-blur-md text-white font-extrabold text-[10px] rounded-full uppercase tracking-wider border border-white/20 shadow-sm shrink-0">
-                <i class="bi bi-tag-fill text-[9px] text-emerald-400"></i>${categoryLabel}
+          <!-- Top Card Meta Strip (Category & Status/Price) -->
+          <div class="px-4 py-2.5 bg-slate-50/90 dark:bg-slate-800/80 border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between gap-2 z-10">
+            <span class="h-6 px-2.5 inline-flex items-center gap-1.5 bg-[#123B32] text-white dark:bg-emerald-600 font-extrabold text-[10px] rounded-full uppercase tracking-wider shadow-xs shrink-0">
+              <i class="bi bi-tag-fill text-[9px] text-emerald-300"></i>${categoryLabel}
+            </span>
+            ${isPast ? `
+              <span class="h-6 px-2.5 inline-flex items-center bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-[10.5px] rounded-full font-mono shadow-xs shrink-0">
+                <i class="bi bi-check2-circle mr-1 text-emerald-500"></i> Concluded
               </span>
-              <span class="h-7 px-3 inline-flex items-center bg-emerald-600 ${isPaid ? 'bg-amber-600' : 'bg-emerald-600'} text-white font-bold text-xs rounded-full shadow-sm font-mono border border-white/20 shrink-0">
+            ` : `
+              <span class="h-6 px-2.5 inline-flex items-center ${isPaid ? 'bg-amber-600' : 'bg-emerald-600'} text-white font-bold text-xs rounded-full font-mono shadow-xs shrink-0">
                 ${fee}
               </span>
-            </div>
-            
-            <!-- Date Badge: Fully Positioned on Image Bottom-Left with Clean Padding -->
-            <div class="absolute bottom-3 left-3 z-10">
-              <span class="h-7 px-2.5 inline-flex items-center gap-1.5 rounded-lg bg-black/80 backdrop-blur-md text-white font-mono text-[11px] font-bold border border-white/15 shadow-sm">
-                <i class="bi bi-calendar3 text-amber-300 text-xs"></i>
-                <span>${ev.event_date || 'TBA'}</span>
-              </span>
-            </div>
+            `}
+          </div>
+
+          <!-- Event Poster Canvas - Perfect Fit Full Image Orientation with Ambient Backdrop Glow -->
+          <div class="h-64 sm:h-72 w-full relative overflow-hidden bg-slate-950 flex items-center justify-center group/img cursor-pointer select-none" onclick="window.openEventPosterModal('${ev.id}')" title="Click to view full event poster">
+            <!-- Ambient blurred backdrop ensuring any letterboxing is glowing and aesthetic -->
+            <img src="${eventImg}" aria-hidden="true" alt="" class="absolute inset-0 w-full h-full object-cover blur-2xl opacity-35 scale-125 pointer-events-none">
+            <div class="absolute inset-0 bg-slate-950/25 pointer-events-none"></div>
+
+            <!-- Full Uncropped Event Poster with Perfect Fit Orientation -->
+            <img src="${eventImg}" alt="${ev.title}" loading="lazy" decoding="async" class="relative z-1 max-w-full max-h-full w-auto h-auto object-contain mx-auto p-1.5 transition-transform duration-300 group-hover/img:scale-[1.02] ${isPast ? 'grayscale-25' : ''}">
+
+            <!-- Sleek Fullscreen Poster Pill Button -->
+            <button type="button" onclick="event.stopPropagation(); window.openEventPosterModal('${ev.id}')" class="absolute bottom-2.5 right-2.5 z-10 h-7 px-3 inline-flex items-center gap-1.5 rounded-lg bg-black/75 hover:bg-[#123B32] dark:bg-black/75 dark:hover:bg-emerald-700 text-white font-bold text-[11px] shadow-lg backdrop-blur-md border border-white/20 hover:border-emerald-400/60 transition-all duration-200 hover:scale-105 cursor-pointer group/btn" title="Click to view full poster">
+              <i class="bi bi-arrows-angle-expand text-[10px] text-amber-300 group-hover/btn:text-white transition-colors"></i>
+              <span>View Poster</span>
+            </button>
           </div>
 
           <!-- Card Content Body -->
-          <div class="p-5 sm:p-6 space-y-4 flex-1 flex flex-col justify-between">
-            <div class="space-y-2.5">
+          <div class="p-5 sm:p-6 space-y-3.5 flex-1 flex flex-col justify-between">
+            <div class="space-y-2">
               <!-- Title -->
               <h3 class="text-base sm:text-lg font-bold font-heading text-slate-900 dark:text-white group-hover:text-[#123B32] dark:group-hover:text-emerald-400 transition-colors leading-snug">
                 ${ev.title}
               </h3>
 
-              <!-- Venue Details -->
-              <div class="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300 font-medium">
-                <i class="bi bi-geo-alt-fill text-[#123B32] dark:text-emerald-400 text-xs shrink-0"></i>
-                <span class="truncate">${ev.location || 'Salem, Tamil Nadu'}</span>
+              <!-- Event Date & Venue Details -->
+              <div class="flex flex-wrap items-center gap-y-1 gap-x-2.5 text-xs text-slate-600 dark:text-slate-300 font-medium pt-0.5">
+                <span class="inline-flex items-center gap-1.5 text-[#123B32] dark:text-emerald-400 font-bold font-mono">
+                  <i class="bi bi-calendar3 text-xs text-amber-500 dark:text-amber-400"></i>
+                  <span>${ev.event_date || 'TBA'}</span>
+                </span>
+                <span class="text-slate-300 dark:text-slate-700">•</span>
+                <span class="inline-flex items-center gap-1.5 truncate max-w-[200px]">
+                  <i class="bi bi-geo-alt-fill text-[#123B32] dark:text-emerald-400 text-xs shrink-0"></i>
+                  <span class="truncate">${ev.location || 'Salem, Tamil Nadu'}</span>
+                </span>
               </div>
 
               <!-- Description with Read More Toggle -->
-              <div class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+              <div class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed pt-1">
                 <p id="event-desc-${ev.id}" class="line-clamp-2 transition-all">
                   ${ev.description || 'Join us for this comprehensive technical session and professional networking event.'}
                 </p>
@@ -744,13 +810,20 @@
               </div>
             </div>
 
-            <!-- Action Buttons: Register CTA & Accessible Share Button -->
+            <!-- Action Buttons: Register CTA (or Concluded Notice) & Accessible Share Button -->
             <div class="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
-              <button onclick="openRegisterModal('${ev.id}', '${encodeURIComponent(ev.title)}', '${encodeURIComponent(fee)}')" class="flex-1 py-2.5 px-4 bg-[#123B32] hover:bg-[#C47D4C] text-white font-bold text-xs rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg cursor-pointer">
-                <i class="bi bi-ticket-perforated text-sm"></i>
-                <span>Register For Event</span>
-                <i class="bi bi-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
-              </button>
+              ${isPast ? `
+                <button type="button" disabled class="flex-1 py-2.5 px-4 bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 font-bold text-xs rounded-xl cursor-not-allowed flex items-center justify-center gap-2 border border-slate-200 dark:border-slate-700/80 pointer-events-none opacity-85 select-none" title="Registration Closed - Event Date Passed">
+                  <i class="bi bi-lock-fill text-xs"></i>
+                  <span>Registration Closed</span>
+                </button>
+              ` : `
+                <button onclick="openRegisterModal('${ev.id}', '${encodeURIComponent(ev.title)}', '${encodeURIComponent(fee)}')" class="flex-1 py-2.5 px-4 bg-[#123B32] hover:bg-[#C47D4C] text-white font-bold text-xs rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg cursor-pointer">
+                  <i class="bi bi-ticket-perforated text-sm"></i>
+                  <span>Register For Event</span>
+                  <i class="bi bi-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
+                </button>
+              `}
               <button type="button" onclick="openShareModal('${ev.id}')" class="w-10 h-10 bg-slate-100 hover:bg-[#E8EFEB] dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 hover:text-[#123B32] dark:hover:text-emerald-400 border border-slate-200 dark:border-slate-700 hover:border-emerald-500/40 rounded-xl transition-all duration-200 flex items-center justify-center shadow-xs cursor-pointer shrink-0 group/share" title="Share Event" aria-label="Share Event">
                 <i class="bi bi-share-fill text-xs group-hover/share:scale-110 transition-transform pointer-events-none"></i>
               </button>
@@ -781,6 +854,141 @@
         `;
       }
     }
+  };
+
+  // Open Event Poster Exhibition Lightbox Modal
+  window.openEventPosterModal = function (eventId) {
+    const ev = (window.allEventsData || []).find(e => String(e.id) === String(eventId));
+    if (!ev) return;
+
+    const defaultImg = ev.category && ev.category.toLowerCase().includes('hackathon') ? 
+      'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=80' : 
+      'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80';
+    const eventImg = ev.image_url || defaultImg;
+    const categoryLabel = ev.category ? ev.category.split('|')[0].trim().toUpperCase() : 'EVENT';
+    const fee = ev.registration_fee || 'Free';
+    const isPaid = fee !== 'Free' && fee !== '0' && fee !== '' && !String(fee).toLowerCase().includes('free');
+    const safeTitle = escapeHtml(ev.title || 'Event Details');
+    const safeDesc = escapeHtml(ev.description || 'Join us for this comprehensive technical session and professional networking event.');
+    const safeLocation = escapeHtml(ev.location || 'Salem, Tamil Nadu');
+    const safeDate = escapeHtml(ev.event_date || 'TBA');
+    const isPast = window.isEventPassed(ev);
+
+    const oldModal = document.getElementById('event-poster-modal');
+    if (oldModal) oldModal.remove();
+
+    const modalHtml = `
+      <div id="event-poster-modal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-md animate-fade-in" onclick="if(event.target === this) window.closeEventPosterModal()" role="dialog" aria-modal="true">
+        <div class="relative max-w-5xl w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row max-h-[90vh] text-slate-900 dark:text-white">
+          
+          <!-- Close 'X' Button -->
+          <button onclick="window.closeEventPosterModal()" class="absolute top-4 right-4 z-30 w-9 h-9 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center text-sm transition-all cursor-pointer shadow-md border border-white/20" aria-label="Close Preview" title="Close (Esc)">
+            <i class="bi bi-x-lg"></i>
+          </button>
+
+          <!-- Left Column / Event Poster Viewer (Responsive) -->
+          <div class="w-full md:w-[58%] bg-slate-950 flex items-center justify-center p-4 sm:p-6 min-h-[300px] max-h-[50vh] md:max-h-[85vh] relative select-none overflow-hidden">
+            <img src="${eventImg}" aria-hidden="true" alt="" class="absolute inset-0 w-full h-full object-cover blur-2xl opacity-30 scale-125 pointer-events-none">
+            <img src="${eventImg}" alt="${safeTitle}" class="relative z-1 max-w-full max-h-[46vh] md:max-h-[80vh] w-auto h-auto object-contain rounded-xl shadow-2xl ${isPast ? 'grayscale-25' : ''}">
+            <div class="absolute bottom-3 left-3 z-10 flex items-center gap-2">
+              <span class="px-2.5 py-1 rounded-md bg-black/60 backdrop-blur-md text-white font-mono text-[10px] font-bold border border-white/10">OFFICIAL POSTER</span>
+              <a href="${eventImg}" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 rounded-md bg-black/60 hover:bg-black/80 backdrop-blur-md text-white font-mono text-[10px] font-bold border border-white/10 transition-colors inline-flex items-center gap-1 cursor-pointer" title="Open high-resolution poster in new tab">
+                <i class="bi bi-box-arrow-up-right text-[9px]"></i>
+                <span>Open Full Size</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Right Column / Information & Registration Actions -->
+          <div class="w-full md:w-[42%] p-5 sm:p-7 bg-[#FDFCFA] dark:bg-slate-900 flex flex-col justify-between overflow-y-auto max-h-[44vh] md:max-h-[85vh] border-t md:border-t-0 md:border-l border-slate-200 dark:border-slate-800 space-y-4">
+            
+            <div class="space-y-3">
+              <!-- Category & Price Badges -->
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <span class="px-3 py-1 rounded-full bg-[#123B32] text-white dark:bg-emerald-600 font-extrabold text-[10px] uppercase tracking-wider shadow-xs">
+                  ${categoryLabel}
+                </span>
+                ${isPast ? `
+                  <span class="px-3 py-1 rounded-full bg-slate-700 text-slate-200 font-mono font-bold text-xs shadow-xs">
+                    <i class="bi bi-check2-circle mr-1 text-emerald-400"></i> Concluded
+                  </span>
+                ` : `
+                  <span class="px-3 py-1 rounded-full ${isPaid ? 'bg-amber-600 text-white' : 'bg-emerald-600 text-white'} font-mono font-bold text-xs shadow-xs">
+                    ${fee}
+                  </span>
+                `}
+              </div>
+
+              <!-- Title -->
+              <h2 class="text-lg sm:text-xl md:text-2xl font-black font-heading text-slate-900 dark:text-white leading-tight">
+                ${safeTitle}
+              </h2>
+
+              <!-- Date & Location -->
+              <div class="space-y-1.5 pt-1">
+                <div class="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300 font-medium">
+                  <i class="bi bi-calendar3 text-[#123B32] dark:text-emerald-400"></i>
+                  <span>${safeDate}</span>
+                </div>
+                <div class="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300 font-medium">
+                  <i class="bi bi-geo-alt-fill text-[#123B32] dark:text-emerald-400"></i>
+                  <span>${safeLocation}</span>
+                </div>
+              </div>
+
+              <!-- Description Box -->
+              <div class="bg-white dark:bg-slate-950/70 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-2xs space-y-1.5">
+                <h4 class="text-[11px] font-bold uppercase tracking-wider text-[#123B32] dark:text-emerald-400 flex items-center gap-1.5">
+                  <i class="bi bi-info-circle-fill"></i> Event Overview & Details
+                </h4>
+                <p class="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-line max-h-48 overflow-y-auto pr-1">
+                  ${safeDesc}
+                </p>
+              </div>
+            </div>
+
+            <!-- Footer Action Buttons -->
+            <div class="pt-2 flex flex-col sm:flex-row items-center gap-2.5">
+              ${isPast ? `
+                <button type="button" disabled class="w-full sm:flex-1 py-2.5 px-4 bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 rounded-xl text-xs font-bold flex items-center justify-center gap-2 cursor-not-allowed border border-slate-200 dark:border-slate-700 shadow-2xs">
+                  <i class="bi bi-lock-fill text-xs"></i>
+                  <span>Registration Closed (Event Concluded)</span>
+                </button>
+              ` : `
+                <button onclick="window.closeEventPosterModal(); openRegisterModal('${ev.id}', '${encodeURIComponent(ev.title)}', '${encodeURIComponent(fee)}')" class="w-full sm:flex-1 py-2.5 px-4 bg-[#123B32] hover:bg-[#C47D4C] text-white rounded-xl text-xs font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer">
+                  <i class="bi bi-ticket-perforated text-sm"></i>
+                  <span>Register For Event</span>
+                  <i class="bi bi-arrow-right text-xs"></i>
+                </button>
+              `}
+              <a href="${eventImg}" download="${safeTitle.replace(/[^a-zA-Z0-9]/g, '_')}_poster.jpg" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto py-2.5 px-4 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+                <i class="bi bi-download"></i>
+                <span>Download</span>
+              </a>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    document.body.style.overflow = 'hidden';
+
+    // Handle Escape key
+    const escHandler = function(e) {
+      if (e.key === 'Escape') {
+        window.closeEventPosterModal();
+        document.removeEventListener('keydown', escHandler);
+      }
+    };
+    document.addEventListener('keydown', escHandler);
+  };
+
+  window.closeEventPosterModal = function() {
+    const modal = document.getElementById('event-poster-modal');
+    if (modal) modal.remove();
+    document.body.style.overflow = '';
   };
 
   // Base64 File Converter with 10 MB Limit Restriction
@@ -823,9 +1031,20 @@
   window.allGalleryData = [];
   window.activeGalleryCategory = 'all';
 
+  function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
   async function loadGalleryShowcase() {
     const container = document.getElementById('dynamic-gallery-container');
-    if (!container) return;
+    const reel = document.getElementById('dynamic-gallery-reel');
+    if (!container && !reel) return;
 
     try {
       const res = await fetch(`${API_BASE}/api/public/gallery`).then(r => r.json()).catch(() => ({ gallery: [] }));
@@ -865,46 +1084,54 @@
     if (reel) {
       if (allItems.length === 0) {
         reel.innerHTML = `
-          <div class="w-full py-8 text-center text-slate-400 bg-slate-50 dark:bg-slate-900/40 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800">
-            <i class="bi bi-images text-2xl mb-1 block"></i>
-            <p class="text-xs font-semibold">No highlights uploaded yet.</p>
+          <div class="w-full py-10 text-center text-slate-400 bg-white/60 dark:bg-slate-900/40 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800">
+            <i class="bi bi-images text-3xl mb-2 block text-emerald-700/60 dark:text-emerald-400"></i>
+            <p class="text-xs font-semibold text-slate-600 dark:text-slate-400">No moments uploaded yet.</p>
           </div>
         `;
       } else {
-        reel.innerHTML = allItems.map(item => `
-          <div onclick="window.openGalleryLightbox('${encodeURIComponent(item.image_blob)}', '${encodeURIComponent(item.title)}', '${encodeURIComponent(item.category || '')}', '${encodeURIComponent(item.description || '')}')" class="shrink-0 w-72 sm:w-84 bg-white dark:bg-slate-900 rounded-3xl overflow-hidden border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 snap-start cursor-pointer flex flex-col justify-between group">
-            <!-- Top Image -->
-            <div class="relative w-full aspect-16/10 overflow-hidden bg-slate-950">
-              <img src="${item.image_blob}" alt="${item.title}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-106 transition-transform duration-500" onerror="this.src='images/software.png'">
-              <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-              <div class="absolute top-3 left-3">
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-[#123B32] text-white dark:bg-emerald-600 font-extrabold text-[9px] uppercase tracking-wider shadow-md">
-                  ${item.category || 'HIGHLIGHT'}
-                </span>
-              </div>
-              <div class="absolute top-3 right-3 w-7 h-7 rounded-full bg-black/60 backdrop-blur-md text-white flex items-center justify-center text-[11px] opacity-0 group-hover:opacity-100 transition-opacity">
-                <i class="bi bi-arrows-fullscreen"></i>
-              </div>
-            </div>
+        reel.innerHTML = allItems.map((item, idx) => {
+          const safeTitle = escapeHtml(item.title || 'Event Highlight');
+          const safeCategory = escapeHtml(item.category || 'HIGHLIGHT');
+          const safeDesc = escapeHtml(item.description || '');
+          const itemId = item.id != null ? item.id : idx;
+          const imgSrc = item.image_blob || 'images/software.png';
 
-            <!-- Bottom Text Container (100% Readable) -->
-            <div class="p-4 sm:p-5 flex flex-col justify-between grow space-y-2">
-              <div>
-                <h3 class="text-sm font-bold font-heading text-slate-900 dark:text-white group-hover:text-[#123B32] dark:group-hover:text-emerald-400 transition-colors line-clamp-1 leading-snug">
-                  ${item.title}
-                </h3>
-                ${item.description ? `<p class="text-[11px] text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed mt-1">${item.description}</p>` : ''}
+          return `
+            <div onclick="window.openGalleryLightboxById('${itemId}')" class="shrink-0 w-72 sm:w-80 md:w-84 bg-white dark:bg-slate-900 rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 snap-start cursor-pointer flex flex-col justify-between group">
+              <!-- Top Image Frame -->
+              <div class="relative w-full aspect-[4/3] overflow-hidden bg-slate-950 flex items-center justify-center">
+                <img src="${imgSrc}" alt="${safeTitle}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='images/software.png'">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity"></div>
+                <div class="absolute top-3 left-3">
+                  <span class="inline-flex items-center px-3 py-1 rounded-full bg-[#123B32] text-white dark:bg-emerald-600 font-extrabold text-[10px] uppercase tracking-wider shadow-md">
+                    ${safeCategory}
+                  </span>
+                </div>
+                <div class="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/60 backdrop-blur-md text-white flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
+                  <i class="bi bi-arrows-fullscreen"></i>
+                </div>
               </div>
-              <div class="pt-2.5 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-[11px] font-bold text-[#123B32] dark:text-emerald-400">
-                <span class="inline-flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
-                  <span>View Full Size</span>
-                  <i class="bi bi-arrow-right"></i>
-                </span>
-                <span class="text-[10px] font-mono text-slate-400">HD Photo</span>
+
+              <!-- Bottom Text Details -->
+              <div class="p-4 sm:p-5 flex flex-col justify-between grow space-y-3 bg-white dark:bg-slate-900">
+                <div>
+                  <h3 class="text-sm sm:text-base font-extrabold font-heading text-slate-900 dark:text-white group-hover:text-[#123B32] dark:group-hover:text-emerald-400 transition-colors line-clamp-1 leading-snug">
+                    ${safeTitle}
+                  </h3>
+                  ${safeDesc ? `<p class="text-xs text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed mt-1.5" title="${safeDesc}">${safeDesc}</p>` : ''}
+                </div>
+                <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs font-bold text-[#123B32] dark:text-emerald-400">
+                  <span class="inline-flex items-center gap-1.5 group-hover:translate-x-1 transition-transform">
+                    <span>View Full Details & Photo</span>
+                    <i class="bi bi-arrow-right"></i>
+                  </span>
+                  <span class="text-[10px] font-mono text-slate-400">HD Photo</span>
+                </div>
               </div>
             </div>
-          </div>
-        `).join('');
+          `;
+        }).join('');
       }
     }
 
@@ -921,87 +1148,182 @@
     if (items.length === 0) {
       container.innerHTML = `
         <div class="col-span-full text-center p-12 bg-white dark:bg-slate-900 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800 text-slate-500 text-xs">
-          <i class="bi bi-images text-3xl block mb-2 text-slate-400"></i>
+          <i class="bi bi-images text-3xl block mb-2 text-emerald-700/60 dark:text-emerald-400"></i>
           No media found in this category.
         </div>
       `;
       return;
     }
 
-    container.innerHTML = items.map(item => `
-      <div onclick="window.openGalleryLightbox('${encodeURIComponent(item.image_blob)}', '${encodeURIComponent(item.title)}', '${encodeURIComponent(item.category || '')}', '${encodeURIComponent(item.description || '')}')" class="group bg-white dark:bg-slate-900 rounded-3xl overflow-hidden border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col justify-between">
-        <!-- Top Image -->
-        <div class="relative w-full aspect-16/10 overflow-hidden bg-slate-950">
-          <img src="${item.image_blob}" alt="${item.title}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-106 transition-transform duration-500" onerror="this.src='images/software.png'">
-          <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-          <div class="absolute top-3 left-3">
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-[#123B32] text-white dark:bg-emerald-600 font-extrabold text-[9px] uppercase tracking-wider shadow-md">
-              ${item.category || 'EVENT'}
-            </span>
-          </div>
-          <div class="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/60 backdrop-blur-md text-white flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity">
-            <i class="bi bi-arrows-fullscreen"></i>
-          </div>
-        </div>
+    container.innerHTML = items.map((item, idx) => {
+      const safeTitle = escapeHtml(item.title || 'Gallery Photo');
+      const safeCategory = escapeHtml(item.category || 'EVENT');
+      const safeDesc = escapeHtml(item.description || '');
+      const itemId = item.id != null ? item.id : idx;
+      const imgSrc = item.image_blob || 'images/software.png';
 
-        <!-- Bottom Content Box with Ultra Clean Visible Typography -->
-        <div class="p-4 sm:p-5 flex flex-col justify-between grow space-y-2.5 bg-white dark:bg-slate-900">
-          <div>
-            <h3 class="text-sm sm:text-base font-extrabold font-heading text-slate-900 dark:text-white group-hover:text-[#123B32] dark:group-hover:text-emerald-400 transition-colors line-clamp-2 leading-snug">
-              ${item.title}
-            </h3>
-            ${item.description ? `<p class="text-xs text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed mt-1.5">${item.description}</p>` : ''}
+      return `
+        <div onclick="window.openGalleryLightboxById('${itemId}')" class="group bg-white dark:bg-slate-900 rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 cursor-pointer flex flex-col justify-between">
+          <!-- Top Image Frame -->
+          <div class="relative w-full aspect-[4/3] overflow-hidden bg-slate-950 flex items-center justify-center">
+            <img src="${imgSrc}" alt="${safeTitle}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='images/software.png'">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity"></div>
+            <div class="absolute top-3 left-3">
+              <span class="inline-flex items-center px-3 py-1 rounded-full bg-[#123B32] text-white dark:bg-emerald-600 font-extrabold text-[10px] uppercase tracking-wider shadow-md">
+                ${safeCategory}
+              </span>
+            </div>
+            <div class="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/60 backdrop-blur-md text-white flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
+              <i class="bi bi-arrows-fullscreen"></i>
+            </div>
           </div>
 
-          <div class="pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs font-bold text-[#123B32] dark:text-emerald-400">
-            <span class="inline-flex items-center gap-1 text-[11px] group-hover:translate-x-0.5 transition-transform">
-              <span>View High-Res Photo</span>
-              <i class="bi bi-arrow-right"></i>
-            </span>
-            <span class="text-[10px] font-mono text-slate-400 uppercase">Gallery</span>
+          <!-- Bottom Content Box -->
+          <div class="p-4 sm:p-5 flex flex-col justify-between grow space-y-3 bg-white dark:bg-slate-900">
+            <div>
+              <h3 class="text-sm sm:text-base font-extrabold font-heading text-slate-900 dark:text-white group-hover:text-[#123B32] dark:group-hover:text-emerald-400 transition-colors line-clamp-2 leading-snug">
+                ${safeTitle}
+              </h3>
+              ${safeDesc ? `<p class="text-xs text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed mt-1.5" title="${safeDesc}">${safeDesc}</p>` : ''}
+            </div>
+
+            <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs font-bold text-[#123B32] dark:text-emerald-400">
+              <span class="inline-flex items-center gap-1.5 text-xs group-hover:translate-x-1 transition-transform">
+                <span>View Full Details & Photo</span>
+                <i class="bi bi-arrow-right"></i>
+              </span>
+              <span class="text-[10px] font-mono text-slate-400 uppercase">Gallery</span>
+            </div>
           </div>
         </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
+  }
+
+  window.openGalleryLightboxById = function(itemId) {
+    const item = (window.allGalleryData || []).find((i, idx) => String(i.id) === String(itemId) || String(idx) === String(itemId));
+    if (item) {
+      window.renderGalleryLightboxModal(item);
+    }
   };
 
-  window.openGalleryLightbox = function(encodedImg, encodedTitle, encodedCat, encodedDesc) {
-    const img = decodeURIComponent(encodedImg);
-    const title = decodeURIComponent(encodedTitle);
-    const cat = decodeURIComponent(encodedCat);
-    const desc = decodeURIComponent(encodedDesc);
+  window.openGalleryLightbox = function(arg1, arg2, arg3, arg4) {
+    if (arg2 === undefined) {
+      if (typeof arg1 === 'object' && arg1 !== null) {
+        window.renderGalleryLightboxModal(arg1);
+      } else {
+        window.openGalleryLightboxById(arg1);
+      }
+      return;
+    }
+    try {
+      const img = arg1 ? (arg1.includes('%') ? decodeURIComponent(arg1) : arg1) : '';
+      const title = arg2 ? (arg2.includes('%') ? decodeURIComponent(arg2) : arg2) : '';
+      const cat = arg3 ? (arg3.includes('%') ? decodeURIComponent(arg3) : arg3) : '';
+      const desc = arg4 ? (arg4.includes('%') ? decodeURIComponent(arg4) : arg4) : '';
+      window.renderGalleryLightboxModal({ image_blob: img, title, category: cat, description: desc });
+    } catch (e) {
+      window.renderGalleryLightboxModal({ image_blob: arg1, title: arg2, category: arg3, description: arg4 });
+    }
+  };
 
+  window.renderGalleryLightboxModal = function(item) {
     const oldModal = document.getElementById('gallery-lightbox-modal');
     if (oldModal) oldModal.remove();
 
+    const imgSrc = item.image_blob || 'images/software.png';
+    const safeTitle = escapeHtml(item.title || 'Event Photograph');
+    const safeCat = escapeHtml(item.category || 'EVENT');
+    const rawDesc = item.description || '';
+    const safeDesc = escapeHtml(rawDesc);
+    const dateFormatted = item.created_at ? new Date(item.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : '';
+
     const modalHtml = `
-      <div id="gallery-lightbox-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in" onclick="if(event.target === this) window.closeGalleryLightbox()">
-        <div class="relative max-w-4xl w-full bg-slate-950 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl space-y-0 text-white">
+      <div id="gallery-lightbox-modal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-md animate-fade-in" onclick="if(event.target === this) window.closeGalleryLightbox()" role="dialog" aria-modal="true">
+        <div class="relative max-w-5xl w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row max-h-[90vh] text-slate-900 dark:text-white">
           
-          <button onclick="window.closeGalleryLightbox()" class="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-black/60 hover:bg-white/20 text-white flex items-center justify-center text-lg transition-colors cursor-pointer" aria-label="Close Preview">
+          <!-- Close 'X' Button -->
+          <button onclick="window.closeGalleryLightbox()" class="absolute top-4 right-4 z-30 w-9 h-9 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center text-sm transition-all cursor-pointer shadow-md border border-white/20" aria-label="Close Preview" title="Close (Esc)">
             <i class="bi bi-x-lg"></i>
           </button>
 
-          <div class="w-full max-h-[70vh] bg-black flex items-center justify-center overflow-hidden">
-            <img src="${img}" alt="${title}" class="max-w-full max-h-[70vh] object-contain">
+          <!-- Left Column / Photo Viewer Canvas (Responsive Height on Mobile & Desktop) -->
+          <div class="w-full md:w-[58%] bg-slate-950 flex items-center justify-center p-4 sm:p-6 min-h-[280px] max-h-[46vh] md:max-h-[85vh] relative select-none">
+            <img src="${imgSrc}" alt="${safeTitle}" class="max-w-full max-h-[44vh] md:max-h-[78vh] w-auto h-auto object-contain rounded-xl shadow-2xl">
+            <div class="absolute bottom-3 left-3">
+              <span class="px-2.5 py-1 rounded-md bg-black/60 backdrop-blur-md text-white font-mono text-[10px] font-bold">HD ORIGINAL</span>
+            </div>
           </div>
 
-          <div class="p-6 bg-slate-900 border-t border-slate-800 space-y-2">
-            <div class="flex items-center gap-2">
-              <span class="px-2.5 py-0.5 rounded-full bg-emerald-600 text-white font-mono font-bold text-[10px] uppercase">${cat || 'EVENT'}</span>
+          <!-- Right Column / Information & Full Description Details (Scrollable & Responsive) -->
+          <div class="w-full md:w-[42%] p-5 sm:p-7 bg-[#FDFCFA] dark:bg-slate-900 flex flex-col justify-between overflow-y-auto max-h-[44vh] md:max-h-[85vh] border-t md:border-t-0 md:border-l border-slate-200 dark:border-slate-800 space-y-4">
+            
+            <div class="space-y-3">
+              <!-- Category & Date Header Badges -->
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="px-3 py-1 rounded-full bg-[#123B32] text-white dark:bg-emerald-600 font-extrabold text-[10px] uppercase tracking-wider shadow-xs">
+                  ${safeCat}
+                </span>
+                ${dateFormatted ? `
+                  <span class="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1 font-medium">
+                    <i class="bi bi-calendar3 text-[#123B32] dark:text-emerald-400"></i> ${dateFormatted}
+                  </span>
+                ` : ''}
+              </div>
+
+              <!-- Title -->
+              <h2 class="text-lg sm:text-xl md:text-2xl font-black font-heading text-slate-900 dark:text-white leading-tight">
+                ${safeTitle}
+              </h2>
+
+              <!-- Full Description Content Box -->
+              <div class="bg-white dark:bg-slate-950/70 p-4 sm:p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-2xs space-y-1.5">
+                <h4 class="text-[11px] font-bold uppercase tracking-wider text-[#123B32] dark:text-emerald-400 flex items-center gap-1.5">
+                  <i class="bi bi-card-text"></i> Full Description & Details
+                </h4>
+                ${safeDesc ? `
+                  <p class="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-line max-h-52 overflow-y-auto pr-1">
+                    ${safeDesc}
+                  </p>
+                ` : `
+                  <p class="text-xs text-slate-400 italic">No extended notes available for this photograph.</p>
+                `}
+              </div>
             </div>
-            <h2 class="text-lg font-bold font-heading text-white">${title}</h2>
-            ${desc ? `<p class="text-xs text-slate-300 leading-relaxed">${desc}</p>` : ''}
+
+            <!-- Footer Action Buttons -->
+            <div class="pt-2 flex items-center gap-2.5">
+              <a href="${imgSrc}" download="${safeTitle.replace(/[^a-zA-Z0-9]/g, '_')}.jpg" target="_blank" rel="noopener noreferrer" class="flex-1 py-2.5 px-4 bg-[#123B32] hover:bg-[#2F5B4E] text-white rounded-xl text-xs font-bold shadow-sm hover:shadow transition-all flex items-center justify-center gap-2 cursor-pointer">
+                <i class="bi bi-download text-sm"></i>
+                <span>Download Photo</span>
+              </a>
+              <button type="button" onclick="window.closeGalleryLightbox()" class="py-2.5 px-4 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl text-xs font-bold transition-all cursor-pointer">
+                Close
+              </button>
+            </div>
+
           </div>
         </div>
       </div>
     `;
+
     document.body.insertAdjacentHTML('beforeend', modalHtml);
+    document.body.style.overflow = 'hidden';
+
+    // Handle Escape key
+    const escHandler = function(e) {
+      if (e.key === 'Escape') {
+        window.closeGalleryLightbox();
+        document.removeEventListener('keydown', escHandler);
+      }
+    };
+    document.addEventListener('keydown', escHandler);
   };
 
   window.closeGalleryLightbox = function() {
     const modal = document.getElementById('gallery-lightbox-modal');
     if (modal) modal.remove();
+    document.body.style.overflow = '';
   };
 
   // 6. Global Modal Helpers for Job Details, Apply & Event Register
@@ -1161,13 +1483,13 @@ ${job.description || 'No description provided.'}
                 <input type="email" id="pub-app-email" required placeholder="john@example.com" class="w-full p-3 bg-[#F8FAFC] dark:bg-[#0B0F19] border border-[#D3DDD7] dark:border-slate-800 rounded-xl text-xs text-[#0F172A] dark:text-white placeholder:text-[#64748B] dark:placeholder:text-slate-500 focus:outline-none focus:border-[#123B32] dark:focus:border-emerald-500 font-sans transition-all">
               </div>
               <div>
-                <label class="block font-bold text-xs text-[#1E292B] dark:text-slate-200 mb-1.5">Phone Number</label>
-                <input type="tel" id="pub-app-phone" placeholder="+91 98765 43210" class="w-full p-3 bg-[#F8FAFC] dark:bg-[#0B0F19] border border-[#D3DDD7] dark:border-slate-800 rounded-xl text-xs text-[#0F172A] dark:text-white placeholder:text-[#64748B] dark:placeholder:text-slate-500 focus:outline-none focus:border-[#123B32] dark:focus:border-emerald-500 font-sans transition-all">
+                <label class="block font-bold text-xs text-[#1E292B] dark:text-slate-200 mb-1.5">Phone Number *</label>
+                <input type="tel" id="pub-app-phone" required placeholder="+91 98765 43210" class="w-full p-3 bg-[#F8FAFC] dark:bg-[#0B0F19] border border-[#D3DDD7] dark:border-slate-800 rounded-xl text-xs text-[#0F172A] dark:text-white placeholder:text-[#64748B] dark:placeholder:text-slate-500 focus:outline-none focus:border-[#123B32] dark:focus:border-emerald-500 font-sans transition-all">
               </div>
             </div>
             <div>
-              <label class="block font-bold text-xs text-[#1E292B] dark:text-slate-200 mb-1.5">Upload Resume / Portfolio Document (Max 10 MB)</label>
-              <input type="file" id="pub-app-resume-file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" onchange="handlePublicResumeUpload(event)" class="w-full p-2.5 bg-[#F8FAFC] dark:bg-[#0B0F19] border border-[#D3DDD7] dark:border-slate-800 rounded-xl text-xs text-[#0F172A] dark:text-slate-300 cursor-pointer">
+              <label class="block font-bold text-xs text-[#1E292B] dark:text-slate-200 mb-1.5">Upload Resume / Portfolio Document (Max 10 MB) *</label>
+              <input type="file" id="pub-app-resume-file" required accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" onchange="handlePublicResumeUpload(event)" class="w-full p-2.5 bg-[#F8FAFC] dark:bg-[#0B0F19] border border-[#D3DDD7] dark:border-slate-800 rounded-xl text-xs text-[#0F172A] dark:text-slate-300 cursor-pointer">
               <input type="hidden" id="pub-app-resume" value="">
               <div id="pub-resume-preview" class="hidden pt-1.5 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
                 <i class="bi bi-file-earmark-check-fill text-sm"></i>
@@ -1175,8 +1497,8 @@ ${job.description || 'No description provided.'}
               </div>
             </div>
             <div>
-              <label class="block font-bold text-xs text-[#1E292B] dark:text-slate-200 mb-1.5">Cover Note / Brief Intro</label>
-              <textarea id="pub-app-msg" placeholder="Tell us why you are a great fit for SST..." class="w-full p-3 bg-[#F8FAFC] dark:bg-[#0B0F19] border border-[#D3DDD7] dark:border-slate-800 rounded-xl text-xs text-[#0F172A] dark:text-white placeholder:text-[#64748B] dark:placeholder:text-slate-500 h-24 focus:outline-none focus:border-[#123B32] dark:focus:border-emerald-500 font-sans transition-all"></textarea>
+              <label class="block font-bold text-xs text-[#1E292B] dark:text-slate-200 mb-1.5">Cover Note / Brief Intro *</label>
+              <textarea id="pub-app-msg" required placeholder="Tell us why you are a great fit for SST..." class="w-full p-3 bg-[#F8FAFC] dark:bg-[#0B0F19] border border-[#D3DDD7] dark:border-slate-800 rounded-xl text-xs text-[#0F172A] dark:text-white placeholder:text-[#64748B] dark:placeholder:text-slate-500 h-24 focus:outline-none focus:border-[#123B32] dark:focus:border-emerald-500 font-sans transition-all"></textarea>
             </div>
             <div class="flex justify-end items-center gap-3 pt-2">
               <button type="button" onclick="closePublicModal()" class="px-5 py-2.5 bg-[#F1F5F3] hover:bg-[#E2E8F0] dark:bg-slate-800 dark:hover:bg-slate-700 text-[#0F172A] dark:text-slate-300 rounded-xl font-bold text-xs transition-all cursor-pointer">Cancel</button>
@@ -1213,8 +1535,18 @@ ${job.description || 'No description provided.'}
       return;
     }
 
-    if (phone && !window.isValidPhone(phone)) {
-      showPublicModalNotice('Invalid Phone', 'Please enter a valid contact phone number.', true);
+    if (!phone || !window.isValidPhone(phone)) {
+      showPublicModalNotice('Phone Number Required', 'Please enter a valid contact phone number.', true);
+      return;
+    }
+
+    if (!resume) {
+      showPublicModalNotice('Resume Required', 'Please upload your resume / portfolio document.', true);
+      return;
+    }
+
+    if (!message || message.length < 5) {
+      showPublicModalNotice('Cover Note Required', 'Please provide a cover note / brief intro (minimum 5 characters).', true);
       return;
     }
 
@@ -1328,6 +1660,12 @@ ${job.description || 'No description provided.'}
     const allEvs = window.allEventsData || [];
     const eventObj = allEvs.find(e => String(e.id) === String(eventId) || e.title === title) || {};
     
+    // Check if event is past/completed by status or event date
+    if (window.isEventPassed(eventObj)) {
+      showPublicModalNotice('Registration Closed', `Registration for "${title || 'this event'}" is closed as this event has already concluded or its scheduled date has passed.`, true);
+      return;
+    }
+
     // Auto-generate UPI QR string from UPI ID and numeric fee
     const upiId = (eventObj.upi_id || 'shazusofttechnologies@upi').trim();
     const numAmount = (fee.match(/\d+/) || ['499'])[0];
