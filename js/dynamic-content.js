@@ -1972,7 +1972,7 @@ ${job.description || 'No description provided.'}
               <img id="post-reg-attached-img" src="${screenshot}" alt="Payment Screenshot" class="w-16 h-16 object-contain bg-slate-950 rounded-xl border border-emerald-300 shadow-sm p-0.5 cursor-pointer shrink-0" onclick="window.open(this.src, '_blank')" title="Click to view full image">
               <div class="text-xs flex-1 min-w-0">
                 <span class="font-bold text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5"><i class="bi bi-check-circle-fill text-emerald-600"></i> Payment Screenshot Attached</span>
-                <span class="text-slate-500 dark:text-slate-400 text-[11px] block truncate mt-0.5">Admin will verify your receipt and email the confirmed pass.</span>
+                <span class="text-slate-500 dark:text-slate-400 text-[11px] block truncate mt-0.5">Admin will verify your receipt and email your official pass &amp; WhatsApp Group link once verified.</span>
                 <button type="button" onclick="document.getElementById('post-reg-upload-box').classList.toggle('hidden')" class="mt-1 text-[11px] text-[#123B32] dark:text-emerald-400 font-bold hover:underline cursor-pointer">Re-upload / Change Screenshot</button>
               </div>
             </div>
