@@ -1722,7 +1722,7 @@ ${job.description || 'No description provided.'}
                 </div>
                 <div class="space-y-2 text-center sm:text-left flex-1 min-w-0">
                   <span class="block font-black text-xs sm:text-sm text-[#0F172A] dark:text-white">Scan &amp; Pay using any UPI App (GPay, PhonePe, Paytm)</span>
-                  <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">UPI ID: <code class="font-mono font-bold text-[#123B32] dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800 select-all">${upiId}</code></p>
+                  <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">Payment VPA: <code class="font-mono font-bold text-[#123B32] dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800 select-all">${upiId}</code></p>
                   <span class="block text-[11px] text-slate-500 dark:text-slate-400 leading-tight">After making payment, enter your 12-digit UPI UTR reference number in the field below to confirm your pass.</span>
                 </div>
               </div>
@@ -1809,22 +1809,23 @@ ${job.description || 'No description provided.'}
             ${isPaid ? `
               <div class="p-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-2xl space-y-3">
                 <div class="space-y-1.5">
-                  <label class="block font-bold text-xs text-amber-900 dark:text-amber-300 flex items-center gap-1.5">
-                    <i class="bi bi-receipt"></i>
-                    <span>12-Digit UPI Transaction / UTR Reference No *</span>
+                  <label class="block font-bold text-xs text-amber-900 dark:text-amber-300 flex items-center justify-between">
+                    <span class="flex items-center gap-1.5"><i class="bi bi-receipt"></i> 12-Digit UPI Transaction / UTR Reference No</span>
+                    <span class="text-[10px] text-slate-500 font-normal">Optional</span>
                   </label>
-                  <input type="text" id="pub-reg-utr" required placeholder="e.g. 423589102456" class="w-full p-3 bg-white dark:bg-[#0B0F19] border border-amber-300 dark:border-amber-700 rounded-xl text-xs font-bold text-[#0F172A] dark:text-white focus:outline-none focus:border-[#123B32] font-mono tracking-wider">
-                  <span class="text-[11px] text-slate-500 dark:text-slate-400 block leading-tight">Enter the 12-digit UTR found on your payment confirmation screen (GPay, PhonePe, Paytm).</span>
+                  <input type="text" id="pub-reg-utr" placeholder="e.g. 423589102456 (Optional if screenshot attached)" class="w-full p-3 bg-white dark:bg-[#0B0F19] border border-amber-300 dark:border-amber-700 rounded-xl text-xs font-bold text-[#0F172A] dark:text-white focus:outline-none focus:border-[#123B32] font-mono tracking-wider">
+                  <span class="text-[11px] text-slate-500 dark:text-slate-400 block leading-tight">Optional: Enter 12-digit UTR if shown on your payment confirmation screen.</span>
                 </div>
 
-                <!-- Payment Screenshot Upload -->
+                <!-- Payment Screenshot Upload (Mandatory for Paid Events) -->
                 <div class="pt-2 border-t border-amber-200/80 dark:border-amber-800/80 space-y-2">
                   <label class="block font-bold text-xs text-amber-900 dark:text-amber-300 flex items-center justify-between">
-                    <span class="flex items-center gap-1.5"><i class="bi bi-image text-amber-600"></i> Payment Screenshot / Receipt (Proof)</span>
-                    <span class="text-[10px] text-slate-500 font-normal">PNG / JPG / WebP (Max 5MB)</span>
+                    <span class="flex items-center gap-1.5"><i class="bi bi-image text-amber-600"></i> Payment Screenshot / Receipt (Proof) <span class="text-red-500">*</span></span>
+                    <span class="text-[10px] text-amber-800 dark:text-amber-300 font-bold bg-amber-100 dark:bg-amber-900/60 px-1.5 py-0.5 rounded">Mandatory &bull; Max 5MB</span>
                   </label>
-                  <input type="file" id="pub-reg-screenshot" accept="image/*" onchange="window.handlePaymentProofPreview(event)" class="w-full p-2 bg-white dark:bg-[#0B0F19] border border-amber-200 dark:border-amber-800 rounded-xl text-xs cursor-pointer">
+                  <input type="file" id="pub-reg-screenshot" accept="image/*" required onchange="window.handlePaymentProofPreview(event)" class="w-full p-2 bg-white dark:bg-[#0B0F19] border border-amber-300 dark:border-amber-700 rounded-xl text-xs cursor-pointer focus:outline-none focus:border-[#123B32]">
                   <input type="hidden" id="pub-reg-screenshot-base64" value="">
+                  <span class="text-[11px] text-slate-500 dark:text-slate-400 block leading-tight">Attach screenshot of payment confirmation screen showing UTR / Reference number (Mandatory).</span>
                   
                   <div id="pub-reg-screenshot-preview-box" class="hidden pt-1 flex items-center gap-3">
                     <img id="pub-reg-screenshot-preview-img" src="" alt="Payment Screenshot Preview" class="w-14 h-14 object-contain bg-slate-900 rounded-xl border border-amber-300 dark:border-amber-700 shadow-2xs p-0.5">
@@ -1851,7 +1852,7 @@ ${job.description || 'No description provided.'}
               ${isPaid ? `
                 <button type="submit" id="pub-reg-submit-btn" class="w-full py-3.5 px-6 bg-[#123B32] hover:bg-[#1A4B40] dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-extrabold rounded-xl transition-all shadow-lg hover:shadow-xl text-xs sm:text-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">
                   <i class="bi bi-shield-check text-base"></i>
-                  <span>I've Paid — Submit UTR &amp; Complete Registration</span>
+                  <span>I've Paid — Submit Receipt &amp; Complete Registration</span>
                   <i class="bi bi-arrow-right text-xs"></i>
                 </button>
               ` : `
@@ -1951,6 +1952,19 @@ ${job.description || 'No description provided.'}
               ` : ''}
             </div>
           </div>
+
+          ${regData.whatsapp_group_link ? `
+            <!-- Official WhatsApp Group Invitation Card -->
+            <div class="p-3.5 bg-emerald-50 dark:bg-emerald-950/40 border-2 border-emerald-400 dark:border-emerald-600 rounded-2xl flex items-center justify-between gap-3 shadow-xs">
+              <div class="space-y-0.5 min-w-0">
+                <span class="text-xs font-black text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5"><i class="bi bi-whatsapp text-emerald-600 text-sm"></i> Official WhatsApp Group</span>
+                <span class="text-[11px] text-slate-600 dark:text-slate-400 block truncate">Join to connect with attendees &amp; get live updates.</span>
+              </div>
+              <a href="${regData.whatsapp_group_link}" target="_blank" rel="noopener noreferrer" class="px-3.5 py-2 bg-[#25D366] hover:bg-[#1ebd5a] text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center gap-1.5 shrink-0">
+                <span>Join Group</span> <i class="bi bi-box-arrow-up-right text-[10px]"></i>
+              </a>
+            </div>
+          ` : ''}
 
           <!-- Payment Screenshot Section -->
           <div id="post-reg-proof-container" class="space-y-3">
@@ -2429,8 +2443,11 @@ ${job.description || 'No description provided.'}
       return;
     }
 
-    if (!isFree && utr.length < 4) {
-      showPublicModalNotice('Transaction UTR Required', 'Please enter a valid UPI / Bank Transaction UTR Number for payment verification.', true);
+    const screenshotBase64 = document.getElementById('pub-reg-screenshot-base64')?.value || '';
+    if (!isFree && (!screenshotBase64 || screenshotBase64.length < 50)) {
+      showPublicModalNotice('Payment Screenshot Required', 'Please upload / attach your payment screenshot or receipt (GPay, PhonePe, Paytm) before submitting.', true);
+      const fileInput = document.getElementById('pub-reg-screenshot');
+      if (fileInput) fileInput.focus();
       return;
     }
 
@@ -2486,12 +2503,13 @@ ${job.description || 'No description provided.'}
           title: title,
           fee: fee,
           transaction_id: utr,
-          payment_screenshot: data.payment_screenshot || body.payment_screenshot || ''
+          payment_screenshot: data.payment_screenshot || body.payment_screenshot || '',
+          whatsapp_group_link: data.whatsapp_group_link || ''
         });
       } else {
         const token = data.token_no || (data.registration && data.registration.token_no);
         if (token) localStorage.setItem('sst_last_token', token);
-        showPublicModalNotice('Registration Confirmed!', 'Thank you for registering! Your event pass dossier has been recorded and emailed to you. We will contact you shortly.', false, token);
+        showPublicModalNotice('Registration Confirmed!', 'Thank you for registering! Your event pass dossier has been recorded and emailed to you. Check your inbox for your official pass and WhatsApp group link.', false, token);
       }
     } catch (err) {
       if (submitBtn) {

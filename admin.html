@@ -2558,7 +2558,10 @@
             <div class="flex items-center gap-3">
               ${ev.image_url ? `<img src="${ev.image_url}" alt="Poster" class="w-12 h-12 object-contain bg-slate-900 rounded-lg border border-slate-200 shrink-0 p-0.5 shadow-2xs">` : `<div class="w-12 h-12 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 text-xs shrink-0"><i class="bi bi-image"></i></div>`}
               <div class="min-w-0">
-                <span class="block font-bold text-slate-900 truncate max-w-xs">${ev.title}</span>
+                <div class="flex items-center gap-1.5">
+                  <span class="block font-bold text-slate-900 truncate max-w-xs">${ev.title}</span>
+                  ${ev.whatsapp_group_link ? `<a href="${ev.whatsapp_group_link}" target="_blank" onclick="event.stopPropagation()" title="WhatsApp Group Configured: ${ev.whatsapp_group_link}" class="text-emerald-600 hover:text-emerald-700 inline-flex items-center"><i class="bi bi-whatsapp text-xs"></i></a>` : ''}
+                </div>
                 <span class="block text-[11px] text-slate-500 truncate max-w-xs">${ev.description}</span>
               </div>
             </div>
@@ -2688,6 +2691,16 @@
             </div>
           </div>
 
+          <!-- WHATSAPP GROUP LINK FIELD -->
+          <div class="p-3 bg-emerald-50/70 border border-emerald-200 rounded-2xl space-y-1.5">
+            <label class="block text-slate-700 font-bold text-xs flex items-center justify-between">
+              <span class="flex items-center gap-1.5"><i class="bi bi-whatsapp text-emerald-600 text-sm"></i> Official WhatsApp Group Link</span>
+              <span class="text-[10px] text-emerald-700 font-medium bg-emerald-100 px-2 py-0.5 rounded-full">Sent via Email to Attendees</span>
+            </label>
+            <input type="url" id="ev-whatsapp-link" value="${ev.whatsapp_group_link || ''}" placeholder="https://chat.whatsapp.com/..." class="w-full p-2.5 bg-white border border-emerald-300 rounded-xl text-slate-900 text-xs focus:outline-none focus:border-[#123B32]">
+            <span class="text-[10.5px] text-slate-500 block leading-tight">Attendees who register for this event will receive this WhatsApp Group link via email so they can join the community.</span>
+          </div>
+
           <div>
             <label class="block text-slate-600 font-semibold mb-1">Description</label>
             <textarea id="ev-desc" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 h-16 focus:outline-none focus:border-[#123B32]">${ev.description || ''}</textarea>
@@ -2773,6 +2786,7 @@
         registration_fee: fee,
         upi_id: upi,
         payment_qr: payment_qr,
+        whatsapp_group_link: (document.getElementById('ev-whatsapp-link')?.value || '').trim(),
         image_url: document.getElementById('ev-image-url')?.value || '',
         description: document.getElementById('ev-desc').value,
         status: document.getElementById('ev-status').value
@@ -3849,6 +3863,17 @@
               <span class="block text-slate-500 font-bold mb-1">Description:</span>
               <p class="whitespace-pre-line text-slate-700 leading-relaxed">${item.description || 'No description provided.'}</p>
             </div>
+            ${item.whatsapp_group_link ? `
+              <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-200 flex items-center justify-between gap-3">
+                <div class="space-y-0.5 min-w-0">
+                  <span class="block text-emerald-900 font-bold text-xs flex items-center gap-1.5"><i class="bi bi-whatsapp text-emerald-600"></i> WhatsApp Group Link:</span>
+                  <span class="block text-emerald-700 font-mono text-[11px] truncate select-all">${item.whatsapp_group_link}</span>
+                </div>
+                <a href="${item.whatsapp_group_link}" target="_blank" class="px-3 py-1.5 bg-[#25D366] text-white rounded-lg font-bold text-xs shrink-0 flex items-center gap-1 shadow-xs hover:bg-[#1ebd5a]">
+                  <span>Open Group</span> <i class="bi bi-box-arrow-up-right text-[10px]"></i>
+                </a>
+              </div>
+            ` : ''}
           </div>
         `;
         actionsHtml = `
