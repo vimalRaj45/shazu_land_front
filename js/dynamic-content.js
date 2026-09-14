@@ -1914,7 +1914,8 @@ ${job.description || 'No description provided.'}
     document.querySelectorAll('#public-notice-backdrop').forEach(el => el.remove());
     const tokenNo = regData.token_no || '';
     const title = regData.title || 'Event Registration';
-    const fee = regData.fee || '₹499';
+    const fee = regData.fee || 'Free';
+    const isFree = regData.is_free !== undefined ? regData.is_free : (fee.toLowerCase().includes('free') || fee === '0' || fee === '');
     const utr = regData.transaction_id || '';
     let screenshot = regData.payment_screenshot || '';
 
@@ -1928,7 +1929,7 @@ ${job.description || 'No description provided.'}
               <i class="bi bi-hourglass-split"></i>
             </div>
             <h3 class="text-base sm:text-lg font-black font-heading text-slate-900 dark:text-white">Registration Received! ⏳</h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400">Payment verification pending admin approval</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Registration verification pending admin approval</p>
           </div>
 
           <!-- Event & Token Dossier Card -->
@@ -1953,58 +1954,74 @@ ${job.description || 'No description provided.'}
             </div>
           </div>
 
-          ${regData.whatsapp_group_link ? `
-            <!-- Official WhatsApp Group Invitation Card -->
-            <div class="p-3.5 bg-emerald-50 dark:bg-emerald-950/40 border-2 border-emerald-400 dark:border-emerald-600 rounded-2xl flex items-center justify-between gap-3 shadow-xs">
-              <div class="space-y-0.5 min-w-0">
-                <span class="text-xs font-black text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5"><i class="bi bi-whatsapp text-emerald-600 text-sm"></i> Official WhatsApp Group</span>
-                <span class="text-[11px] text-slate-600 dark:text-slate-400 block truncate">Join to connect with attendees &amp; get live updates.</span>
-              </div>
-              <a href="${regData.whatsapp_group_link}" target="_blank" rel="noopener noreferrer" class="px-3.5 py-2 bg-[#25D366] hover:bg-[#1ebd5a] text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center gap-1.5 shrink-0">
-                <span>Join Group</span> <i class="bi bi-box-arrow-up-right text-[10px]"></i>
-              </a>
+          <!-- Official WhatsApp Group Notice (Only accessible after admin verification) -->
+          <div class="p-3.5 bg-emerald-50/50 dark:bg-emerald-950/20 border border-dashed border-emerald-300 dark:border-emerald-800 rounded-2xl flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-[#25D366] flex items-center justify-center text-lg shrink-0">
+              <i class="bi bi-whatsapp"></i>
             </div>
-          ` : ''}
-
-          <!-- Payment Screenshot Section -->
-          <div id="post-reg-proof-container" class="space-y-3">
-            <div id="post-reg-attached-box" class="${screenshot ? '' : 'hidden'} p-3.5 bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/80 rounded-2xl flex items-center gap-3">
-              <img id="post-reg-attached-img" src="${screenshot}" alt="Payment Screenshot" class="w-16 h-16 object-contain bg-slate-950 rounded-xl border border-emerald-300 shadow-sm p-0.5 cursor-pointer shrink-0" onclick="window.open(this.src, '_blank')" title="Click to view full image">
-              <div class="text-xs flex-1 min-w-0">
-                <span class="font-bold text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5"><i class="bi bi-check-circle-fill text-emerald-600"></i> Payment Screenshot Attached</span>
-                <span class="text-slate-500 dark:text-slate-400 text-[11px] block truncate mt-0.5">Admin will verify your receipt and email your official pass &amp; WhatsApp Group link once verified.</span>
-                <button type="button" onclick="document.getElementById('post-reg-upload-box').classList.toggle('hidden')" class="mt-1 text-[11px] text-[#123B32] dark:text-emerald-400 font-bold hover:underline cursor-pointer">Re-upload / Change Screenshot</button>
-              </div>
-            </div>
-
-            <!-- Upload Box (Shown if no screenshot or user clicks re-upload) -->
-            <div id="post-reg-upload-box" class="${screenshot ? 'hidden' : ''} p-4 bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-2xl space-y-2.5 text-xs">
-              <div class="space-y-0.5">
-                <label class="block font-bold text-xs text-amber-950 dark:text-amber-200 flex items-center gap-1.5">
-                  <i class="bi bi-cloud-arrow-up-fill text-amber-600"></i>
-                  <span>Upload Payment Screenshot / Receipt</span>
-                </label>
-                <p class="text-[11px] text-slate-600 dark:text-slate-400 leading-tight">
-                  Please attach your GPay / PhonePe / Paytm payment screen to confirm your registration pass.
-                </p>
-              </div>
-
-              <input type="file" id="post-reg-file-input" accept="image/*" onchange="window.handlePostRegFileSelect(event)" class="w-full p-2 bg-white dark:bg-[#0B0F19] border border-amber-300 dark:border-amber-700 rounded-xl text-xs cursor-pointer">
-              <input type="hidden" id="post-reg-base64" value="">
-
-              <div id="post-reg-preview-bar" class="hidden flex items-center gap-2 pt-1">
-                <img id="post-reg-thumbnail" src="" alt="Thumbnail" class="w-12 h-12 object-contain bg-slate-950 rounded-lg border border-amber-300 p-0.5 shrink-0">
-                <div class="flex-1 min-w-0">
-                  <span class="text-[11px] font-bold text-slate-800 dark:text-slate-200 block truncate">Ready to submit</span>
-                  <span class="text-[10px] text-slate-400 block">Click below to upload</span>
-                </div>
-                <button type="button" id="post-reg-btn-submit" onclick="window.submitPostRegProof('${tokenNo}')" class="px-3.5 py-2 bg-[#123B32] hover:bg-[#1A4B40] text-white font-bold rounded-xl text-xs shadow-md transition-all cursor-pointer shrink-0 flex items-center gap-1.5">
-                  <i class="bi bi-upload"></i>
-                  <span>Upload</span>
-                </button>
-              </div>
+            <div class="text-xs space-y-0.5 min-w-0">
+              <span class="font-bold text-slate-800 dark:text-slate-200 block text-[11.5px] flex items-center gap-1.5">
+                Official WhatsApp Community Group
+                <span class="px-1.5 py-0.2 bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 text-[10px] rounded font-mono font-semibold">Verification Required</span>
+              </span>
+              <span class="text-[11px] text-slate-500 dark:text-slate-400 block leading-tight">
+                Your WhatsApp Community Group link will be dispatched to your email and unlocked on the status tracking portal once your registration is officially verified by administration.
+              </span>
             </div>
           </div>
+
+          ${!isFree ? `
+            <!-- Payment Screenshot Section for Paid Events -->
+            <div id="post-reg-proof-container" class="space-y-3">
+              <div id="post-reg-attached-box" class="${screenshot ? '' : 'hidden'} p-3.5 bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/80 rounded-2xl flex items-center gap-3">
+                <img id="post-reg-attached-img" src="${screenshot}" alt="Payment Screenshot" class="w-16 h-16 object-contain bg-slate-950 rounded-xl border border-emerald-300 shadow-sm p-0.5 cursor-pointer shrink-0" onclick="window.open(this.src, '_blank')" title="Click to view full image">
+                <div class="text-xs flex-1 min-w-0">
+                  <span class="font-bold text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5"><i class="bi bi-check-circle-fill text-emerald-600"></i> Payment Screenshot Attached</span>
+                  <span class="text-slate-500 dark:text-slate-400 text-[11px] block truncate mt-0.5">Admin will verify your receipt and email your official pass &amp; WhatsApp Group link once verified.</span>
+                  <button type="button" onclick="document.getElementById('post-reg-upload-box').classList.toggle('hidden')" class="mt-1 text-[11px] text-[#123B32] dark:text-emerald-400 font-bold hover:underline cursor-pointer">Re-upload / Change Screenshot</button>
+                </div>
+              </div>
+
+              <!-- Upload Box (Shown if no screenshot or user clicks re-upload) -->
+              <div id="post-reg-upload-box" class="${screenshot ? 'hidden' : ''} p-4 bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-2xl space-y-2.5 text-xs">
+                <div class="space-y-0.5">
+                  <label class="block font-bold text-xs text-amber-950 dark:text-amber-200 flex items-center gap-1.5">
+                    <i class="bi bi-cloud-arrow-up-fill text-amber-600"></i>
+                    <span>Upload Payment Screenshot / Receipt</span>
+                  </label>
+                  <p class="text-[11px] text-slate-600 dark:text-slate-400 leading-tight">
+                    Please attach your GPay / PhonePe / Paytm payment screen to confirm your registration pass.
+                  </p>
+                </div>
+
+                <input type="file" id="post-reg-file-input" accept="image/*" onchange="window.handlePostRegFileSelect(event)" class="w-full p-2 bg-white dark:bg-[#0B0F19] border border-amber-300 dark:border-amber-700 rounded-xl text-xs cursor-pointer">
+                <input type="hidden" id="post-reg-base64" value="">
+
+                <div id="post-reg-preview-bar" class="hidden flex items-center gap-2 pt-1">
+                  <img id="post-reg-thumbnail" src="" alt="Thumbnail" class="w-12 h-12 object-contain bg-slate-950 rounded-lg border border-amber-300 p-0.5 shrink-0">
+                  <div class="flex-1 min-w-0">
+                    <span class="text-[11px] font-bold text-slate-800 dark:text-slate-200 block truncate">Ready to submit</span>
+                    <span class="text-[10px] text-slate-400 block">Click below to upload</span>
+                  </div>
+                  <button type="button" id="post-reg-btn-submit" onclick="window.submitPostRegProof('${tokenNo}')" class="px-3.5 py-2 bg-[#123B32] hover:bg-[#1A4B40] text-white font-bold rounded-xl text-xs shadow-md transition-all cursor-pointer shrink-0 flex items-center gap-1.5">
+                    <i class="bi bi-upload"></i>
+                    <span>Upload</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          ` : `
+            <!-- Free Event Confirmation Badge -->
+            <div class="p-3.5 bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/60 rounded-2xl flex items-center gap-3 text-xs">
+              <div class="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                <i class="bi bi-shield-check"></i>
+              </div>
+              <div class="flex-1 min-w-0">
+                <span class="font-bold text-emerald-800 dark:text-emerald-300 block">Free Registration Received</span>
+                <span class="text-[11px] text-slate-500 dark:text-slate-400 block truncate">Admin will verify your attendee profile and email your official pass &amp; WhatsApp Group link once approved.</span>
+              </div>
+            </div>
+          `}
 
           <!-- Bottom Action Buttons -->
           <div class="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
@@ -2495,22 +2512,17 @@ ${job.description || 'No description provided.'}
         throw err;
       }
       closePublicModal();
-      if (data.is_pending_payment || !isFree) {
-        const token = data.token_no || (data.registration && data.registration.token_no) || '';
-        if (token && token.startsWith('SST-')) localStorage.setItem('sst_last_token', token);
-        showPostRegPaymentModal({
-          token_no: token,
-          title: title,
-          fee: fee,
-          transaction_id: utr,
-          payment_screenshot: data.payment_screenshot || body.payment_screenshot || '',
-          whatsapp_group_link: data.whatsapp_group_link || ''
-        });
-      } else {
-        const token = data.token_no || (data.registration && data.registration.token_no);
-        if (token) localStorage.setItem('sst_last_token', token);
-        showPublicModalNotice('Registration Confirmed!', 'Thank you for registering! Your event pass dossier has been recorded and emailed to you. Check your inbox for your official pass and WhatsApp group link.', false, token);
-      }
+      const token = data.token_no || (data.registration && data.registration.token_no) || '';
+      if (token && token.startsWith('SST-')) localStorage.setItem('sst_last_token', token);
+      showPostRegPaymentModal({
+        token_no: token,
+        title: title,
+        fee: fee,
+        transaction_id: utr,
+        payment_screenshot: data.payment_screenshot || body.payment_screenshot || '',
+        whatsapp_group_link: null,
+        is_free: isFree
+      });
     } catch (err) {
       if (submitBtn) {
         submitBtn.disabled = false;

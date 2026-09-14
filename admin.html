@@ -2512,7 +2512,7 @@
           body: JSON.stringify({ payment_status })
         });
         if (!ok) throw new Error(data.error || 'Payment status update failed');
-        showToast(payment_status === 'Verified' ? 'Payment Verified! Official Entry Pass emailed.' : `Status updated to ${payment_status}`);
+        showToast(payment_status === 'Verified' ? 'Registration Verified! Official Pass & WhatsApp link emailed.' : `Status updated to ${payment_status}`);
         loadRegistrations();
       } catch (err) {
         showToast(err.message, 'error');
